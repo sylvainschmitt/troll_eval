@@ -1,0 +1,10 @@
+# Experiment
+
+-   phenology parameters
+-   calibration approach
+-   exploring phenology
+-   variations approach
+-   evaluation methods
+-   rcontroll v4
+-   singularity image
+-   snakemake workflow

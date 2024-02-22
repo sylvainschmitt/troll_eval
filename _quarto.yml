@@ -8,6 +8,24 @@ book:
   date: last-modified
   chapters:
     - index.qmd
+    - part: 10_data.qmd
+      chapters: 
+        - 11_inventories.qmd
+        - 12_traits.qmd
+        - 13_soil.qmd
+        - 14_climate.qmd
+        - 15_fluxes.qmd
+    - part: 20_experiment.qmd
+    - part: 30_results.qmd
+      chapters: 
+        - 31_calibration.qmd
+        - 32_exploration.qmd
+        - 33_variation.qmd
+        - 34_evaluation.qmd
+    - part: 40_discussion.qmd
+  appendices:
+    - 99_references.qmd
+    
 bibliography: references.bib
 
 format:

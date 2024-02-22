@@ -1,0 +1,10 @@
+# Fluxes
+
+-   FLUXNET 2015 BR-Sa1 & GF-Guy (ET, GPP)
+-   Paracou litterfall (origin?)
+-   Tapajos litterfall (link to LBA)
+-   PLUMBER for MODIS LAI
+-   Paracou PAD (G. Vincent & N. Barbier)
+-   Tapajos LAD (<https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>)
+-   LAI per age (<https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf>)
+-   Guyaflux SWC (D. Bonal)

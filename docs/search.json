@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "TROLL V4 Evaluation",
     "section": "",
-    "text": "Introduction\nTROLL V4 Evaluation."
+    "text": "Introduction"
   },
   {
     "objectID": "index.html#poeple",
@@ -12,5 +12,96 @@
     "title": "TROLL V4 Evaluation",
     "section": "Poeple",
     "text": "Poeple\n\nSylvain Schmitt (sylvain.schmitt@cirad.fr)\nIsabelle Maréchaux (isabelle.marechaux@inrae.fr)\nJérôme Chave (jerome.chave@univ-tlse3.fr)\nFabian J. Fischer (f.fischer@bristol.ac.uk)\nDamien Bonal (damien.bonal@inrae.fr)\nNicolas Barbier (nicolas.barbier@ird.fr)\nGregoire Vincent (gregoire.vincent@ird.fr)\nGéraldine Derroire (geraldine.derroire@cirad.fr)\nGiacomo Selan (giacomo.sellan@cirad.fr)"
+  },
+  {
+    "objectID": "10_data.html",
+    "href": "10_data.html",
+    "title": "Data",
+    "section": "",
+    "text": "Short description\nIntroduction of inputs (species, traits, climate, soil)\nIntroduction of evaluation (inventories, fluxes)"
+  },
+  {
+    "objectID": "11_inventories.html",
+    "href": "11_inventories.html",
+    "title": "1  Inventories",
+    "section": "",
+    "text": "Paracou plots (G. Derroire)\nParacou understory plots (G. Derroire & G. Sellan)\nTapajos (link to LBA)\nStructure\nComposition\nPhylogeny"
+  },
+  {
+    "objectID": "12_traits.html",
+    "href": "12_traits.html",
+    "title": "2  Traits",
+    "section": "",
+    "text": "Allometric data\nFunctional traits data\nJoint data\nImputation\nEvaluation\nDistribution"
+  },
+  {
+    "objectID": "13_soil.html",
+    "href": "13_soil.html",
+    "title": "3  Soil",
+    "section": "",
+    "text": "Paracou (origin?)\nTapajos (origin?)"
+  },
+  {
+    "objectID": "14_climate.html",
+    "href": "14_climate.html",
+    "title": "4  Climate",
+    "section": "",
+    "text": "Guyaflux (D. Bonal)\nERA5-Land\nFLUXNET 2015 BR-Sa1 & GF-Guy\nComparisons\nInput data\nDry season definition\nVariations at multiple temporal scales (year, month, 15 days, week, day, half-hourly)"
+  },
+  {
+    "objectID": "15_fluxes.html",
+    "href": "15_fluxes.html",
+    "title": "5  Fluxes",
+    "section": "",
+    "text": "FLUXNET 2015 BR-Sa1 & GF-Guy (ET, GPP)\nParacou litterfall (origin?)\nTapajos litterfall (link to LBA)\nPLUMBER for MODIS LAI\nParacou PAD (G. Vincent & N. Barbier)\nTapajos LAD (https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726)\nLAI per age (https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf)\nGuyaflux SWC (D. Bonal)"
+  },
+  {
+    "objectID": "20_experiment.html",
+    "href": "20_experiment.html",
+    "title": "Experiment",
+    "section": "",
+    "text": "phenology parameters\ncalibration approach\nexploring phenology\nvariations approach\nevaluation methods\nrcontroll v4\nsingularity image\nsnakemake workflow"
+  },
+  {
+    "objectID": "30_results.html",
+    "href": "30_results.html",
+    "title": "Results",
+    "section": "",
+    "text": "Short description, and eventually brief summary"
+  },
+  {
+    "objectID": "31_calibration.html",
+    "href": "31_calibration.html",
+    "title": "6  Calibration",
+    "section": "",
+    "text": "Parameters effect\nBest parameters"
+  },
+  {
+    "objectID": "32_exploration.html",
+    "href": "32_exploration.html",
+    "title": "7  Exploration",
+    "section": "",
+    "text": "Fluxes exploration with generic or site dependent phenology parameters"
+  },
+  {
+    "objectID": "33_variation.html",
+    "href": "33_variation.html",
+    "title": "8  Variation",
+    "section": "",
+    "text": "Fluxes variability across simulation"
+  },
+  {
+    "objectID": "34_evaluation.html",
+    "href": "34_evaluation.html",
+    "title": "9  Evaluation",
+    "section": "",
+    "text": "Fluxes\nStructure\nComposition"
+  },
+  {
+    "objectID": "40_discussion.html",
+    "href": "40_discussion.html",
+    "title": "Discussion",
+    "section": "",
+    "text": "Discuss\nConclude"
   }
 ]

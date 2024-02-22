@@ -1,0 +1,9 @@
+# Climate
+
+-   Guyaflux (D. Bonal)
+-   ERA5-Land
+-   FLUXNET 2015 BR-Sa1 & GF-Guy
+-   Comparisons
+-   Input data
+-   Dry season definition
+-   Variations at multiple temporal scales (year, month, 15 days, week, day, half-hourly)

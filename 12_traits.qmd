@@ -1,0 +1,8 @@
+# Traits
+
+-   Allometric data
+-   Functional traits data
+-   Joint data
+-   Imputation
+-   Evaluation
+-   Distribution
