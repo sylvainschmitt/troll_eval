@@ -1,0 +1,54 @@
+__default__:
+  jobname: "default"
+  mem: "10G"
+  cpus: 1
+  time: "48:00:00"
+  
+rename:
+  jobname: "rename"
+  mem: "1G"
+  cpus: 1
+  time: "01:00:00"
+  
+format:
+  jobname: "format"
+  mem: "1G"
+  cpus: 1
+  time: "01:00:00"
+
+prepare_spinup:
+  jobname: "prepare_spinup"
+  mem: "10G"
+  cpus: 1
+  time: "01:00:00"
+  
+spinup:
+  jobname: "spinup"
+  mem: "10G"
+  cpus: 1
+  time: "96:00:00"
+  
+prepare_run:
+  jobname: "prepare_run"
+  mem: "10G"
+  cpus: 1
+  time: "01:00:00"
+  
+run:
+  jobname: "run"
+  mem: "10G"
+  cpus: 1
+  time: "96:00:00"
+  
+run2:
+  jobname: "run2"
+  mem: "10G"
+  cpus: 1
+  time: "96:00:00"
+  
+run3:
+  jobname: "run3"
+  mem: "10G"
+  cpus: 1
+  time: "96:00:00"
+  
