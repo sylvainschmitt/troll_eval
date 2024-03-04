@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9005: inventories & soil data
 -   troll_eval 0.1.0.9004: book structure
 -   troll_eval 0.1.0.9003: snakemake wk and folder structure
 -   troll_eval 0.1.0.9002: singularity image

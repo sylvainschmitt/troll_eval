@@ -33,5 +33,6 @@ format:
     theme: cosmo
     code-fold: true
     number-depth: -1
+    number-sections: false
 
 editor: visual

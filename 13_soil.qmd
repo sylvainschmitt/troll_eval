@@ -1,4 +1,29 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+```
+
 # Soil
 
--   Paracou (origin?)
--   Tapajos (origin?)
+Soil data have been collected by Jérémy Lischtein (pers. com.) for Paracou and Tapajos. They include:
+
+-   Silt, clay, and sand fraction in percent for Paracou (@vanlangenhove2021: Table 1, slope SLD soils, 0-30 cm and Gourlet-Fleury et al. (2004): Table 3, deep ferralitic soils, 0-40 cm) and Tapajos (@silver2000: Table 5, gradient position 350).
+-   Soil Organic Carbon (SOC) in percent for Paracou (@vanlangenhove2021: mean of slope SLD soil values (0-30 cm depth) in Tables 2-3, dry and wet seasons averaged) and Tapajos (@quesada2010: Table S2, 0-30 cm depth).
+-   Dry Bulk Density (DBD) in for Paracou (@vanlangenhove2021: mean over 0-30 cm depth for superficial lateral drainage (SLD) slope soils) and Tapajos (@silver2000: mean for clay soils (0-10 cm depth) from Table 1, gradient positions 350 and 400).
+-   pH for Paracou (@vanlangenhove2021: mean of slope SLD soil values 0-30 cm depth in Table 1) and Tapajos (@quesada2010: Table S2, 0-30 cm).
+-   Cation Exchange Capcity (CEC) in miliequivalent per 100 grammes for Paracou (@sabatier1997: Table 2, SLD soils, 0-30 cm) and Tapajos (@quesada2010: Table S2, 0-30 cm depth).
+-   Soil depth in metre based on no drainage barrier to at least 12 m depth [@nepstad2002] for Tapajos.
+
+```{r soil}
+#| message: false
+#| warning: false
+list(
+  tapajos = read_tsv("data/soil/TROLLv4_soil_MIP_vG_TNF.txt"),
+  paracou = read_tsv("data/soil/TROLLv4_soil_MIP_vG.txt")) %>% 
+  bind_rows(.id = "site") %>% 
+  group_by(site, proportion_Silt, proportion_Clay, proportion_Sand,
+           SOC, DBD, pH, CEC) %>% 
+  summarise(depth = max(layer_thickness)) %>%
+  knitr::kable(col.names = c("", "silt", "clay", "sand", "SOC", "DBD", "pH", "CEC", "depth"))
+```

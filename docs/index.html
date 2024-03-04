@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sylvain Schmitt">
-<meta name="dcterms.date" content="2024-02-22">
+<meta name="dcterms.date" content="2024-03-04">
 
 <title>TROLL V4 Evaluation</title>
 <style>
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -62,6 +96,15 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="site_libs/leaflet-binding-2.2.0/leaflet.js"></script>
 
 
 </head>
@@ -117,32 +160,27 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./11_inventories.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Inventories</span></span></a>
+  <a href="./11_inventories.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Inventories</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./12_traits.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Traits</span></span></a>
+  <a href="./12_traits.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Traits</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./13_soil.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Soil</span></span></a>
+  <a href="./13_soil.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Soil</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./14_climate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Climate</span></span></a>
+  <a href="./14_climate.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Climate</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./15_fluxes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Fluxes</span></span></a>
+  <a href="./15_fluxes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Fluxes</span></a>
   </div>
 </li>
       </ul>
@@ -162,26 +200,22 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./31_calibration.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Calibration</span></span></a>
+  <a href="./31_calibration.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Calibration</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./32_exploration.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Exploration</span></span></a>
+  <a href="./32_exploration.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Exploration</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./33_variation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Variation</span></span></a>
+  <a href="./33_variation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Variation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./34_evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Evaluation</span></span></a>
+  <a href="./34_evaluation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Evaluation</span></a>
   </div>
 </li>
       </ul>
@@ -219,6 +253,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
   <ul class="collapse">
+  <li><a href="#study-sites" id="toc-study-sites" class="nav-link" data-scroll-target="#study-sites">Study sites</a></li>
   <li><a href="#poeple" id="toc-poeple" class="nav-link" data-scroll-target="#poeple">Poeple</a></li>
   </ul></li>
   </ul>
@@ -246,7 +281,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 22, 2024</p>
+      <p class="date">March 4, 2024</p>
     </div>
   </div>
   
@@ -258,12 +293,29 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="introduction" class="level1 unnumbered">
 <h1 class="unnumbered">Introduction</h1>
-<ul>
-<li>Short description</li>
-<li>Objective</li>
-<li>Context</li>
-<li>Study sites</li>
-</ul>
+<p>The aim of these analyses is to evaluate the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.</p>
+<section id="study-sites" class="level2">
+<h2 class="anchored" data-anchor-id="study-sites">Study sites</h2>
+<p>We have four sites with long-term eddy flux tower in Amazonia but we were only able to collect data from 2 in Brazil and 1 in French Guiana with free access. As BR-Sa3 also known as Km83 is in a logged forest on a shorter period and with lower rainfall registered in the flux tower we will focus on GF-Guy, hereafter Paracou, and BR-Sa1, hereafter Tapajos.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Paracou"</span>, <span class="st">"Tapajos"</span>),</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">latitude =</span> <span class="fu">c</span>(<span class="fl">5.27877</span>, <span class="sc">-</span><span class="fl">2.85667</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">longitude =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">52.92486</span>, <span class="sc">-</span><span class="fl">54.9588900</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leaflet</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addMarkers</span>(<span class="at">label =</span> <span class="sc">~</span>site, <span class="at">labelOptions =</span> <span class="fu">labelOptions</span>(<span class="at">noHide =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-7fc94cfad00a5cb5fc7c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-7fc94cfad00a5cb5fc7c">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[[5.27877,-2.85667],[-52.92486,-54.95889],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,["Paracou","Tapajos"],{"interactive":false,"permanent":true,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-2.85667,5.27877],"lng":[-54.95889,-52.92486]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
 <section id="poeple" class="level2">
 <h2 class="anchored" data-anchor-id="poeple">Poeple</h2>
 <ul>
@@ -272,10 +324,17 @@ ul.task-list li input[type="checkbox"] {
 <li>Jérôme Chave (jerome.chave@univ-tlse3.fr)</li>
 <li>Fabian J. Fischer (f.fischer@bristol.ac.uk)</li>
 <li>Damien Bonal (damien.bonal@inrae.fr)</li>
+<li>Benoit Burban(benoit.burban@inrae.fr)</li>
 <li>Nicolas Barbier (nicolas.barbier@ird.fr)</li>
 <li>Gregoire Vincent (gregoire.vincent@ird.fr)</li>
+<li>Philippe Verley (philippe.verley@ird.fr)</li>
+<li><em>James Ball</em> <em>(jgcb3@cam.ac.uk)?</em></li>
 <li>Géraldine Derroire (geraldine.derroire@cirad.fr)</li>
 <li>Giacomo Selan (giacomo.sellan@cirad.fr)</li>
+<li><em>Jérémy Lischtein ()?</em></li>
+<li>Daniela Nemetschek (Daniela.Krebber@ecofog.gf)</li>
+<li>Marion Boisseaux (marionboisseaux@gmail.com)</li>
+<li>Camille Ziegler (camille.ziegler9@gmail.com)</li>
 </ul>
 
 
