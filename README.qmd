@@ -3,6 +3,7 @@ title: "TROLL V4 Evaluation"
 author: Sylvain Schmitt -
 date: today
 date-format: medium
+format: gfm
 ---
 
 The aim of these analyses is to evaluate the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites. All steps (including data, methods, uses of singularity and snakemake) and results are described in the following document: <https://sylvainschmitt.github.io/troll_eval/> .
