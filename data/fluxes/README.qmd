@@ -1,0 +1,25 @@
+---
+title: "Fluxes data"
+author: Sylvain Schmitt -
+date: today
+date-format: medium
+format: 
+  gfm:
+    toc: true
+    toc-depth: 2
+---
+
+This folder contains our point to fluxes data used to evaluate the TROLL model outputs:
+
+-   FLUXNET 2015 fluxes data for Paracou and Tapajos are available with climate data
+-   Guyaflux fluxes data for Paracou, namely soil water content (m3/m3), are available with climate data
+-   Paracou litterfall were provided by Damien Bonal (D. Bonal pers. com.)
+-   Paracou plant area density were provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.)
+-   Tapajos litterfall are available online through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC): <https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html>
+-   PLUMBER data for leaf area index (LAI) from MODIS were retrieve from Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>
+-   Tapajos leaf area density (LAD) was retrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>
+-   Tapajos and Paracou leaf area index (LAI) per age was retrieved from @yang2023: <https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf>
+
+```{r, comment=""}
+fs::dir_tree()
+```

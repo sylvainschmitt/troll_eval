@@ -1,0 +1,16 @@
+---
+title: "Soil data"
+author: Sylvain Schmitt -
+date: today
+date-format: medium
+format: 
+  gfm:
+    toc: true
+    toc-depth: 2
+---
+
+This folder contains Paracou and Tapajos soil data gathered by Jérémy Lischtein (pers. com.) from the litterature (see corresponding chapter).
+
+```{r, comment=""}
+fs::dir_tree()
+```
