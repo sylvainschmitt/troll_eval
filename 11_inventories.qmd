@@ -173,7 +173,7 @@ read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>%
 
 ## Composition
 
-Forest composition was simply be assessed using rank abundances curves cut at the number of species simulated in TROLL each plots (uncertainty dotted lines in Paracou data).
+Forest composition was simply assessed using rank abundances curves cut at the number of species simulated in TROLL each plots (uncertainty dotted lines in Paracou data).
 
 ```{r comp}
 #| message: false

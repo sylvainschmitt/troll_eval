@@ -1,0 +1,444 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+library(ggfortify)
+```
+
+# Species
+
+Species allometric parameters and functional traits for Paracou and Tapajos used oth as input of TROLL evaluation and as output to assess forest functional composition. Numerous allometric parameters and functional traits didn't existed and have been inferred from dbh & height data or using relation among traits with predictive mean matching.
+
+## Allometric parameters
+
+We took advantage of the TALLO database [@jucker2022] to infer species allometric parameters of the 496 species present in Amazonia (latitude between 10 and -18 and longitude between -78 and -39).
+
+```{r tallodist}
+#| message: false
+ggplot(map_data("world"), aes(x = long, y = lat)) +
+  geom_polygon(aes(group = group), fill="lightgray", colour = "white") +
+  geom_point(data = read_csv("data/species/tallo.csv") %>% 
+               mutate(amazonia = ifelse(longitude <= -39 & 
+                                          longitude >= -79 &
+                                          latitude >= -18 &
+                                          latitude <= 10, "amazonia", "other")),
+  aes(x = longitude, y = latitude, col = amazonia)) +
+  theme_bw() +
+  geom_hline(yintercept = c(10, -18)) +
+  geom_vline(xintercept = c(-39, -79)) +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_color_manual("", values = c("darkgreen", "black")) +
+  coord_equal()
+```
+
+```{r hdbh}
+#| message: false
+read_csv("data/species/tallo.csv") %>% 
+  filter(longitude <= -39, longitude >= -79, latitude >= -18, latitude <= 10) %>% 
+  ggplot(aes(stem_diameter_cm, height_m)) +
+  geom_point(aes(col = species), alpha = 0.25) +
+  theme_bw() +
+  geom_smooth() +
+  scale_color_discrete(guide = "none") +
+  xlab("diameter (cm)") + ylab("height (m)")
+```
+
+We inferred the following allometry using `brms`:
+
+$$
+\begin{array}{c} 
+log(height) \sim N [ log(h_{max,s} \times \frac{dbh}{a_{h,s}+dbh^2}), \sigma^2] \\
+h_{max,s} \sim N (h_{max}, \sigma_h^2) \\
+a_{h,s} \sim N (a_{h}, \sigma_a^2)
+\end{array}
+$$
+
+```{r fit}
+#| eval: false
+library(brms)
+mdata <- read_csv("data/species/tallo.csv") %>% 
+  filter(longitude <= -39, longitude >= -79, latitude >= -18, latitude <= 10) %>% 
+  select(species, height_m, stem_diameter_cm) %>% 
+  rename(h = height_m, d = stem_diameter_cm) %>% 
+  mutate(d = d/100) %>% 
+  mutate(species = ifelse(is.na(species), "unknown", species))
+fit <- brm(bf(log(h) ~ log(hmax * (d/ (ah + d))), 
+              hmax ~ 1 + 1|species,
+              ah ~ 1 + 1|species,
+              nl = TRUE), 
+           prior = c(
+             prior(normal(40, 10), lb = 10, nlpar = "hmax"),
+             prior(normal(0.5, 0.5), lb = 0, nlpar = "ah")
+             ),
+           data = mdata, chains = 2, cores = 2, threads = 10)
+save(fit, file = "outputs/brms_tallo.Rdata")
+fit %>% 
+  tidybayes::spread_draws(b_hmax_Intercept, r_species__hmax[species,],
+               b_ah_Intercept, r_species__ah[species,]) %>% 
+  mutate(ah = b_ah_Intercept + r_species__ah) %>% 
+  mutate(hmax = b_hmax_Intercept + r_species__hmax) %>% 
+  group_by(species) %>% 
+  summarise(ah = median(ah), hmax = median(hmax)) %>% 
+  filter(species != "unknown") %>% 
+  mutate(species = gsub(".", " ", species, fixed = TRUE)) %>% 
+  left_join(read_csv("data/species/tallo.csv") %>% 
+  filter(longitude <= -39, longitude >= -79, latitude >= -18, latitude <= 10) %>% 
+    select(family, genus, species) %>% unique()) %>% 
+  write_tsv("outputs/tallo_pars.tsv")
+```
+
+We had good convergence and good post-predictive checks.
+
+```{r rhat}
+#| message: false
+load('outputs/brms_tallo.Rdata')
+bayesplot::mcmc_rhat(bayesplot::rhat(fit$fit))
+```
+
+```{r ppc}
+#| message: false
+load('outputs/brms_tallo.Rdata')
+bayesplot::pp_check(fit)
+```
+
+We thus inferred 496 additional $a_h$, $h_{max}$ couple of parameters.
+
+```{r tabfit}
+load('outputs/brms_tallo.Rdata')
+sjPlot::tab_model(fit)
+```
+
+```{r ahhmax}
+fit %>% 
+  tidybayes::spread_draws(b_hmax_Intercept, r_species__hmax[species,],
+               b_ah_Intercept, r_species__ah[species,]) %>% 
+  mutate(ah = b_ah_Intercept + r_species__ah) %>% 
+  mutate(hmax = b_hmax_Intercept + r_species__hmax) %>% 
+  group_by(species) %>% 
+  summarise(ah = median(ah), hmax = median(hmax)) %>%
+  filter(species != "unknown") %>% 
+  ggplot(aes(ah, hmax)) +
+  geom_point() +
+  theme_bw() +
+  xlab(expression(a[h])) + ylab(expression(h[max]))
+```
+
+## Functional traits
+
+We further combined the obtained coefficient from `TALLO` with the following datasets:
+
+-   @jucker2022
+-   @maréchaux2015
+-   @guillemot2022
+-   @vleminckx2021
+-   TROLL version 4 species data
+-   Tapajos functional traits data retrieved by Jérôme Chave (pers. com.) from the TRY database [@Kattge2019]
+
+TROLL version 4 species data were gathered from:
+
+-   TROLL version 3 species (partly from @baraloto2010, described in @maréchaux2017, and available in \@schmitt2023 and )
+-   @maréchaux2015
+-   @maréchaux2019
+-   @nemetschek2024
+-   @schmitt2023a
+-   Boisseaux *et al.* submitted
+-   Ziegler *et al.* (which?)
+
+All databases together included 20 traits across 2,921 species but with numerous missing data. Traits distribution were similar across datasets. However, for the same species, allometric parameters inferred from `TALLO` were lower than those inside TROLL V4 and leaf area from Guillemot was higher than those from TROLL and Vleminckx. As all Paracou TROLL species are in Vleminckx dataset and 109 species from Tapajos we will use only the species from Vleminckx to limit missing data in predictive mean matching (PMM) data imputation.
+
+```{r spdata}
+#| message: false
+#| warning: false
+# Maréchaux et al., (2015)
+marechaux <- readxl::read_xls("data/species/marechaux.xls", "data") %>% 
+  mutate(Pi_tlp = as.numeric(Pi_tlp)) %>% 
+  separate(Binomial, c("genus", "species"), remove = FALSE) %>% 
+  mutate(species = gsub("_", " ", Binomial)) %>% 
+  rename(family = Family, TLP = Pi_tlp) %>% 
+  dplyr::select(family, genus, species, TLP) %>% 
+  mutate(dataset = "Maréchaux 2015") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# Jucker et al., (2022) inferred
+tallo <- read_tsv("outputs/tallo_pars.tsv") %>% 
+  mutate(dataset = "Tallo inferred") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# Vleminckx et al., (2021)
+vleminckx <- readxl::read_xlsx("data/species/vleminckx.xlsx",
+                  "App.S6-ok", skip = 3) %>% 
+  mutate(species = sub("_", " ", Species)) %>% 
+  mutate(species = gsub("[[:punct:]]", "", species)) %>% 
+  rename(family = Family, genus = Genus, CC = Chlorophyll_content,
+         LT = Thickness, LA = Leaf_Area, d13C = `13C`,
+         BT = Trunk_bark_thickness) %>% 
+    mutate(N = N/100, P = P/10^6, LMA = 1/SLA*1000) %>% 
+  mutate(LMA = ifelse(LMA > 200, NA, LMA)) %>% 
+  dplyr::select(family, genus, species, CC, LT, 
+                Toughness, LA, LMA, C, N, d13C, Ca, P, K, 
+                BT, WSG, SRL, SRTA) %>% 
+   mutate(dataset = "Vleminckx 2021") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# Guillemot et al., (2022)
+guillemot <- readxl::read_xlsx("data/species/guillemot.xlsx", "Dataset") %>% 
+  mutate(max_height = as.numeric(gsub(',', '.', max_height))) %>% 
+  rename(LA = leaf_size, N = Leaf_N, P = Leaf_P, 
+         WSG = Wood_density, hmax = max_height) %>% 
+  mutate(TLP = ifelse(TLP < -3, NA, TLP)) %>% 
+  mutate(P50 = ifelse(P50 < -10, NA, P50)) %>% 
+  mutate(LA = ifelse(LA > 1000, NA, LA)) %>% 
+  mutate(LMA = ifelse(LMA > 200, NA, LMA)) %>% 
+  select(family, genus, species, TLP, P50, LMA, LA, WSG) %>% 
+  mutate(dataset = "Guillemot 2022") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# TROLL V4
+troll <- rcontroll::TROLLv4_species %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  rename(species = name, N =Nmass, P = Pmass,
+         WSG = wsg, TLP = tlp, LA = leafarea) %>% 
+   mutate(species = gsub("_", " ", species)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  left_join(select(vleminckx, family, genus, species) %>% unique()) %>% 
+  mutate(dataset = "TROLL V4") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# Tapajos
+tapajos <- vroom::vroom("data/species/tapajos_try.csv") %>% 
+  separate(species, c("genus", "Species"), remove = FALSE) %>% 
+  mutate(family = BIOMASS::getTaxonomy(genus, findOrder = FALSE)$family)  %>% 
+  filter(!is.na(Species)) %>% 
+  filter(!is.na(family)) %>% 
+  mutate(LMA = 1/SLA*1000, N = `N_try(mg/g)`/1000, WSG = wood_density,
+         P = `P_try(mg/g)`/1000, dbhmax = dbh_max/100) %>% 
+  select(family, genus, species, LMA, N, P, WSG, dbhmax) %>% 
+  mutate(dataset = "Tapajos TRY") %>% 
+  gather(trait, value, -dataset, -family, -genus, -species)
+# All
+raw <- bind_rows(marechaux, 
+                 tallo,
+                 vleminckx, 
+                 guillemot, 
+                 troll,
+                 tapajos) %>% 
+  na.omit()  
+filtered <- raw %>% 
+  filter(species %in% vleminckx$species) %>% 
+  group_by(family, genus, species, dataset, trait) %>% 
+  summarise(value = median(value)) %>% 
+  group_by(family, genus, species, trait) %>% 
+  summarise(value = median(value)) %>% 
+  pivot_wider(names_from = trait, values_from = value) %>% 
+  ungroup()
+```
+
+```{r traittab}
+#| message: false
+filtered %>% 
+  select(-family, -genus) %>% 
+  gather(trait, value, -species) %>% 
+  na.omit() %>% 
+  group_by(trait) %>% 
+  summarise(N = n()) %>% 
+  knitr::kable()
+```
+
+```{r vlem}
+#| message: false
+options(knitr.kable.NA = '')
+raw %>% 
+  group_by(species, dataset) %>% 
+  summarise(value = 1) %>% 
+  pivot_wider(names_from = dataset, values_from = value) %>% 
+  mutate(`Vleminckx 2021` = ifelse(is.na(`Vleminckx 2021`), "Vleminckx: no", "Vleminckx: yes")) %>% 
+  ungroup() %>% 
+  select(-species) %>% 
+  gather(dataset, value, -`Vleminckx 2021`) %>% 
+  na.omit() %>% 
+  group_by(`Vleminckx 2021`, dataset) %>% 
+  summarise(N = n()) %>% 
+  pivot_wider(names_from = `Vleminckx 2021`, values_from = N) %>% 
+  knitr::kable()
+```
+
+```{r traitdistraw}
+raw %>% 
+  mutate(trait = gsub("_", " ", trait)) %>% 
+  ggplot(aes(dataset, value, col = dataset)) +
+  geom_boxplot() +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(),
+        legend.position = "bottom") 
+```
+
+```{r traitdistrawcomp}
+#| message: false
+raw %>% 
+  select(species, dataset, trait, value) %>% 
+  group_by(species, dataset, trait) %>% 
+  summarise(value = median(value)) %>% 
+  group_by(species, trait) %>%
+  filter(n() > 1) %>%
+  mutate(median = median(value, na.rm = TRUE)) %>% 
+  ggplot(aes(median, value, col = dataset)) +
+  geom_point() +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r rawcorr}
+filtered %>% 
+  select(-family, -genus, -species) %>% 
+  cor(use = "pairwise.complete.obs") %>% 
+  corrplot::corrplot(type = "upper", diag = FALSE)
+```
+
+## Imputation
+
+Missing data were too important to use random forest for imputation with `missForest` even with phylogenetic eigen values. Thus, I used simple predictive mean matching (PMM) data imputation with `mice` without phylogenetic eigen values. However, phylogenetic eigen values could also been used with `phylomice` (not done here). As we focused on species in common with Vlemincks data we only had to impute ah, dbhmax, hmax and TLP with values from Maréchaux, Tapajos and inferred with `TALLO`. Obtained imputed distributions matched well the observed distribution of the raw data and imputed functional space match the one of the raw data (PCA). The PCA also revealed similar functional spaces between species from Paracou and Tapajos, whereas Tapajos functional space is a bit wider.
+
+```{r mice}
+#| eval: false
+imputation <- filtered %>% 
+  mice::mice(maxit = 100)
+complete(imputation) %>% 
+  gather(trait, value, -family, -genus, -species) %>% 
+  mutate(type = "imputed") %>% 
+  bind_rows(gather(filtered, trait, value, -family, -genus, -species) %>% 
+              mutate(type = "raw")) %>% 
+  na.omit() %>% 
+  write_tsv("outputs/imputation.tsv")
+```
+
+```{r dens}
+#| message: false
+vroom::vroom("outputs/imputation.tsv") %>% 
+  filter(trait %in% troll$trait) %>% 
+  ggplot(aes(value, col = type)) +
+  geom_density() +
+  theme_bw() +
+  facet_wrap(~ trait, scales = "free")
+```
+
+```{r pca1}
+#| message: false
+data <- vroom::vroom("outputs/imputation.tsv") %>% 
+  filter(trait %in% troll$trait) %>% 
+  pivot_wider(names_from = trait, values_from = value) %>% 
+  na.omit()
+autoplot(princomp(select(data, -family, -genus, -species, -type), cor = TRUE), 
+         data = data, alpha = 0.25, col = "type",
+         loadings.label.size = 6,
+         loadings.label.colour = 'red', loadings.label.vjust = 1.1,
+         loadings.label.repel	= TRUE,
+         loadings = T, loadings.label = T, loadings.colour = 'red') +
+  coord_equal() +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_bw()
+```
+
+```{r pca2}
+data2 <- data %>% 
+  filter(type == "imputed") %>% 
+  mutate(tapajos = (species %in% tapajos$species)) %>% 
+  mutate(paracou = (species %in% troll$species)) %>% 
+  filter(tapajos | paracou) %>% 
+  mutate(forest = ifelse(tapajos, "tapajos", "paracou")) %>% 
+  mutate(forest = ifelse(paracou & tapajos, "both", forest)) %>% 
+  select(-tapajos, -paracou, -type)
+autoplot(princomp(select(data2, -family, -genus, -species, -forest), cor = TRUE), 
+         data = data2, alpha = 0.5, col = "forest",
+         loadings.label.size = 6,
+         loadings.label.colour = 'red', loadings.label.vjust = 1.1,
+         loadings.label.repel	= TRUE,
+         loadings = T, loadings.label = T, loadings.colour = 'red') +
+  coord_equal() +
+  geom_hline(aes(yintercept = 0), col = 'black', linetype = "dotted") +
+  geom_vline(aes(xintercept = 0), col = 'black', linetype = "dotted") +
+  theme_bw() +
+  stat_ellipse(aes(col = forest))
+```
+
+```{r data2troll}
+#| eval: false
+data2 %>% 
+  filter(forest != "paracou") %>% 
+  select(-forest, -family, -genus) %>% 
+  mutate(seedmass = 1, regionalfreq = 1/n()) %>% 
+  mutate(species = gsub(" ", "_", species)) %>% 
+  rename(s_name = species, s_LMA = LMA, s_Nmass = N, s_Pmass = P, s_wsg = WSG,
+         s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
+         s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
+         s_tlp = TLP, s_leafaera = LA) %>% 
+  write_tsv("outputs/tapajos_species_troll.tsv")
+data2 %>% 
+  filter(forest != "tapajos") %>% 
+  select(-forest, -family, -genus) %>% 
+  mutate(seedmass = 1, regionalfreq = 1/n()) %>% 
+  mutate(species = gsub(" ", "_", species)) %>% 
+  rename(s_name = species, s_LMA = LMA, s_Nmass = N, s_Pmass = P, s_wsg = WSG,
+         s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
+         s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
+         s_tlp = TLP, s_leafaera = LA) %>% 
+  write_tsv("outputs/paracou_species_troll.tsv")
+```
+
+## Functional composition
+
+Forest functional composition was simply assessed using functional trait distribution in each plots (repeted lines in Paracou data) at the species level in Paracou and genus level in Tapajos.
+
+```{r dist}
+#| eval: false
+traits <- bind_rows(read_tsv("outputs/tapajos_species_troll.tsv"),
+          read_tsv("outputs/paracou_species_troll.tsv")) %>% 
+  unique() %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  rename(species = name) %>% 
+  mutate(species = gsub("_", " ", species)) %>% 
+  gather(trait, trait_value, -species)
+paracou <- read_tsv("outputs/inventories.tsv") %>% 
+  filter(site == "Paracou", type == "default") %>% 
+  mutate(plot = ifelse(site == "Tapajos", 1, plot)) %>% 
+  filter(type == "default") %>% 
+  select(site, plot, species) %>% 
+  left_join(traits) %>% 
+  na.omit()
+tapajos <- read_tsv("outputs/inventories.tsv") %>% 
+  filter(site == "Tapajos", type == "default") %>% 
+  mutate(site = "Tapajos", plot = 1) %>% 
+  separate(species, "species") %>% 
+  select(plot, site, species) %>% 
+      left_join(traits %>% 
+  separate(species, "species") %>% 
+  group_by(species, trait) %>% 
+  summarise_all(mean)) %>% 
+  na.omit()
+bind_rows(paracou, tapajos) %>% 
+  write_tsv("outputs/functional_composition.tsv")
+```
+
+```{r paracoudist}
+#| message: false
+read_tsv("outputs/functional_composition.tsv") %>% 
+  filter(site == "Paracou") %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  ggtitle("Paracou", "546,498 inds represented on 577,761 (94.59%)") +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_color_discrete("")
+```
+
+```{r tapajosdist}
+#| message: false
+read_tsv("outputs/functional_composition.tsv") %>% 
+  filter(site == "Tapajos") %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  geom_density() +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_color_discrete("")
+```

@@ -11,7 +11,7 @@ book:
     - part: 10_data.qmd
       chapters: 
         - 11_inventories.qmd
-        - 12_traits.qmd
+        - 12_species.qmd
         - 13_soil.qmd
         - 14_climate.qmd
         - 15_fluxes.qmd
