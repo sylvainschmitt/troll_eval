@@ -1,0 +1,9 @@
+# Tools
+
+The analyses developed in TROLL version 4 evaluation rely mainly on the development of a new version of rcontroll integrating this new version of TROLL, the encapsulation of this new version with other R pacakges in a singularity image, and the snakemake worklfow to automatically run the virtual experiment in a cluster with slurm. The rest of the analyses are done directly in the quarto book.
+
+## rcontroll version 4
+
+## singularity encapsulation
+
+## snakemake workflow

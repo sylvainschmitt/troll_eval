@@ -18,6 +18,10 @@ Soil data have been collected by Jérémy Lischtein (pers. com.) for Paracou and
 ```{r soil}
 #| message: false
 #| warning: false
+read_tsv("data/soil/TROLLv4_soil_MIP_vG_TNF.txt") %>% 
+  write_tsv("outputs/tapajos_soil_troll.tsv")
+read_tsv("data/soil/TROLLv4_soil_MIP_vG.txt") %>% 
+  write_tsv("outputs/paracou_soil_troll.tsv")
 list(
   tapajos = read_tsv("data/soil/TROLLv4_soil_MIP_vG_TNF.txt"),
   paracou = read_tsv("data/soil/TROLLv4_soil_MIP_vG.txt")) %>% 

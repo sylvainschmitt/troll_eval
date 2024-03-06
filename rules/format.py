@@ -1,8 +1,8 @@
 rule format:
     input:
-        "data/climate_raw.tsv",
-        "data/{site}_species_raw.tsv",
-        "data/{site}_soil_raw.tsv"
+        "output/fluxnet_climate.tsv",
+        "output/{site}_species_troll.tsv",
+        "data/{site}_soil_troll.tsv"
     output:
         "results/data/{site}_climate.tsv",
         "results/data/{site}_species.tsv",

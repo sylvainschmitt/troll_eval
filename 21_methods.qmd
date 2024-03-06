@@ -1,0 +1,9 @@
+# Methods
+
+Methods include the calibration of the new leaf phenology modules with leaf litterfall observation from Tapajos and Paracou (see fluxes), exploring the variations among repetitions of simulations with similar parameters, and the methods used for simulation outputs evaluation.
+
+## Phenology calibration
+
+## Variations approach
+
+## Evaluation methods

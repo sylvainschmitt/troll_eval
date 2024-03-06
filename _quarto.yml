@@ -16,13 +16,14 @@ book:
         - 14_climate.qmd
         - 15_fluxes.qmd
     - part: 20_experiment.qmd
+      chapters: 
+        - 21_methods.qmd
+        - 22_tools.qmd
     - part: 30_results.qmd
       chapters: 
         - 31_calibration.qmd
-        - 32_exploration.qmd
-        - 33_variation.qmd
-        - 34_evaluation.qmd
-    - part: 40_discussion.qmd
+        - 32_variation.qmd
+        - 33_evaluation.qmd
   appendices:
     - 99_references.qmd
     

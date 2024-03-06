@@ -1,5 +1,0 @@
-# Evaluation
-
--   Fluxes
--   Structure
--   Composition

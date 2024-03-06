@@ -1,0 +1,143 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+```
+
+# Variation
+
+```{r gppvar}
+#| message: false
+#| warning: false
+files <- list.files("results/run3/", pattern = "sumstats.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "sumstats.txt", 
+                    recursive = T, full.names = F) 
+period <- "month"
+files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  mutate(gpp = gpp*10^2) %>% 
+  select(site, repetition, iter, gpp) %>% 
+  mutate(date = as_date(ifelse(site == "Paracou", 
+                       "2004/01/01", 
+                       "2002/01/01"))) %>% 
+  mutate(date = date + iter) %>% 
+  group_by(site, repetition, date = floor_date(date, period)) %>% 
+  summarise(gpp = mean(gpp)) %>% 
+  group_by(site, date = floor_date(date, period)) %>% 
+  summarise(l = min(gpp), 
+            m = median(gpp), 
+            h = max(gpp)) %>% 
+  ggplot(aes(date, m)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line(col = "grey") +
+  geom_errorbar(aes(ymin = l, ymax = h)) +
+  facet_wrap(~ site, nrow = 2, scales = "free") +
+  theme_bw() +
+  xlab("") + ylab("Growth Primary Productivity (kgC/m2/yr)")
+```
+
+```{r laivar}
+#| message: false
+#| warning: false
+files <- list.files("results/run3/", pattern = "LAIdynamics.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "LAIdynamics.txt", 
+                    recursive = T, full.names = F) 
+period <- "month"
+files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  mutate(date = as_date(ifelse(site == "Paracou", 
+                       "2004/01/01", 
+                       "2002/01/01"))) %>% 
+  mutate(date = date + iter) %>% 
+  group_by(site, repetition, date = floor_date(date, period)) %>% 
+  summarise(LAI = mean(LAI)) %>% 
+  group_by(site, date = floor_date(date, period)) %>% 
+  summarise(l = min(LAI), 
+            m = median(LAI), 
+            h = max(LAI)) %>% 
+  ggplot(aes(date, m)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line(col = "grey") +
+  geom_errorbar(aes(ymin = l, ymax = h)) +
+  facet_wrap(~ site, nrow = 2, scales = "free") +
+  theme_bw() +
+    xlab("") + ylab("Leaf Area Index (LAI m2/m2)")
+```
+
+```{r etpvar}
+#| message: false
+#| warning: false
+files <- list.files("results/run3/", pattern = "water_balance.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "water_balance.txt", 
+                    recursive = T, full.names = F) 
+period <- "month"
+files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  mutate(date = as_date(ifelse(site == "Paracou", 
+                       "2004/01/01", 
+                       "2002/01/01"))) %>% 
+  mutate(date = date + iter) %>% 
+  mutate(et = (transpitation_0 + transpitation_1 + transpitation_2 + 
+                 transpitation_3 + transpitation_4 + evaporation)*1000) %>% 
+  group_by(site, repetition, date = floor_date(date, period)) %>% 
+  summarise(et = mean(et)) %>% 
+  group_by(site, date = floor_date(date, period)) %>% 
+  summarise(l = min(et), 
+            m = median(et), 
+            h = max(et)) %>% 
+  ggplot(aes(date, m)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line(col = "grey") +
+  geom_errorbar(aes(ymin = l, ymax = h)) +
+  facet_wrap(~ site, nrow = 2, scales = "free") +
+  theme_bw() +
+    xlab("") + ylab("Evapotranspiration (mm/day)")
+```
+
+```{r swcvar}
+#| message: false
+#| warning: false
+files <- list.files("results/run3/", pattern = "water_balance.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "water_balance.txt", 
+                    recursive = T, full.names = F) 
+period <- "month"
+files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  mutate(date = as_date(ifelse(site == "Paracou", 
+                       "2004/01/01", 
+                       "2002/01/01"))) %>% 
+  mutate(date = date + iter) %>% 
+  group_by(site, repetition, date = floor_date(date, period)) %>% 
+  summarise(SWC_0 = mean(SWC_0)) %>% 
+  group_by(site, date = floor_date(date, period)) %>% 
+  summarise(l = min(SWC_0), 
+            m = median(SWC_0), 
+            h = max(SWC_0)) %>% 
+  ggplot(aes(date, m)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line(col = "grey") +
+  geom_errorbar(aes(ymin = l, ymax = h)) +
+  facet_wrap(~ site, nrow = 2, scales = "free") +
+  theme_bw() +
+  xlab("") + ylab("Soil Water Content (m3/m3)")
+```

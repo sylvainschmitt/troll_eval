@@ -179,7 +179,49 @@
     "href": "20_experiment.html",
     "title": "Experiment",
     "section": "",
-    "text": "phenology parameters\ncalibration approach\nexploring phenology\nvariations approach\nevaluation methods\nrcontroll v4\nsingularity image\nsnakemake workflow"
+    "text": "Virtual experiment for TROLL evaluation relies on several methods and tools developed in this part."
+  },
+  {
+    "objectID": "21_methods.html#phenology-calibration",
+    "href": "21_methods.html#phenology-calibration",
+    "title": "Methods",
+    "section": "Phenology calibration",
+    "text": "Phenology calibration"
+  },
+  {
+    "objectID": "21_methods.html#variations-approach",
+    "href": "21_methods.html#variations-approach",
+    "title": "Methods",
+    "section": "Variations approach",
+    "text": "Variations approach"
+  },
+  {
+    "objectID": "21_methods.html#evaluation-methods",
+    "href": "21_methods.html#evaluation-methods",
+    "title": "Methods",
+    "section": "Evaluation methods",
+    "text": "Evaluation methods"
+  },
+  {
+    "objectID": "22_tools.html#rcontroll-version-4",
+    "href": "22_tools.html#rcontroll-version-4",
+    "title": "Tools",
+    "section": "rcontroll version 4",
+    "text": "rcontroll version 4"
+  },
+  {
+    "objectID": "22_tools.html#singularity-encapsulation",
+    "href": "22_tools.html#singularity-encapsulation",
+    "title": "Tools",
+    "section": "singularity encapsulation",
+    "text": "singularity encapsulation"
+  },
+  {
+    "objectID": "22_tools.html#snakemake-workflow",
+    "href": "22_tools.html#snakemake-workflow",
+    "title": "Tools",
+    "section": "snakemake workflow",
+    "text": "snakemake workflow"
   },
   {
     "objectID": "30_results.html",
@@ -189,39 +231,46 @@
     "text": "Short description, and eventually brief summary"
   },
   {
-    "objectID": "31_calibration.html",
-    "href": "31_calibration.html",
+    "objectID": "31_calibration.html#parameters-effect",
+    "href": "31_calibration.html#parameters-effect",
     "title": "Calibration",
-    "section": "",
-    "text": "Parameters effect\nBest parameters"
+    "section": "Parameters effect",
+    "text": "Parameters effect\n\n\nCode\n read_tsv(\"outputs/calib.tsv\") %&gt;% \n  filter(b0 == 0.02, delta == 0.2) %&gt;% \n  ggplot(aes(yday(date), simulated, col = a0, fill = a0)) +\n  geom_point(alpha = 0.5) +\n  geom_smooth(aes(group = as.factor(a0)), method = \"lm\", se = FALSE, \n              formula = y ~ poly(x, 20, raw = TRUE)) +\n  theme_bw() +\n  facet_wrap(~ site, scales = \"free\", nrow = 1) +\n  scale_color_viridis_c(\"Year\") +\n  xlab(\"\") + ylab(\"Simulated litterfall (MgC/ha/yr)\") +\n  scale_x_continuous(breaks = yday(as_date(paste0(\"2001-\", 1:12, \"-1\"))),\n                   labels = c(\"J\", \"F\", \"M\", \"A\", \"M\", \"J\", \"J\", \"A\", \"S\", \"O\", \"N\", \"D\")) +\n  scale_color_viridis_c(\"a0 | b0 = 0.02, delta = 0.2\") +\n  scale_fill_viridis_c(\"a0 | b0 = 0.02, delta = 0.2\") +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\nCode\nsim_metrics %&gt;% \n  filter(b0 == 0.02, delta == 0.2, type == \"simulated\") %&gt;% \n  ggplot(aes(pike_day, ratio, col = a0)) +\n  geom_point() +\n  theme_bw() +\n  facet_wrap(~ site) +\n  ylab(\"Simulated litterfall ratio\") +\n  xlab(\"Simulated litterfall pike day\") +\n  scale_color_viridis_c() +\n  scale_color_viridis_c(\"a0 | b0 = 0.02, delta = 0.2\") +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\nCode\n read_tsv(\"outputs/calib.tsv\") %&gt;% \n  filter(a0 == 0.2, delta == 0.2) %&gt;% \n  ggplot(aes(yday(date), simulated, col = b0, fill = b0)) +\n  geom_point(alpha = 0.5) +\n  geom_smooth(aes(group = as.factor(b0)), method = \"lm\", se = FALSE, \n              formula = y ~ poly(x, 20, raw = TRUE)) +\n  theme_bw() +\n  facet_wrap(~ site, scales = \"free\", nrow = 1) +\n  scale_color_viridis_c(\"Year\") +\n  xlab(\"\") + ylab(\"Simulated litterfall (MgC/ha/yr)\") +\n  scale_x_continuous(breaks = yday(as_date(paste0(\"2001-\", 1:12, \"-1\"))),\n                   labels = c(\"J\", \"F\", \"M\", \"A\", \"M\", \"J\", \"J\", \"A\", \"S\", \"O\", \"N\", \"D\")) +\n  scale_color_viridis_c(\"b0 | a0 = 0.2, delta = 0.2\") +\n  scale_fill_viridis_c(\"b0 | a0 = 0.2, delta = 0.2\") +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\nCode\nsim_metrics %&gt;% \n  filter(a0 == 0.2, delta == 0.2, type == \"simulated\") %&gt;% \n  ggplot(aes(pike_day, ratio, col = b0)) +\n  geom_point() +\n  theme_bw() +\n  facet_wrap(~ site) +\n  ylab(\"Simulated litterfall ratio\") +\n  xlab(\"Simulated litterfall pike day\") +\n  scale_color_viridis_c() +\n  scale_color_viridis_c(\"b0 | a0 = 0.2, delta = 0.2\") +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\nCode\nread_tsv(\"outputs/calib.tsv\") %&gt;% \n  filter(b0 == 0.02, a0 == 0.2) %&gt;% \n  ggplot(aes(yday(date), simulated, col = delta, fill = delta)) +\n  geom_point(alpha = 0.5) +\n  geom_smooth(aes(group = as.factor(delta)), method = \"lm\", se = FALSE, \n              formula = y ~ poly(x, 20, raw = TRUE)) +\n  theme_bw() +\n  facet_wrap(~ site, scales = \"free\", nrow = 1) +\n  scale_color_viridis_c(\"Year\") +\n  xlab(\"\") + ylab(\"Simulated litterfall (MgC/ha/yr)\") +\n  scale_x_continuous(breaks = yday(as_date(paste0(\"2001-\", 1:12, \"-1\"))),\n                   labels = c(\"J\", \"F\", \"M\", \"A\", \"M\", \"J\", \"J\", \"A\", \"S\", \"O\", \"N\", \"D\")) +\n  scale_color_viridis_c(\"delta | a0 = 0.2, b0 = 0.02\") +\n  scale_fill_viridis_c(\"delta | a0 = 0.2, b0 = 0.02\") +\n  theme(legend.position = \"bottom\")\n\n\n\n\n\n\n\nCode\nsim_metrics %&gt;% \n  filter(b0 == 0.02, a0 == 0.2, type == \"simulated\") %&gt;% \n  ggplot(aes(pike_day, ratio, col = delta)) +\n  geom_point() +\n  theme_bw() +\n  facet_wrap(~ site) +\n  ylab(\"Simulated litterfall ratio\") +\n  xlab(\"Simulated litterfall pike day\") +\n  scale_color_viridis_c() +\n  scale_color_viridis_c(\"delta | a0 = 0.2, b0 = 0.02\") +\n  theme(legend.position = \"bottom\")"
   },
   {
-    "objectID": "32_exploration.html",
-    "href": "32_exploration.html",
-    "title": "Exploration",
-    "section": "",
-    "text": "Fluxes exploration with generic or site dependent phenology parameters"
+    "objectID": "31_calibration.html#best-parameters",
+    "href": "31_calibration.html#best-parameters",
+    "title": "Calibration",
+    "section": "Best parameters",
+    "text": "Best parameters\n\n\nCode\nbest &lt;- sim_metrics %&gt;% \n  ungroup() %&gt;% \n  mutate(ratio = as.vector(scale(ratio)), \n         pike_day = as.vector(scale(pike_day))) %&gt;% \n  gather(metric, value, -site, -a0, -b0, -delta, -year, -type) %&gt;% \n  filter(metric %in% c(\"ratio\", \"pike_day\")) %&gt;% \n  mutate(metric = paste0(metric, \"_\", type)) %&gt;% \n  select(-type) %&gt;% \n  pivot_wider(names_from = metric, values_from = value) %&gt;% \n  na.omit() %&gt;% \n  mutate(error = sqrt((ratio_observed - ratio_simulated)^2\n                      +(pike_day_observed - pike_day_simulated)^2)) %&gt;% \n  group_by(site, a0, b0, delta) %&gt;% \n  summarise(RMSEP = sqrt(mean(error^2, na.rm = T))) %&gt;% # should be normed\n  group_by(site) %&gt;% \n  slice_min(RMSEP) %&gt;% \n  mutate(sim = paste0(site, \"_\", a0, \"_\", b0, \"_\", delta))\nbest %&gt;% \n  knitr::kable()\n\n\n\n\n\nsite\na0\nb0\ndelta\nRMSEP\nsim\n\n\n\n\nParacou\n0.2\n0.015\n0.1\n0.7155474\nParacou_0.2_0.015_0.1\n\n\nTapajos\n0.2\n0.015\n0.3\n0.3464949\nTapajos_0.2_0.015_0.3\n\n\n\n\n\n\n\nCode\nvroom::vroom(\"outputs/calib.tsv\") %&gt;% \n  mutate(sim = paste0(site, \"_\", a0, \"_\", b0, \"_\", delta)) %&gt;% \n  filter(sim %in% best$sim) %&gt;%\n  select(-sim, -a0, -b0, -delta, -dt) %&gt;% \n  gather(type, value, -site, -date) %&gt;%  \n  ggplot(aes(yday(date), value, col = type, fill = type)) +\n  geom_smooth(method = \"lm\", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5) +\n  geom_line(aes(group = paste0(year(date), type)), alpha = 0.5) +\n  geom_point() +\n  theme_bw() +\n  facet_wrap(~ site, scales = \"free\", nrow = 2) +\n  xlab(\"\") + ylab(\"Observed litterfall (MgC/ha/yr)\") +\n  scale_x_continuous(breaks = yday(as_date(paste0(\"2001-\", 1:12, \"-1\"))),\n                   labels = c(\"J\", \"F\", \"M\", \"A\", \"M\", \"J\", \"J\", \"A\", \"S\", \"O\", \"N\", \"D\"))\n\n\n\n\n\n\n\nCode\nvroom::vroom(\"outputs/calib.tsv\") %&gt;% \n  mutate(sim = paste0(site, \"_\", a0, \"_\", b0, \"_\", delta)) %&gt;% \n  filter(sim %in% best$sim) %&gt;%\n  select(-sim, -a0, -b0, -delta, -dt) %&gt;% \n  gather(type, value, -site, -date) %&gt;% \n  ggplot(aes(date, value, col = type)) +\n  geom_line(alpha = 0.5) +\n  facet_wrap(~ site, scales = \"free_x\") +\n  theme_bw() +\n  theme(legend.position = \"bottom\") +\n  scale_color_discrete(\"\", labels = c(\"field\", \"TROLL\")) +\n  xlab(\"\") + ylab(\"Litterfall (MgC/ha/yr)\")"
   },
   {
-    "objectID": "33_variation.html",
-    "href": "33_variation.html",
+    "objectID": "32_variation.html",
+    "href": "32_variation.html",
     "title": "Variation",
     "section": "",
-    "text": "Fluxes variability across simulation"
+    "text": "Code\nfiles &lt;- list.files(\"results/run3/\", pattern = \"sumstats.txt\", \n                    recursive = T, full.names = T) \nnames(files) &lt;- list.files(\"results/run3/\", pattern = \"sumstats.txt\", \n                    recursive = T, full.names = F) \nperiod &lt;- \"month\"\nfiles %&gt;% \n  lapply(vroom::vroom) %&gt;% \n  bind_rows(.id = \"file\") %&gt;% \n  separate(file, \"sim\", \"/\") %&gt;% \n  separate(sim, c(\"site\", \"repetition\")) %&gt;%\n  mutate(repetition = as.numeric(gsub(\"R\", \"\", repetition))) %&gt;% \n  mutate(gpp = gpp*10^2) %&gt;% \n  select(site, repetition, iter, gpp) %&gt;% \n  mutate(date = as_date(ifelse(site == \"Paracou\", \n                       \"2004/01/01\", \n                       \"2002/01/01\"))) %&gt;% \n  mutate(date = date + iter) %&gt;% \n  group_by(site, repetition, date = floor_date(date, period)) %&gt;% \n  summarise(gpp = mean(gpp)) %&gt;% \n  group_by(site, date = floor_date(date, period)) %&gt;% \n  summarise(l = min(gpp), \n            m = median(gpp), \n            h = max(gpp)) %&gt;% \n  ggplot(aes(date, m)) +\n  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +\n  geom_line(col = \"grey\") +\n  geom_errorbar(aes(ymin = l, ymax = h)) +\n  facet_wrap(~ site, nrow = 2, scales = \"free\") +\n  theme_bw() +\n  xlab(\"\") + ylab(\"Growth Primary Productivity (kgC/m2/yr)\")\n\n\n\n\n\n\n\nCode\nfiles &lt;- list.files(\"results/run3/\", pattern = \"LAIdynamics.txt\", \n                    recursive = T, full.names = T) \nnames(files) &lt;- list.files(\"results/run3/\", pattern = \"LAIdynamics.txt\", \n                    recursive = T, full.names = F) \nperiod &lt;- \"month\"\nfiles %&gt;% \n  lapply(vroom::vroom) %&gt;% \n  bind_rows(.id = \"file\") %&gt;% \n  separate(file, \"sim\", \"/\") %&gt;% \n  separate(sim, c(\"site\", \"repetition\")) %&gt;%\n  mutate(repetition = as.numeric(gsub(\"R\", \"\", repetition))) %&gt;% \n  mutate(date = as_date(ifelse(site == \"Paracou\", \n                       \"2004/01/01\", \n                       \"2002/01/01\"))) %&gt;% \n  mutate(date = date + iter) %&gt;% \n  group_by(site, repetition, date = floor_date(date, period)) %&gt;% \n  summarise(LAI = mean(LAI)) %&gt;% \n  group_by(site, date = floor_date(date, period)) %&gt;% \n  summarise(l = min(LAI), \n            m = median(LAI), \n            h = max(LAI)) %&gt;% \n  ggplot(aes(date, m)) +\n  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +\n  geom_line(col = \"grey\") +\n  geom_errorbar(aes(ymin = l, ymax = h)) +\n  facet_wrap(~ site, nrow = 2, scales = \"free\") +\n  theme_bw() +\n    xlab(\"\") + ylab(\"Leaf Area Index (LAI m2/m2)\")\n\n\n\n\n\n\n\nCode\nfiles &lt;- list.files(\"results/run3/\", pattern = \"water_balance.txt\", \n                    recursive = T, full.names = T) \nnames(files) &lt;- list.files(\"results/run3/\", pattern = \"water_balance.txt\", \n                    recursive = T, full.names = F) \nperiod &lt;- \"month\"\nfiles %&gt;% \n  lapply(vroom::vroom) %&gt;% \n  bind_rows(.id = \"file\") %&gt;% \n  separate(file, \"sim\", \"/\") %&gt;% \n  separate(sim, c(\"site\", \"repetition\")) %&gt;%\n  mutate(repetition = as.numeric(gsub(\"R\", \"\", repetition))) %&gt;% \n  mutate(date = as_date(ifelse(site == \"Paracou\", \n                       \"2004/01/01\", \n                       \"2002/01/01\"))) %&gt;% \n  mutate(date = date + iter) %&gt;% \n  mutate(et = (transpitation_0 + transpitation_1 + transpitation_2 + \n                 transpitation_3 + transpitation_4 + evaporation)*1000) %&gt;% \n  group_by(site, repetition, date = floor_date(date, period)) %&gt;% \n  summarise(et = mean(et)) %&gt;% \n  group_by(site, date = floor_date(date, period)) %&gt;% \n  summarise(l = min(et), \n            m = median(et), \n            h = max(et)) %&gt;% \n  ggplot(aes(date, m)) +\n  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +\n  geom_line(col = \"grey\") +\n  geom_errorbar(aes(ymin = l, ymax = h)) +\n  facet_wrap(~ site, nrow = 2, scales = \"free\") +\n  theme_bw() +\n    xlab(\"\") + ylab(\"Evapotranspiration (mm/day)\")\n\n\n\n\n\n\n\nCode\nfiles &lt;- list.files(\"results/run3/\", pattern = \"water_balance.txt\", \n                    recursive = T, full.names = T) \nnames(files) &lt;- list.files(\"results/run3/\", pattern = \"water_balance.txt\", \n                    recursive = T, full.names = F) \nperiod &lt;- \"month\"\nfiles %&gt;% \n  lapply(vroom::vroom) %&gt;% \n  bind_rows(.id = \"file\") %&gt;% \n  separate(file, \"sim\", \"/\") %&gt;% \n  separate(sim, c(\"site\", \"repetition\")) %&gt;%\n  mutate(repetition = as.numeric(gsub(\"R\", \"\", repetition))) %&gt;% \n  mutate(date = as_date(ifelse(site == \"Paracou\", \n                       \"2004/01/01\", \n                       \"2002/01/01\"))) %&gt;% \n  mutate(date = date + iter) %&gt;% \n  group_by(site, repetition, date = floor_date(date, period)) %&gt;% \n  summarise(SWC_0 = mean(SWC_0)) %&gt;% \n  group_by(site, date = floor_date(date, period)) %&gt;% \n  summarise(l = min(SWC_0), \n            m = median(SWC_0), \n            h = max(SWC_0)) %&gt;% \n  ggplot(aes(date, m)) +\n  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +\n  geom_line(col = \"grey\") +\n  geom_errorbar(aes(ymin = l, ymax = h)) +\n  facet_wrap(~ site, nrow = 2, scales = \"free\") +\n  theme_bw() +\n  xlab(\"\") + ylab(\"Soil Water Content (m3/m3)\")"
   },
   {
-    "objectID": "34_evaluation.html",
-    "href": "34_evaluation.html",
+    "objectID": "33_evaluation.html#fluxes",
+    "href": "33_evaluation.html#fluxes",
     "title": "Evaluation",
-    "section": "",
-    "text": "Fluxes\nStructure\nComposition"
+    "section": "Fluxes",
+    "text": "Fluxes\n\nGrowth Primary Productivity\n\n\nLeaf Area Index\n\n\nLeaf Area Index per Age\n\n\nEvapotranspiration\n\n\nRelative Soil Water Content"
   },
   {
-    "objectID": "40_discussion.html",
-    "href": "40_discussion.html",
-    "title": "Discussion",
-    "section": "",
-    "text": "Discuss\nConclude"
+    "objectID": "33_evaluation.html#structure",
+    "href": "33_evaluation.html#structure",
+    "title": "Evaluation",
+    "section": "Structure",
+    "text": "Structure\n\nForest\n\n\nUnderstory"
+  },
+  {
+    "objectID": "33_evaluation.html#composition",
+    "href": "33_evaluation.html#composition",
+    "title": "Evaluation",
+    "section": "Composition",
+    "text": "Composition\n\nSpecies\n\n\nFunctional"
   },
   {
     "objectID": "99_references.html",

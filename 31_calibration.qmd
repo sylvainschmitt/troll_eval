@@ -1,4 +1,224 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+```
+
 # Calibration
 
--   Parameters effect
--   Best parameters
+```{r calib}
+#| eval: false
+prep_sim <- function(f) {
+  t <- vroom::vroom(f)  %>% 
+    select(iter, litterfall) %>% 
+    mutate(file = f) %>% 
+    mutate(file = gsub("results/calib/", "", file)) %>% 
+    mutate(file = gsub("_0_sumstats.txt", "", file)) %>% 
+    separate(file, c("site", "a0", "b0", "delta"), "_", convert = T) %>% 
+    mutate(date = as_date(ifelse(site == "Tapajos", 
+                                 "2002/01/01", "2004/01/01")) + iter) %>% 
+    mutate(litterfall = litterfall*365) %>% 
+    select(-iter) %>% 
+    left_join(vroom::vroom("outputs/litter.tsv") %>% 
+                rename(observed = litterfall))
+  t$obs_group <- NA
+  t$obs_group[!is.na(t$dt)] <- 1:length(t$dt[!is.na(t$dt)])
+  t %>% 
+    fill(obs_group, .direction = "up") %>% 
+    mutate(dt_full = dt) %>% 
+    fill(dt_full, .direction = "up") %>% 
+    group_by(obs_group) %>% 
+    filter(n() >= dt_full) %>% 
+    mutate(simulated = ifelse(!is.na(dt), 
+                              zoo::rollmeanr(litterfall, unique(dt_full), fill = NA), 
+                              NA)) %>% 
+    ungroup() %>% 
+    select(site, a0, b0, delta, date, dt, observed, simulated) %>% 
+    na.omit()
+}
+
+files <- list.files("results/calib", full.names = T, pattern = "sumstats.txt")
+names(files) <- list.files("results/calib/sumstats", full.names = F, pattern = "sumstats.txt")
+raw <- files %>% 
+  lapply(prep_sim)  %>% 
+  bind_rows()
+write_tsv(raw, "outputs/calib.tsv")
+```
+
+```{r indices}
+#| message: false
+sim_metrics <- read_tsv("outputs/calib.tsv") %>% 
+  gather(type, litterfall, -site, -a0, -b0, -delta, -date, -dt) %>% 
+  group_by(site, a0, b0, delta, year = year(date), type) %>% 
+    summarise(pike = mean(c(litterfall[which.max(litterfall)],
+                          litterfall[which.max(litterfall)-1],
+                          litterfall[which.max(litterfall)+1]), na.rm = TRUE),
+            pike_date = date[which.max(litterfall)],
+            basal = mean(as.numeric(month(date) %in% 1:4)*litterfall, na.rm = TRUE)) %>%  
+  mutate(pike_day = yday(pike_date), ratio = pike / basal) %>% 
+  filter(basal > 0, pike_day > 100)
+```
+
+## Parameters effect
+
+```{r a0}
+#| message: false
+ read_tsv("outputs/calib.tsv") %>% 
+  filter(b0 == 0.02, delta == 0.2) %>% 
+  ggplot(aes(yday(date), simulated, col = a0, fill = a0)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(group = as.factor(a0)), method = "lm", se = FALSE, 
+              formula = y ~ poly(x, 20, raw = TRUE)) +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 1) +
+  scale_color_viridis_c("Year") +
+  xlab("") + ylab("Simulated litterfall (MgC/ha/yr)") +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  scale_color_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
+  scale_fill_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
+  theme(legend.position = "bottom")
+```
+
+```{r a0indices}
+#| message: false
+sim_metrics %>% 
+  filter(b0 == 0.02, delta == 0.2, type == "simulated") %>% 
+  ggplot(aes(pike_day, ratio, col = a0)) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site) +
+  ylab("Simulated litterfall ratio") +
+  xlab("Simulated litterfall pike day") +
+  scale_color_viridis_c() +
+  scale_color_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
+  theme(legend.position = "bottom")
+```
+
+```{r b0}
+#| message: false
+ read_tsv("outputs/calib.tsv") %>% 
+  filter(a0 == 0.2, delta == 0.2) %>% 
+  ggplot(aes(yday(date), simulated, col = b0, fill = b0)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(group = as.factor(b0)), method = "lm", se = FALSE, 
+              formula = y ~ poly(x, 20, raw = TRUE)) +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 1) +
+  scale_color_viridis_c("Year") +
+  xlab("") + ylab("Simulated litterfall (MgC/ha/yr)") +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  scale_color_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
+  scale_fill_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
+  theme(legend.position = "bottom")
+```
+
+```{r b0indices}
+#| message: false
+sim_metrics %>% 
+  filter(a0 == 0.2, delta == 0.2, type == "simulated") %>% 
+  ggplot(aes(pike_day, ratio, col = b0)) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site) +
+  ylab("Simulated litterfall ratio") +
+  xlab("Simulated litterfall pike day") +
+  scale_color_viridis_c() +
+  scale_color_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
+  theme(legend.position = "bottom")
+```
+
+```{r delta}
+#| message: false
+read_tsv("outputs/calib.tsv") %>% 
+  filter(b0 == 0.02, a0 == 0.2) %>% 
+  ggplot(aes(yday(date), simulated, col = delta, fill = delta)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(aes(group = as.factor(delta)), method = "lm", se = FALSE, 
+              formula = y ~ poly(x, 20, raw = TRUE)) +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 1) +
+  scale_color_viridis_c("Year") +
+  xlab("") + ylab("Simulated litterfall (MgC/ha/yr)") +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  scale_color_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
+  scale_fill_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
+  theme(legend.position = "bottom")
+```
+
+```{r deltaindices}
+#| message: false
+sim_metrics %>% 
+  filter(b0 == 0.02, a0 == 0.2, type == "simulated") %>% 
+  ggplot(aes(pike_day, ratio, col = delta)) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site) +
+  ylab("Simulated litterfall ratio") +
+  xlab("Simulated litterfall pike day") +
+  scale_color_viridis_c() +
+  scale_color_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
+  theme(legend.position = "bottom")
+```
+
+## Best parameters
+
+```{r best}
+#| message: false
+#| warning: false
+best <- sim_metrics %>% 
+  ungroup() %>% 
+  mutate(ratio = as.vector(scale(ratio)), 
+         pike_day = as.vector(scale(pike_day))) %>% 
+  gather(metric, value, -site, -a0, -b0, -delta, -year, -type) %>% 
+  filter(metric %in% c("ratio", "pike_day")) %>% 
+  mutate(metric = paste0(metric, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = metric, values_from = value) %>% 
+  na.omit() %>% 
+  mutate(error = sqrt((ratio_observed - ratio_simulated)^2
+                      +(pike_day_observed - pike_day_simulated)^2)) %>% 
+  group_by(site, a0, b0, delta) %>% 
+  summarise(RMSEP = sqrt(mean(error^2, na.rm = T))) %>% # should be normed
+  group_by(site) %>% 
+  slice_min(RMSEP) %>% 
+  mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta))
+best %>% 
+  knitr::kable()
+```
+
+```{r bestwithin}
+#| message: false
+vroom::vroom("outputs/calib.tsv") %>% 
+  mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
+  filter(sim %in% best$sim) %>%
+  select(-sim, -a0, -b0, -delta, -dt) %>% 
+  gather(type, value, -site, -date) %>%  
+  ggplot(aes(yday(date), value, col = type, fill = type)) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5) +
+  geom_line(aes(group = paste0(year(date), type)), alpha = 0.5) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 2) +
+  xlab("") + ylab("Observed litterfall (MgC/ha/yr)") +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r bestamng}
+#| message: false
+vroom::vroom("outputs/calib.tsv") %>% 
+  mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
+  filter(sim %in% best$sim) %>%
+  select(-sim, -a0, -b0, -delta, -dt) %>% 
+  gather(type, value, -site, -date) %>% 
+  ggplot(aes(date, value, col = type)) +
+  geom_line(alpha = 0.5) +
+  facet_wrap(~ site, scales = "free_x") +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_color_discrete("", labels = c("field", "TROLL")) +
+  xlab("") + ylab("Litterfall (MgC/ha/yr)")
+```
