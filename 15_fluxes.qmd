@@ -1,5 +1,17 @@
 # Fluxes
 
+FLUXNET 2015 [@PastorelloGilberto2020] at Paracou and Tapajos was retrieved freely from [FLUXNET](https://fluxnet.org/data/fluxnet2015-dataset/) (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation.
+
+> The FLUXNET2015 Dataset includes data collected at sites from multiple [regional flux networks](https://fluxnet.org/about/regional-networks/). The preparation of this FLUXNET Dataset has been possible thanks only to the efforts of many scientists and technicians around the world and the coordination among teams from regional networks.
+
+PI: Damien Bonal (Paracou), Mike Goulden (Tapajos), Scott Saleska (Tapajos)
+
+## Guyaflux
+
+Guyaflux are Paracou Eddy Flux tower raw data [@bonal2008] from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 [@ukkola2022] or FLUXNET [@PastorelloGilberto2020]. They are mainly used for validation / comparisons of FLUXNET 2015 and for fluxes.
+
+PI: Damien Bonal
+
 -   FLUXNET 2015 BR-Sa1 & GF-Guy (ET, GPP)
 -   Paracou litterfall (origin?)
 -   Tapajos litterfall (link to LBA)

@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9008: climate data
 -   troll_eval 0.1.0.9007: all raw data
 -   troll_eval 0.1.0.9006: species data
 -   troll_eval 0.1.0.9005: inventories & soil data

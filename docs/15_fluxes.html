@@ -20,7 +20,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -121,7 +140,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./12_traits.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Traits</span></a>
+  <a href="./12_species.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Species</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -203,7 +222,13 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#guyaflux" id="toc-guyaflux" class="nav-link active" data-scroll-target="#guyaflux">Guyaflux</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -225,6 +250,15 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>FLUXNET 2015 <span class="citation" data-cites="PastorelloGilberto2020">(<a href="99_references.html#ref-PastorelloGilberto2020" role="doc-biblioref">Pastorello, Gilberto et al. 2020</a>)</span> at Paracou and Tapajos was retrieved freely from <a href="https://fluxnet.org/data/fluxnet2015-dataset/">FLUXNET</a> (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation.</p>
+<blockquote class="blockquote">
+<p>The FLUXNET2015 Dataset includes data collected at sites from multiple <a href="https://fluxnet.org/about/regional-networks/">regional flux networks</a>. The preparation of this FLUXNET Dataset has been possible thanks only to the efforts of many scientists and technicians around the world and the coordination among teams from regional networks.</p>
+</blockquote>
+<p>PI: Damien Bonal (Paracou), Mike Goulden (Tapajos), Scott Saleska (Tapajos)</p>
+<section id="guyaflux" class="level2">
+<h2 class="anchored" data-anchor-id="guyaflux">Guyaflux</h2>
+<p>Guyaflux are Paracou Eddy Flux tower raw data <span class="citation" data-cites="bonal2008">(<a href="99_references.html#ref-bonal2008" role="doc-biblioref">BONAL et al. 2008</a>)</span> from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 <span class="citation" data-cites="ukkola2022">(<a href="99_references.html#ref-ukkola2022" role="doc-biblioref">Ukkola, Abramowitz, and De Kauwe 2022</a>)</span> or FLUXNET <span class="citation" data-cites="PastorelloGilberto2020">(<a href="99_references.html#ref-PastorelloGilberto2020" role="doc-biblioref">Pastorello, Gilberto et al. 2020</a>)</span>. They are mainly used for validation / comparisons of FLUXNET 2015 and for fluxes.</p>
+<p>PI: Damien Bonal</p>
 <ul>
 <li>FLUXNET 2015 BR-Sa1 &amp; GF-Guy (ET, GPP)</li>
 <li>Paracou litterfall (origin?)</li>
@@ -237,6 +271,18 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-bonal2008" class="csl-entry" role="listitem">
+BONAL, DAMIEN, ALEXANDRE BOSC, STÉPHANE PONTON, JEAN-YVES GORET, BENOÎT BURBAN, PATRICK GROSS, JEAN-MARC BONNEFOND, et al. 2008. <span>“Impact of Severe Dry Season on Net Ecosystem Exchange in the Neotropical Rainforest of French Guiana.”</span> <em>Global Change Biology</em> 14 (8): 1917–33. <a href="https://doi.org/10.1111/j.1365-2486.2008.01610.x">https://doi.org/10.1111/j.1365-2486.2008.01610.x</a>.
+</div>
+<div id="ref-PastorelloGilberto2020" class="csl-entry" role="listitem">
+Pastorello, Gilberto, Trotta, Carlo, Canfora, Eleonora, Chu, Housen, Christianson, Danielle, Cheah, You-Wei, Poindexter, Cristina, et al. 2020. <span>“The FLUXNET2015 Dataset and the ONEFlux Processing Pipeline for Eddy Covariance Data.”</span> <em>Nature Publishing Group</em>. <a href="https://doi.org/10.5167/UZH-190509">https://doi.org/10.5167/UZH-190509</a>.
+</div>
+<div id="ref-ukkola2022" class="csl-entry" role="listitem">
+Ukkola, Anna M., Gab Abramowitz, and Martin G. De Kauwe. 2022. <span>“A Flux Tower Dataset Tailored for Land Model Evaluation.”</span> <em>Earth System Science Data</em> 14 (2): 449–61. <a href="https://doi.org/10.5194/essd-14-449-2022">https://doi.org/10.5194/essd-14-449-2022</a>.
+</div>
+</div>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

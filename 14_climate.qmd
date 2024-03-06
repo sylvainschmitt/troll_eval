@@ -1,9 +1,334 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+```
+
 # Climate
 
--   Guyaflux (D. Bonal)
--   ERA5-Land
--   FLUXNET 2015 BR-Sa1 & GF-Guy
--   Comparisons
--   Input data
--   Dry season definition
--   Variations at multiple temporal scales (year, month, 15 days, week, day, half-hourly)
+Climate data for Paracou and Tapajos used as input of TROLL evaluation.
+
+## ERA5-Land
+
+ERA5-Land is a global reanalysis dataset [@muñoz-sabater2021]. ERA5-Land at Paracou was retrieved from the Climate Data Store (CDS) using the R package `rcontroll` [@schmitt2023]. ERA5-Land at Tapajos was retrieved from [Open-Meteo](https://open-meteo.com/) using mamba environment and python script available in the data folder. ERA5-Land was mainly used to validate FLUXNET 2015 and gap-filling.
+
+## FLUXNET 2015
+
+FLUXNET 2015 [@PastorelloGilberto2020] at Paracou and Tapajos was retrieved freely from [FLUXNET](https://fluxnet.org/data/fluxnet2015-dataset/) (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation. However, FLUXNET 2015 precipitation data at Tapajos are not reliable, we thus replaced it with precipitation from ERA5-Land.
+
+> The FLUXNET2015 Dataset includes data collected at sites from multiple [regional flux networks](https://fluxnet.org/about/regional-networks/). The preparation of this FLUXNET Dataset has been possible thanks only to the efforts of many scientists and technicians around the world and the coordination among teams from regional networks.
+
+PI: Damien Bonal (Paracou), Mike Goulden (Tapajos), Scott Saleska (Tapajos)
+
+```{r fluxnet}
+#| message: false
+#| eval: false
+fluxnet <- list(
+  "Paracou" = "data/climate/FLX_GF-Guy_FLUXNET2015_SUBSET_HH_2004-2014_2-4.csv",
+  "Tapajos" = "data/climate/FLX_BR-Sa1_FLUXNET2015_SUBSET_HR_2002-2011_1-4.csv"
+) %>% 
+  lapply(vroom::vroom, na = "-9999") %>% 
+  bind_rows(.id = "site") %>% 
+  select(site, TIMESTAMP_START, TIMESTAMP_END, P_F, SW_IN_F, 
+         TA_F, VPD_F, WS_F, GPP_NT_VUT_REF, LE_F_MDS) %>% 
+  mutate(time = as_datetime(as.character(as.POSIXlt(as.character(TIMESTAMP_START), 
+                                                    format = "%Y%m%d%H%M")))) %>% 
+  rename(rainfall = P_F, snet = SW_IN_F, temperature = TA_F, vpd = VPD_F, ws = WS_F) %>% 
+  mutate(vpd = vpd/10) %>% 
+  select(site, time, rainfall, snet, temperature, vpd, ws)
+fluxnet_tapajos <- filter(fluxnet, site == "Tapajos")
+era <- vroom::vroom("data/climate/era5_tapajos.csv") %>% 
+  filter(year(date) > 2001) %>% 
+  mutate(time = as_datetime(date), rainfall = precipitation) %>% 
+  select(time, rainfall)
+fluxnet_tapajos <- fluxnet_tapajos %>% 
+  select(-rainfall) %>% 
+  left_join(era)
+time_freq <- 0.5 # TROLL v4
+start <- as_datetime(as_date(min(fluxnet_tapajos$time))) # to start from 00:30
+stop <- max(fluxnet_tapajos$time) + 30*60 # to stop at 23:00
+time <- seq(start, stop, by = 60 * 60 * time_freq)
+data <- left_join(tibble(time = time),
+    fluxnet_tapajos,
+    by = "time"
+  ) %>%
+  group_by(date = as_date(time)) %>%
+  mutate(across(c(temperature, vpd, ws),
+                ~ zoo::na.spline(., time, na.rm = FALSE))) %>% 
+  mutate(across(c(snet),
+                ~ zoo::na.approx(., time, na.rm = FALSE))) %>% 
+  ungroup() %>% 
+  select(-date) %>% 
+  mutate(across(c(snet), ~ ifelse(is.na(.), 0, .))) %>% 
+  mutate(across(c(snet), ~ ifelse(. < 0, 0, .))) %>% 
+  mutate(site = "Tapajos")
+bind_rows(filter(fluxnet, site == "Paracou"), data) %>% 
+  write_tsv("outputs/fluxnet_climate.tsv")
+```
+
+## Comparisons
+
+ERA5-Land and FLUXNET2015 showed high correlation which comforted us in using ERA5-Land to gap-fill FLUXNET2015 precipitaiton data at Tapajos.
+
+```{r comp}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, fluxnet, -time, -site) %>% 
+  left_join(read_tsv("data/climate/era5_Paracou.tsv") %>% 
+              gather(variable, era, -time) %>% 
+              mutate(site = "Paracou")) %>% 
+  na.omit() %>% 
+  group_by(site, variable, date = floor_date(time, "month")) %>% 
+  select(-time) %>% 
+  mutate_all(~ ifelse(variable == "rainfall", sum(.), .)) %>% 
+  summarise_all(mean) %>% 
+  ggplot(aes(fluxnet, era)) +
+  geom_point(alpha = 0.5, col = "lightgrey") +
+  facet_wrap(~ variable, scales = "free") +
+  geom_abline(linetype = "dashed") +
+  ggpubr::stat_cor() +
+  theme_bw() +
+  ggtitle("Monthly variations")
+```
+
+## Input data
+
+TROLL input data for climate includes:
+
+-   daily rainfall (mm)
+
+-   half-hourly day net radiation (snet, W/m2)
+
+-   half-hourly day temperature (°C)
+
+-   half-hourly day vapor pressure deficit (vpd, Pa)
+
+-   half-hourly day wind speed (m/s)
+
+We thus need to defined day limits in time at a half-hourly precision. For that we used daily variations of snet. We thus used 7-19h for Paracou and 6-18h for Tapajos.
+
+```{r snetdailyvar}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  group_by(site, time = hms::as_hms(time)) %>% 
+    summarise(l = quantile(snet, 0.025, na.rm = TRUE), 
+            m = mean(snet, na.rm = TRUE), 
+            h = quantile(snet, 0.975, na.rm = TRUE)) %>% 
+  mutate(time = as.numeric(time)/(60*60)) %>% 
+  ggplot(aes(time, m, col = site, fill = site)) +
+  geom_vline(data = data.frame(time = c(7, 19, 6, 18), 
+                               site = c("Paracou", "Paracou",
+                                        "Tapajos", "Tapajos")), 
+             aes(xintercept = time, col = site), 
+             linetype = "dashed", linewidth = 1.5) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  ggtitle("Half-hourly variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  geom_vline(xintercept = c(7, 19), linetype = "dotted")
+```
+
+## Dry seasons
+
+For representation and discussion purposes we defined dry season as 15-days period below 50 mm in means across years (corresponding to month below 100 mm from @bonal2008 but see @fu2013 for a more precise approach). We thus defined a 4-month dry season in Paracou from 8/1 to 12/1 and an almost 5-month dry season in Tapajos from 6/15 to 11/1.
+
+```{r ds}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>%
+  group_by(site, date = floor_date(time, "15 days")) %>% 
+  summarise(rainfall = sum(rainfall, na.rm = TRUE)) %>% 
+  mutate(week = week(date), year = year(date)) %>% 
+  mutate() %>% 
+  ggplot(aes(week,  rainfall)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             rainfall = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_line(aes(group = year), col = "grey") +
+  theme_bw() +
+  facet_wrap(~ site) +
+  geom_smooth(col = "black", se = FALSE) +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  theme(axis.title = element_blank()) +
+  geom_hline(yintercept = 50, linetype = "dashed")
+```
+
+## Variations in time
+
+For data exploration purposes, we represented climate variations at multiple time steps (year, month, half-month, week, day, and half-hour), but ultimately TROLL is forced with half-hourly variations except for precipitation which is daily.
+
+```{r yearly}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = date(time)) %>% 
+  select(-time) %>% 
+   mutate(value = ifelse(variable %in% c("rainfall", "snet"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise_all(mean) %>% 
+  group_by(site, variable, year = year(date)) %>% 
+  select(-date) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+    summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(year, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = c(0.8, 0.2)) +
+  ggtitle("Yearly variations of daily means") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y")
+```
+
+```{r monthly}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = floor_date(time, "month")) %>% 
+  select(-time) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise_all(mean) %>%
+  group_by(month = month(date)) %>% 
+  mutate(week = mean(week(date))) %>%  
+  group_by(site, variable, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = c(0.8, 0.2)) +
+  ggtitle("Monthly means variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r 15days}
+#| message: false
+
+floor_biweek <- function(full) 
+  as_date(paste0(year(full), "-", month(full), "-", ifelse(day(full) > 15, 15, 1)))
+
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = floor_date(time, "15 days")) %>% 
+  select(-time) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise_all(mean) %>%
+  mutate(week = week(floor_biweek(date))) %>%  
+  group_by(site, variable, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_smooth(se = FALSE) +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = c(0.8, 0.2)) +
+  ggtitle("Weekly means variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r week}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = floor_date(time, "week")) %>% 
+  select(-time) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise_all(mean) %>%
+  group_by(site, variable, week = week(date)) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = c(0.8, 0.2)) +
+  ggtitle("Weekly means variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r day}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = floor_date(time, "day")) %>% 
+  select(-time) %>% 
+  mutate(value = ifelse(variable %in% c("rainfall"),
+                           sum(value, na.rm = T), value)) %>% 
+  summarise_all(mean) %>%
+  group_by(site, variable, day = yday(date)) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(day, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = c(0.8, 0.2)) +
+  ggtitle("Weekly means variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y") +
+    scale_x_continuous(breaks = yday(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r halfhourly}
+#| message: false
+read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  gather(variable, value, -site, -time) %>% 
+  filter(variable %in% c("snet", "temperature", "vpd", "ws")) %>% 
+  group_by(site, variable, time = hms::as_hms(time)) %>% 
+    summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(time = as.numeric(time)/(60*60)) %>% 
+  ggplot(aes(time, m, col = site, fill = site)) +
+  geom_vline(data = data.frame(time = c(7, 19, 6, 18), 
+                               site = c("Paracou", "Paracou",
+                                        "Tapajos", "Tapajos")), 
+             aes(xintercept = time, col = site), linetype = "dashed") +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ variable, scales = "free") +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  ggtitle("Half-hourly variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("")
+```
