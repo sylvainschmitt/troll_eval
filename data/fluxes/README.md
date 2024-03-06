@@ -1,6 +1,6 @@
 # Fluxes data
 Sylvain Schmitt -
-Mar 5, 2024
+Mar 6, 2024
 
 This folder contains our point to fluxes data used to evaluate the TROLL
 model outputs:
@@ -23,6 +23,10 @@ model outputs:
 - Tapajos and Paracou leaf area index (LAI) per age was retrieved from
   @yang2023:
   <https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf>
+- Tapajos and Paracou Solar Induced Fluorescence (SIF) from TROPOMI
+  satellites retrieved from
+  <https://figshare.com/ndownloader/articles/19336346/versions/2> and
+  processed in the R script get_sif.R resulting in the rtsif.tsv file
 
 ``` r
 fs::dir_tree()
@@ -81,7 +85,9 @@ fs::dir_tree()
     │   ├── YS-20220920-135633.tif
     │   ├── YS-20221110-133704.tif
     │   └── YS-20221130-131126.tif
+    ├── get_sif.R
     ├── litterfall_2003_2022.csv
     ├── nph15726-sup-0002-notess4.xlsx
     ├── paddense_central.gpkg
-    └── prop_litterfall.csv
+    ├── prop_litterfall.csv
+    └── rtsif.tsv

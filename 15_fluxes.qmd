@@ -1,22 +1,373 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+```
+
 # Fluxes
 
-FLUXNET 2015 [@PastorelloGilberto2020] at Paracou and Tapajos was retrieved freely from [FLUXNET](https://fluxnet.org/data/fluxnet2015-dataset/) (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation.
+Climate data for Paracou and Tapajos used to calibrate the new leaf phenology module in TROLL version 4 and evaluate simulation outputs.
+
+## Carbon and water fluxes - FLUXNET
+
+FLUXNET 2015 [@PastorelloGilberto2020] at Paracou and Tapajos was retrieved freely from [FLUXNET](https://fluxnet.org/data/fluxnet2015-dataset/) (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation including growth primary productivity (GPP) and evapotranspiration (ET). We also computed Photosynthetically Active Radiation (PAR) as it is a driver of GPP, and daily maximum Vapour Pressure Deficit (VPD) as it is a driver of ET. We removed GPP and ET data between 2006 and 2009 in Tapajos due to a known incident with the sensors.
 
 > The FLUXNET2015 Dataset includes data collected at sites from multiple [regional flux networks](https://fluxnet.org/about/regional-networks/). The preparation of this FLUXNET Dataset has been possible thanks only to the efforts of many scientists and technicians around the world and the coordination among teams from regional networks.
 
 PI: Damien Bonal (Paracou), Mike Goulden (Tapajos), Scott Saleska (Tapajos)
 
-## Guyaflux
+```{r fluxnet}
+#| eval: false
+#| message: false
+lambda <- function(t_air) 2.501 - (2.361*10^-3)*t_air
+fluxnet <- list(
+  "Paracou" = "data/climate/FLX_GF-Guy_FLUXNET2015_SUBSET_HH_2004-2014_2-4.csv",
+  "Tapajos" = "data/climate/FLX_BR-Sa1_FLUXNET2015_SUBSET_HR_2002-2011_1-4.csv"
+) %>% 
+  lapply(vroom::vroom, na = "-9999") %>% 
+  bind_rows(.id = "site") %>% 
+  select(site, TIMESTAMP_START, TIMESTAMP_END, P_F, SW_IN_F, 
+         TA_F, VPD_F, WS_F, GPP_NT_VUT_REF, LE_F_MDS) %>% 
+  mutate(time = as_datetime(as.character(as.POSIXlt(as.character(TIMESTAMP_START), 
+                                                    format = "%Y%m%d%H%M")))) %>% 
+  rename(rainfall = P_F, snet = SW_IN_F, temperature = TA_F, vpd = VPD_F, ws = WS_F,
+         gpp = GPP_NT_VUT_REF, le = LE_F_MDS) %>% 
+  mutate(et = 10^-6*le*60*30 / lambda(temperature)) %>% # W.m-2.half-hour to MJ.s-1 to kg.m-2.half-hour
+  mutate(et = ifelse(hour(time) %in% 7:18, et, NA)) %>% 
+  mutate(vpd = vpd/10,
+         gpp = gpp/100, par = snet*2.27*60*30/10^3) %>% 
+  select(site, time, vpd, par, gpp, et)
+fluxnet_tapajos <- filter(fluxnet, site == "Tapajos")
+time_freq <- 0.5 # TROLL v4
+start <- as_datetime(as_date(min(fluxnet_tapajos$time))) # to start from 00:30
+stop <- max(fluxnet_tapajos$time) + 30*60 # to stop at 23:00
+time <- seq(start, stop, by = 60 * 60 * time_freq)
+data <- left_join(tibble(time = time),
+    fluxnet_tapajos,
+    by = "time"
+  ) %>%
+  group_by(date = as_date(time)) %>%
+  mutate(across(c(vpd, gpp),
+                ~ zoo::na.spline(., time, na.rm = FALSE))) %>% 
+  mutate(across(c(par, et),
+                ~ zoo::na.approx(., time, na.rm = FALSE))) %>% 
+  ungroup() %>% 
+  select(-date) %>% 
+  mutate(across(c(par), ~ ifelse(is.na(.), 0, .))) %>% 
+  mutate(across(c(par), ~ ifelse(. < 0, 0, .))) %>% 
+  mutate(site = "Tapajos")
+bind_rows(filter(fluxnet, site == "Paracou"), data) %>% 
+    mutate(vpd_max = vpd) %>% 
+  select(-vpd) %>% 
+  gather(variable, value, -site, -time) %>% 
+  group_by(site, variable, date = date(time)) %>%
+  select(-time) %>% 
+  mutate(value = ifelse(value %in% c("et", "par"),
+                           sum(value, na.rm = T), value)) %>% 
+  mutate(value = ifelse(variable %in% c("vpd_max"),
+                           max(value, na.rm = T), value)) %>% 
+  summarise_all(mean, na.rm = T) %>% 
+  mutate(value = ifelse(variable %in% c("et", "gpp") & site == "Tapajos" & year(date) %in% 2006:2009,
+                           NA, value)) %>% 
+  write_tsv("outputs/fluxnet_fluxes.tsv")
+```
 
-Guyaflux are Paracou Eddy Flux tower raw data [@bonal2008] from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 [@ukkola2022] or FLUXNET [@PastorelloGilberto2020]. They are mainly used for validation / comparisons of FLUXNET 2015 and for fluxes.
+```{r fluxyear}
+#| message: false
+read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
+  ggplot(aes(date, value, col = site)) +
+  geom_line(alpha = 0.5) +
+  geom_line(data = read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
+  group_by(variable, site, date = floor_date(date, "month")) %>% 
+  summarise_all(mean)) +
+  theme_bw() +
+  facet_wrap(~ variable, scales = "free_y") +
+  theme(axis.title = element_blank())
+```
+
+```{r flux15}
+#| message: false
+floor_biweek <- function(full) 
+  as_date(paste0(year(full), "-", month(full), "-", ifelse(day(full) > 15, 15, 1)))
+read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
+  group_by(site, variable, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(floor_biweek(date))) %>%  
+  group_by(site, variable, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_smooth(se = FALSE) +
+  theme_bw() +
+  theme(axis.title = element_blank()) +
+  ggtitle("15-days means variations") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable, scales = "free_y") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+## Carbon flux - TROPOMI SIF
+
+Tapajos and Paracou Solar Induced Fluorescence (SIF) from TROPOMI satellites was retrieved from <https://figshare.com/ndownloader/articles/19336346/versions/2> and processed with the R script available in data. The SIF values were converted in Growth Primary Productivity (GPP) using $GPP = 15.343 \times SIF$ following @chen2022.
+
+```{r sif}
+#| message: false
+read_tsv("data/fluxes/rtsif.tsv") %>% 
+  mutate(value = rtsif*15.343*365/10^3) %>% 
+  ggplot(aes(date, value)) +
+  geom_line(alpha = 0.5, aes(col = site)) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  xlab("") + ylab("Growth Primary Productivity (kgC/m2/yr)")
+```
+
+```{r sifweek}
+#| message: false
+read_tsv("data/fluxes/rtsif.tsv") %>% 
+  mutate(value = rtsif*15.343*365/10^3) %>% 
+  mutate(week = week(date)) %>% 
+  group_by(site, week) %>% 
+  summarise(l = quantile(value*5, 0.025, na.rm = TRUE), 
+            m = quantile(value*5, 0.5, na.rm = TRUE), 
+            h = quantile(value*5, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m, col = site, fill = site)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_smooth(se = FALSE) +
+  geom_point() +geom_line() +
+  theme_bw() +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  xlab("") + ylab("Growth Primary Productivity (kgC/m2/yr)")
+```
+
+## Soil water content - Guyaflux
+
+Guyaflux are Paracou Eddy Flux tower raw data [@bonal2008] from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 [@ukkola2022] or FLUXNET [@PastorelloGilberto2020]. Guyaflux was mainly used for TROLL simulations validation including soil water content (SWC) at different depths.
 
 PI: Damien Bonal
 
--   FLUXNET 2015 BR-Sa1 & GF-Guy (ET, GPP)
--   Paracou litterfall (origin?)
--   Tapajos litterfall (link to LBA)
--   PLUMBER for MODIS LAI
--   Paracou PAD (G. Vincent & N. Barbier)
--   Tapajos LAD (<https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>)
--   LAI per age (<https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf>)
--   Guyaflux SWC (D. Bonal)
+```{r guyaflux}
+#| eval: false
+#| message: false
+read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
+      locale = locale(decimal_mark = ",")) %>% 
+  group_by(Year) %>% 
+  mutate(date = as_date(paste0(min(Year), "/", min(Month),
+                               "/", min(`Julian Day`))) + (`Julian Day` - 1)) %>% 
+    separate(`Hour/min`, c("hour", "minute")) %>% 
+  ungroup() %>% 
+  mutate(minute = ifelse(is.na(minute), 0, 60*as.numeric(minute)/10)) %>% 
+  mutate(time = as_datetime(paste(as.character(date), paste0(hour, ":", minute, ":00")))) %>% 
+  mutate(time = time - 30*60) %>% 
+  filter(year(time)  %in% 2004:2014) %>% 
+  mutate(swc10 = `SWC (-10 cm)`,
+         swc20 = `SWC (-20 cm)`,
+         swc80 = `SWC (-80 cm)`,
+         swc160 = `SWC (-160 cm)`,
+         swc260 = `SWC (-260 cm)`) %>%
+  mutate(site = "Paracou") %>% 
+  select(site, time, swc10, swc20, swc80, swc160, swc260) %>% 
+  group_by(site, date = date(time)) %>% 
+  summarise_all(mean, na.rm = TRUE) %>% 
+  select(-time) %>% 
+  gather(variable, value, -site, -date) %>% 
+  na.omit() %>% 
+  write_tsv("outputs/guyaflux_swc.tsv")
+```
+
+```{r swc}
+#| message: false
+read_tsv("outputs/guyaflux_swc.tsv") %>% 
+  mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
+  group_by(depth, day = yday(date)) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(day, m, col = depth, fill = depth, group = depth)) +
+   annotate("rect", xmin = 214, xmax = 306, fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  theme_bw() +
+  scale_color_viridis_c(direction = -1) +
+  scale_fill_viridis_c(direction = -1) +
+  theme(axis.title = element_blank()) +
+  ggtitle("Daily means variations of SWC in Paracou") +
+  scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+## Litterfall
+
+Paracou litterfall were provided by Damien Bonal (D. Bonal pers. com.). Tapajos litterfall are available online through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC): <https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html> . Litterfall data were mainly used the calibration of the new leaf phenology module in TROLL version 4. Leaf litterfall data were converted in fluxes over a defined time lag (depending on site and sampling date). For calibration two indices were derived for each years:
+
+-   Litterfall pike day as the day of the yearly maximum value
+
+-   Litterfall ratio as the ratio of the pike value (mean of the yearly maximum value and the previous and next values) divided by the basal flux (mean values between January and April)
+
+```{r litterfall}
+#| eval: false
+prop_paracou <- vroom::vroom("data/fluxes/prop_litterfall.csv", n_max = 4) %>% 
+  filter(date == "feuille") %>% 
+  select(-date) %>% 
+  gather(date, prop_leaf)  %>% 
+  mutate(date = as_date(date, format = "%d/%m/%Y")) %>% 
+  na.omit() %>% 
+  group_by(month = month(date)) %>% 
+  summarise(prop_leaf = quantile(prop_leaf, 0.5, na.rm = TRUE)/100)
+litter_paracou <- vroom::vroom("data/fluxes/litterfall_2003_2022.csv") %>% 
+  rename("collector" = "Numero collecteur", "subplot" = "Carre guyaflux") %>% 
+  gather(date, litter, -collector, -subplot) %>% 
+  mutate(date = as_date(date, format = "%d/%m/%Y")) %>% 
+  na.omit() %>% 
+  group_by(date) %>% 
+  summarise(litter = mean(litter)) %>% 
+  mutate(dt = as.numeric(date - lag(date))) %>% 
+  mutate(month = month(date)) %>% 
+  left_join(prop_paracou) %>% 
+  na.omit() %>% 
+  mutate(litterfall = litter*prop_leaf/dt/0.45*3.65) %>% # only leaf from x/x/x to MgC/ha/year
+  mutate(site = 'Paracou') %>% 
+  select(date, dt, litterfall, site)
+litter_tapajos <- vroom::vroom("data/fluxes/CD10_Litter_Tapajos_862/data/lba_km67_litter_archive.txt") %>% 
+  mutate(date = lubridate::as_date(as.character(YYYYMMDD), format = "%Y%m%d")) %>% 
+  mutate(site = 'Tapajos', litterfall = leaf, dt = dT) %>% 
+  select(date, dt, litterfall, site)
+bind_rows(litter_paracou, litter_tapajos) %>% 
+  write_tsv(file = "outputs/litter.tsv")
+```
+
+```{r littermetrics}
+#| message: false
+obs_metrics <- read_tsv("outputs/litter.tsv") %>% 
+  group_by(site, year = year(date)) %>% 
+  summarise(pike = mean(c(litterfall[which.max(litterfall)],
+                          litterfall[which.max(litterfall)-1],
+                          litterfall[which.max(litterfall)+1]), na.rm = TRUE),
+            pike_date = date[which.max(litterfall)],
+            basal = mean(as.numeric(month(date) %in% 1:4)*litterfall, na.rm = TRUE)) %>%  
+  mutate(pike_day = yday(pike_date), ratio = pike / basal) %>% 
+  filter(basal > 0, pike_day > 100)
+```
+
+```{r litterinterannual}
+#| message: false
+#| warning: false
+read_tsv("outputs/litter.tsv") %>% 
+  ggplot(aes(date, litterfall, col = dt)) +
+  geom_line(col = "lightgrey", alpha = 0.5) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 2) +
+  scale_color_viridis_c("Time lapse") +
+  xlab("") + ylab("Observed litterfall (MgC/ha/yr)") +
+  geom_vline(aes(xintercept = pike_date), 
+             data = obs_metrics, col = "red", linetype = "dashed") +
+  geom_point(aes(x = pike_date, y = pike), 
+             data = obs_metrics, col = "red", size = 2)
+```
+
+```{r litterintrannual}
+#| message: false
+#| warning: false
+read_tsv("outputs/litter.tsv") %>% 
+  ggplot(aes(yday(date), litterfall, col = year(date))) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 20, raw = TRUE)) +
+  geom_line(aes(group = as.factor(year(date))), col = "lightgrey", alpha = 0.5) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site, scales = "free", nrow = 2) +
+  scale_color_viridis_c("Year") +
+  xlab("") + ylab("Observed litterfall (MgC/ha/yr)") +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  geom_point(aes(x = pike_day, y = pike), 
+             data = obs_metrics, col = "red", size = 2)
+```
+
+```{r litterindices}
+#| message: false
+obs_metrics %>% 
+  ggplot(aes(pike_day, ratio, col = site, size = year)) +
+  geom_point() +
+  theme_bw() +
+  ylab("Observed litterfall ratio") +
+  xlab("Observed litterfall pike day")
+```
+
+## Canopy structure
+
+Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Area Density (LAD) and Plant Area Density (PAD) from local observation using terrestrial or drone LIDAR remotely-sensed by MODIS. LIDAR data includes drone data from Paracou provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.) and terrestrial data from Tapajos etrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>. Remotely-sensed data from MODIS were retrieved from PLUMBER2 on Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>.
+
+```{r lai}
+#| eval: false
+library(sf)
+library(terra)
+library(ncdf4)
+roi <- invisible(st_read("data/fluxes/paddense_central.gpkg"))
+path <- "data/fluxes/dense_vox1m_angle45_newTif/"
+files <- list.files(path, full.names = TRUE)
+names(files) <- list.files(path)
+pad <- lapply(files, rast) %>%
+  lapply(function(r) {
+    names(r) <- c("dtm", "chm", "density", "angle", "bsi3m", "fpl3m", "pad3m")
+    return(r)}) %>%
+  lapply(terra::extract, roi) %>%
+  bind_rows(.id = "time") %>%
+  mutate(time = gsub(".tif", "", time)) %>%
+  mutate(time = gsub("YS-", "", time)) %>%
+  mutate(time = as_datetime(time))
+pad <- pad %>%
+  group_by(date = date(time)) %>%
+  summarise(value = quantile(pad3m, 0.5, na.rm = T)*10) %>% 
+  mutate(site = "Paracou", variable = "PAD")
+dates <- readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
+                  "abs_height", col_names = FALSE, skip = 0, n_max = 1) %>% 
+  select(-`...1`) %>% 
+  gather(key, date) %>% 
+  mutate(key = as.character(1:n()))
+lad <- readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
+                  "abs_height", col_names = c("height", dates$key), skip = 1) %>% 
+  gather(key, lad, -height) %>% 
+  left_join(dates) %>% 
+  mutate(date = as_date(date))
+lad <- lad %>%
+  group_by(date) %>% 
+  summarise(value = sum(lad)) %>% 
+  mutate(site = "Tapajos", variable = "LAD")
+r1 <- nc_open("~/Documents/data/PLUMBER2/GF-Guy_2004-2014_FLUXNET2015_Met.nc")
+r2 <- nc_open("~/Documents/data/PLUMBER2/BR-Sa3_2001-2003_FLUXNET2015_Met.nc")
+lai <- list(Paracou = data.frame(lai = ncvar_get(r1, "LAI"),
+             time  = as_datetime(ncatt_get(r1, "time")$units) +
+             ncvar_get(r1, "time")),
+     Tapajos = data.frame(lai = ncvar_get(r2, "LAI_alternative"),
+             time  = as_datetime(ncatt_get(r2, "time")$units) +
+             ncvar_get(r2, "time"))) %>% 
+  bind_rows(.id = "site") %>% 
+  group_by(site, date = date(time), variable = "LAI") %>% 
+  summarise(value = mean(lai))
+bind_rows(pad, lad, lai) %>% 
+  write_tsv(file = "outputs/lai.tsv")
+```
+
+```{r laivar}
+#| message: false
+read_tsv("outputs/lai.tsv") %>% 
+  mutate(week = week(date)) %>%  
+  ggplot(aes(week, value, col = site, fill = site)) +
+  geom_line(aes(group = year(date))) +
+  geom_smooth(se = FALSE) +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ variable) +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
