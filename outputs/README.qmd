@@ -14,6 +14,8 @@ This folder will contains the outputs of analyses from the quarto document. In p
 -   brms_talo.Rdata: the bayesian model for allometric parameters inference in the species chapter
 -   calib.tsv: the summary of TROLL simulations for the calibation of the leaf phenology model in the calibration chapter
 -   composition.tsv: forest composition of Paracou and Tapajos from the inventories chapter
+-   evaluation_fluxes.tsv: the summary of TROLL simulations for the evaluation of fluxes
+-   evaluation_forest.tsv: the summary of TROLL simulations for the evaluation of forest structure and composition
 -   fluxnet_climate.tsv: FLUXNET 2015 climate data prepared from the climate chapter
 -   fluxnet_fluxes.tsv: FLUXNET 2015 fluxes data prepared from the fluxes chapter
 -   functional_composition.tsv: functional composition of Paracou and Tapajos from the inventories chapter

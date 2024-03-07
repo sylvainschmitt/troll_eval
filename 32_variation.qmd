@@ -20,7 +20,7 @@ files %>%
   separate(file, "sim", "/") %>% 
   separate(sim, c("site", "repetition")) %>%
   mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
-  mutate(gpp = gpp*10^2) %>% 
+  mutate(gpp = gpp*10^2*365/10^3) %>% 
   select(site, repetition, iter, gpp) %>% 
   mutate(date = as_date(ifelse(site == "Paracou", 
                        "2004/01/01", 

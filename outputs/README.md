@@ -1,6 +1,6 @@
 # Outputs of analyses
 Sylvain Schmitt -
-Mar 6, 2024
+Mar 7, 2024
 
 This folder will contains the outputs of analyses from the quarto
 document. In particular :
@@ -11,6 +11,10 @@ document. In particular :
   leaf phenology model in the calibration chapter
 - composition.tsv: forest composition of Paracou and Tapajos from the
   inventories chapter
+- evaluation_fluxes.tsv: the summary of TROLL simulations for the
+  evaluation of fluxes
+- evaluation_forest.tsv: the summary of TROLL simulations for the
+  evaluation of forest structure and composition
 - fluxnet_climate.tsv: FLUXNET 2015 climate data prepared from the
   climate chapter
 - fluxnet_fluxes.tsv: FLUXNET 2015 fluxes data prepared from the fluxes
@@ -45,6 +49,8 @@ fs::dir_tree()
     ├── brms_tallo.Rdata
     ├── calib.tsv
     ├── composition.tsv
+    ├── evaluation_fluxes.tsv
+    ├── evaluation_forest.tsv
     ├── fluxnet_climate.tsv
     ├── fluxnet_fluxes.tsv
     ├── functional_composition.tsv
