@@ -6,7 +6,7 @@ library(tidyverse)
 
 # Climate
 
-Climate data for Paracou and Tapajos used as input of TROLL evaluation.
+Climatic data for Paracou and Tapajos used for the TROLL evaluation.
 
 ## ERA5-Land
 

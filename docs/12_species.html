@@ -297,7 +297,7 @@ div.csl-indent {
 
 </header>
 
-<p>Species allometric parameters and functional traits for Paracou and Tapajos used oth as input of TROLL evaluation and as output to assess forest functional composition. Numerous allometric parameters and functional traits didn’t existed and have been inferred from dbh &amp; height data or using relation among traits with predictive mean matching.</p>
+<p>Allometric parameters and species functional traits for Paracou and Tapajos were used both as input to the TROLL assessment and as output to assess the functional composition of the forest. Many allometric parameters and functional traits did not exist and were inferred from dbh and height data or by using the relationship between traits with a predictive mean match.</p>
 <section id="allometric-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="allometric-parameters">Allometric parameters</h2>
 <p>We took advantage of the TALLO database <span class="citation" data-cites="jucker2022">(<a href="99_references.html#ref-jucker2022" role="doc-biblioref">Jucker et al. 2022</a>)</span> to infer species allometric parameters of the 496 species present in Amazonia (latitude between 10 and -18 and longitude between -78 and -39).</p>
@@ -783,7 +783,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 </section>
 <section id="imputation" class="level2">
 <h2 class="anchored" data-anchor-id="imputation">Imputation</h2>
-<p>Missing data were too important to use random forest for imputation with <code>missForest</code> even with phylogenetic eigen values. Thus, I used simple predictive mean matching (PMM) data imputation with <code>mice</code> without phylogenetic eigen values. However, phylogenetic eigen values could also been used with <code>phylomice</code> (not done here). As we focused on species in common with Vlemincks data we only had to impute ah, dbhmax, hmax and TLP with values from Maréchaux, Tapajos and inferred with <code>TALLO</code>. Obtained imputed distributions matched well the observed distribution of the raw data and imputed functional space match the one of the raw data (PCA). The PCA also revealed similar functional spaces between species from Paracou and Tapajos, whereas Tapajos functional space is a bit wider.</p>
+<p>Missing data were too important to use random forest for imputation with <code>missForest</code> even with phylogenetic eigen values. Thus, we used simple predictive mean matching (PMM) data imputation with <code>mice</code> without phylogenetic eigen values. However, phylogenetic eigen values could also been used with <code>phylomice</code> (not done here). As we focused on species in common with Vlemincks data we only had to impute ah, dbhmax, hmax and TLP with values from Maréchaux, Tapajos and inferred with <code>TALLO</code>. Obtained imputed distributions matched well the observed distribution of the raw data and imputed functional space match the one of the raw data (PCA). The PCA also revealed similar functional spaces between species from Paracou and Tapajos, whereas Tapajos functional space is a bit wider.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>

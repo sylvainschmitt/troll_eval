@@ -96,6 +96,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -274,6 +276,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<p>Calibration of the new leaf phenology modules against observed litterfall in Paracou and Tapajos. Parameters include:</p>
+<ul>
+<li>a: the leaf resistance parameter</li>
+<li>b: the tree height susceptibility parameter</li>
+<li>delta: the base variation in residence time multiplying factor for drought shedding</li>
+</ul>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -331,6 +339,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="parameters-effect" class="level2">
 <h2 class="anchored" data-anchor-id="parameters-effect">Parameters effect</h2>
+<p>The leaf resistance parameter which is limiting the potential at turgor loss point (TLP, see methods) is manly limiting the height of litterfall pike in dry season with a pike up to 30 MgC/ha/yr with a at 0.01 against no pike with high values above 0.3. An higher leaf resistance above 0.1 also results in a latter pike. Globally, the less resistant are the leaves of the trees the higher is the litterfall in dry conditions.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -373,6 +382,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="31_calibration_files/figure-html/a0indices-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>The the tree height susceptibility parameter drives mainly the pike date but also the pike intensity for values above 0.1. Indeed low values close to 0.01 show a pike starting in September, whereas high values have a pike starting in December.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -415,6 +425,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="31_calibration_files/figure-html/b0indices-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>The base variation in residence time multiplying factor for drought shedding seems to have a lighter influence on litterfall pike intensity and date, at least for default values of the two other parameters.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -460,6 +471,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="best-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="best-parameters">Best parameters</h2>
+<p>We found similar <span class="math inline">\(a=0.2\)</span> and <span class="math inline">\(b=0.015\)</span> to be the best in Paracou and Tapajos, but slightly different <span class="math inline">\(delta\)</span> with <span class="math inline">\(delta=0.1\)</span> in Paracou and <span class="math inline">\(delta=0.3\)</span> in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season pike (~September Paracou, ~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>

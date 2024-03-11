@@ -4,6 +4,35 @@ Methods include the calibration of the new leaf phenology modules with leaf litt
 
 ## Phenology calibration
 
+The new leaf phenology modules lay on a shedding threshold potential:
+
+$$
+\Psi_{T,o}=min(a \times \Psi_{TLP}, -0.01\times h-b)
+$$
+
+with $\Psi_{T,o}$ the leaf shedding potential in MPa, $\Psi_{TLP}$ the leaf water potential at turgor loss point in MPa, and $h$ the tree height in metre. This equations thus introduces to new parameters which are $a$ the leaf resistance parameter and $b$ the tree height susceptibility parameter. Once the leaf shedding potential is reached tree losses their leaf quicker following $delta$ the base variation in residence time multiplying factor for drought shedding. While this scheme is process-based uncertainty relied on the values of $a$ , $b$ and $delta$ that we calibrated. We all the combinations of the following values:
+
+-   a0: \[0.01, 0.025, 0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5\]
+-   b0: \[0.05, 0.01, 0.015, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20\]
+-   delta: \[0.1, 0.2, 0.3, 0.4, 0.5\]
+
+We first ran a spin-up simulation from bareground during 600 years to establish a mature forest with $a=0.2$, $b=0.02$ and $delta=0.2$. We then ran 10 years of simulation with each combinations of parameters that we burnt, to allow the forest and leaf dynamics to adjust to new parameters, and we kept a second run of 10 years for calibration. For each simulation and couples of parameters, we built simulated observation of litterfall based on the sampling date of the observed litterfall in Paracou and Tapajos (with corresponding varying time lapse). We further computed for each simulation the same two metrics built with observed litterfall:
+
+-   Day of the litterfall pike as the day of the maximum annual value
+-   The litterfall rate is the ratio between the pike value (average of the annual maximum value and the previous and following values) divided by the base flow (average values between January and April)
+
+We computed for each simulation the Root Mean Square Error of Prediction (RMSEP) of the euclidean distance between observed and simulated pikes and rates:
+
+$$
+RMSEP = \sqrt{| (ratio_o-ratio_s)^2+(pike_o-pike_s)^2 |}
+$$
+
+We finally selected the set of parameters for each site with the lowest RMSEP to be used in TROLL evaluation.
+
 ## Variations approach
 
+To assess TROLL simulations variations due to stochasticity we ran ten repeats of 10-years simulations at Paracou and Tapajos with best parameters for a single spin-up of 600-years from bareground for each site. As we were mainly interested in daily fluxes that adjust to change in model parameters over a few years, we used only variations between 10 years to save ressources and computation time. But for a better evaluation of TROLL stochasticity for forest structure and composition we should used repeats of 600 years spin-up simulations from bareground.
+
 ## Evaluation methods
+
+We run an extra 10-years simulations (run3) with best parameters after calibration for TROLL evaluation. We evaluated fluxes of carbon (growth primary productivity GPP), water (evapotranspiration ET and relative soil water content RSWC) and leaf (Leaf Area Index LAI), forest structure (basal area BA & abundance) and forest composition of species (rank abundance curves) and functional traits (quantiles). For fluxes, we investigated daily variations, 15-days variations, daily variations against known drivers, daily observed versus predicted, and computed several evaluation metrics (R squared of the linear regressions of null intercept R2, Pearson correlation coefficient CC, root mean square error of prediction RMSEP, standard deviation of the error of prediction SD and their relative counterparts RRMSEP and RSD). We evaluated fluxes when available against eddy-flux measures from towers, ground observations (litter traps and terrestrial lidar) or satellite observations.

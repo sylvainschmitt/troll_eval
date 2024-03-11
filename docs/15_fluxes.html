@@ -298,7 +298,7 @@ div.csl-indent {
 
 </header>
 
-<p>Climate data for Paracou and Tapajos used to calibrate the new leaf phenology module in TROLL version 4 and evaluate simulation outputs.</p>
+<p>Climatic data for Paracou and Tapajos used to calibrate the new leaf phenology module in TROLL version 4 and evaluate simulation results.</p>
 <section id="carbon-and-water-fluxes---fluxnet" class="level2">
 <h2 class="anchored" data-anchor-id="carbon-and-water-fluxes---fluxnet">Carbon and water fluxes - FLUXNET</h2>
 <p>FLUXNET 2015 <span class="citation" data-cites="PastorelloGilberto2020">(<a href="99_references.html#ref-PastorelloGilberto2020" role="doc-biblioref">Pastorello, Gilberto et al. 2020</a>)</span> at Paracou and Tapajos was retrieved freely from <a href="https://fluxnet.org/data/fluxnet2015-dataset/">FLUXNET</a> (the manifest is available in data). They are mainly used for TROLL model forcing but also include fluxes for TROLL simulations validation including growth primary productivity (GPP) and evapotranspiration (ET). We also computed Photosynthetically Active Radiation (PAR) as it is a driver of GPP, and daily maximum Vapour Pressure Deficit (VPD) as it is a driver of ET. We removed GPP and ET data between 2006 and 2009 in Tapajos due to a known incident with the sensors.</p>
@@ -515,10 +515,10 @@ div.csl-indent {
 </section>
 <section id="litterfall" class="level2">
 <h2 class="anchored" data-anchor-id="litterfall">Litterfall</h2>
-<p>Paracou litterfall were provided by Damien Bonal (D. Bonal pers. com.). Tapajos litterfall are available online through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC): <a href="https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html" class="uri">https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html</a> . Litterfall data were mainly used the calibration of the new leaf phenology module in TROLL version 4. Leaf litterfall data were converted in fluxes over a defined time lag (depending on site and sampling date). For calibration two indices were derived for each years:</p>
+<p>Paracou litterfall were provided by Damien Bonal (D. Bonal pers. com.). Tapajos litterfall are available online through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC): <a href="https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html" class="uri">https://daac.ornl.gov/LBA/guides/CD10_Litter_Tapajos.html</a> . Litterfall data were mainly used for the calibration of the new leaf phenology module in TROLL version 4. Leaf litterfall data were converted in fluxes over a defined time lag (depending on site and sampling date). For calibration two indices were derived for each years:</p>
 <ul>
-<li><p>Litterfall pike day as the day of the yearly maximum value</p></li>
-<li><p>Litterfall ratio as the ratio of the pike value (mean of the yearly maximum value and the previous and next values) divided by the basal flux (mean values between January and April)</p></li>
+<li><p>Day of the litterfall pike as the day of the maximum annual value</p></li>
+<li><p>The litterfall rate is the ratio between the pike value (average of the annual maximum value and the previous and following values) divided by the base flow (average values between January and April)</p></li>
 </ul>
 <div class="cell">
 <details>

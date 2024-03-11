@@ -7,7 +7,7 @@ library(ggfortify)
 
 # Species
 
-Species allometric parameters and functional traits for Paracou and Tapajos used oth as input of TROLL evaluation and as output to assess forest functional composition. Numerous allometric parameters and functional traits didn't existed and have been inferred from dbh & height data or using relation among traits with predictive mean matching.
+Allometric parameters and species functional traits for Paracou and Tapajos were used both as input to the TROLL assessment and as output to assess the functional composition of the forest. Many allometric parameters and functional traits did not exist and were inferred from dbh and height data or by using the relationship between traits with a predictive mean match.
 
 ## Allometric parameters
 
@@ -293,7 +293,7 @@ filtered %>%
 
 ## Imputation
 
-Missing data were too important to use random forest for imputation with `missForest` even with phylogenetic eigen values. Thus, I used simple predictive mean matching (PMM) data imputation with `mice` without phylogenetic eigen values. However, phylogenetic eigen values could also been used with `phylomice` (not done here). As we focused on species in common with Vlemincks data we only had to impute ah, dbhmax, hmax and TLP with values from Maréchaux, Tapajos and inferred with `TALLO`. Obtained imputed distributions matched well the observed distribution of the raw data and imputed functional space match the one of the raw data (PCA). The PCA also revealed similar functional spaces between species from Paracou and Tapajos, whereas Tapajos functional space is a bit wider.
+Missing data were too important to use random forest for imputation with `missForest` even with phylogenetic eigen values. Thus, we used simple predictive mean matching (PMM) data imputation with `mice` without phylogenetic eigen values. However, phylogenetic eigen values could also been used with `phylomice` (not done here). As we focused on species in common with Vlemincks data we only had to impute ah, dbhmax, hmax and TLP with values from Maréchaux, Tapajos and inferred with `TALLO`. Obtained imputed distributions matched well the observed distribution of the raw data and imputed functional space match the one of the raw data (PCA). The PCA also revealed similar functional spaces between species from Paracou and Tapajos, whereas Tapajos functional space is a bit wider.
 
 ```{r mice}
 #| eval: false

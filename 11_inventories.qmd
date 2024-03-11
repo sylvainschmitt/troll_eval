@@ -6,7 +6,7 @@ library(tidyverse)
 
 # Inventories
 
-Inventory data from Paracou, including understory trees, and Tapajos used both as input of TROLL evaluation for the species list and as output to assess forest structure, neutral composition and species list.
+Inventory data from Paracou, including understorey trees, and Tapajos were used both as input to the TROLL assessment for the species list and as output to assess forest structure, neutral composition and species list.
 
 ```{r data}
 #| eval: false
@@ -112,6 +112,8 @@ read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>%
 
 > This dataset provides tree inventory, tree height, diameter at breast height (DBH), and estimated crown measurements from 30 plots located in the Tapajos National Forest, Para, Brazil collected in September 2010. The plots were located in primary forest, primary forest subject to reduced-impact selective logging (PFL) between 1999 and 2003, and secondary forest (SF) with different age and disturbance histories. Plots were centered on GLAS (the Geoscience Laser Altimeter System) LiDAR instrument footprints selected along two sensor acquisition tracks spanning a wide range in vertical structure and aboveground biomass. <https://daac.ornl.gov/VEGETATION/guides/Forest_Inventory_Tapajos.html>
 
+PIs: ?
+
 Access: These data are available through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC).
 
 ```{r tapajos}
@@ -129,7 +131,7 @@ read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>%
 
 ## Structure
 
-Forest structure was simply be assessed by DBH (m) classes using basal area (BA, m2/ha) and abundance for each plots (uncertainty bars in Paracou data).
+Forest structure was simply assessed by DBH (m) classes using basal area (BA, m2/ha) and abundance for each plots (uncertainty bars in Paracou data).
 
 ```{r str}
 #| message: false
@@ -173,7 +175,7 @@ read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>%
 
 ## Composition
 
-Forest composition was simply assessed using rank abundances curves cut at the number of species simulated in TROLL each plots (uncertainty dotted lines in Paracou data).
+Forest composition was simply assessed using rank abundances curves for each plots (uncertainty dotted lines in Paracou data).
 
 ```{r comp}
 #| message: false

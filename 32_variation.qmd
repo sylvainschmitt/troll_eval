@@ -6,6 +6,8 @@ library(tidyverse)
 
 # Variation
 
+TROLL simulations showed very little variations due to stochasticity in fluxes (however this is 10-years variations starting from a single spin-up). The highest variation is in Leaf Area Index (LAI, m2/m2), partly due to higher possible stochasticity in leaf shedding, but remains negligible. Oppositely, Growth Primary Productivity (GPP, kgC/m2/yr), evapotranspiration (ET, mm/day) and Soil Water Content (SWC, m3/m3) showed almost no-variations across simulations of monthly mean values.
+
 ```{r gppvar}
 #| message: false
 #| warning: false

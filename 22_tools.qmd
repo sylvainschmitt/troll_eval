@@ -4,6 +4,38 @@ The analyses developed in TROLL version 4 evaluation rely mainly on the developm
 
 ## rcontroll version 4
 
+A new version of rcontroll [@schmitt2023] has been developed for TROLL version 4 evaluation available on the corresponding branch on GitHub: <https://github.com/sylvainschmitt/rcontroll/tree/TROLLV4> . This version mainly includes the inclusion of the new C++ code, the adaptation of inputs parameters and outputs in rcontroll objects and plots. The download of ERA5-Land data has also been updated. Every improvement since the version published on CRAN are described here: <https://github.com/sylvainschmitt/rcontroll/blob/TROLLV4/NEWS.md> (starting from rcontroll 0.2.0.9001).
+
 ## singularity encapsulation
 
+To ease portability, reproducibility and integration into a workflow we encapsulated rcontroll with TROLL version 4 and other useful R packages for the analyses in a singularity image. The singularity recipe is available in `singularity/Singularity` with the R code in `isingularity\install.R`. The code is copied from <https://github.com/sylvainschmitt/singularity-troll>. Once singularity installed (linux only but WSL can help windows users), you can install the image with the following command:
+
+```         
+sudo singularity build troll.sif Singularity
+```
+
+Then the snakemake workflow will automatically use the corresponding image. In case you want to test it manually use the following command:
+
+```         
+singularity shell -e troll.sif 
+```
+
 ## snakemake workflow
+
+To ease portability, reproducibility, and sustainability of the analyses, all virtual experiments have been included in a single snakemake workflow including thus calibration, variation, and evaluation defined in `Snakefile`. Once snakemake installed you can easily run the workflow locally. However the number of simulations is very high for calibration and spin-up simulations are very long so we recommend that you uses an high performance computing (HPC) platform. Most will include snakemake and singularity, and a submission script is already ready for cluster that uses slurm. In case you want to adjust virtual experiments definitions you can adjust the `config/config_calib.yml` file. To test the worklfow locally you can use a dry run:
+
+```         
+snakemake -np -j 1
+```
+
+On the HPC you first need to activate the snakemake module, for instance:
+
+```         
+module load bioinfo/Snakemake/7.20.0
+```
+
+Than used (and adapt) the predefined submission script:
+
+```         
+sbatch job.sh
+```

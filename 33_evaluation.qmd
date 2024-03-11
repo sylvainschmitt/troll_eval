@@ -5,6 +5,8 @@ library(tidyverse)
 
 # Evaluation
 
+Evaluation of the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
+
 ## Fluxes
 
 ```{r fluxes}
@@ -68,6 +70,8 @@ bind_rows(trollwater, trollsum, lai, lai_age) %>%
 ```
 
 ### Growth Primary Productivity
+
+The new version of TROLL correctly simulated the phenology of Growth Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.
 
 ```{r gppdata}
 #| message: false
@@ -184,6 +188,8 @@ daily %>%
 
 ### Leaf Area Index
 
+We had multiples data to evaluate canopy dynamics and resulting Leaf Area Index (LAI, m2/m2) that were not in agreement and unfortunately not in the same time period. LAI from MODIS shows a base value around 6 m2/m2 most of the years and a small increase below 0.2 m2/m3 in the dry season that pike in the middle of the dry season at both Paracou and Tapajos. Field measures with drone lidar showed a greater variation in Paracou with lowest values of 5.5 m2/m2 in April to June and highest values of almost 6 m2/m2 in December. Oppositely, field measures with terrestrial lidar in Tapajos showed no variation of LAI stable around 5.75 m2/m2 the whole year. This results thus question the use of MODIS LAI for TROLL evaluation. Indeed simulated LAI followed also the same phenology with an crease of LAI during the dry season but with values matching drone data in Paracou and not MODIS product. In Tapajos, the simulations showed even higher variations of LAI, that did not correspond to both MODIS and terrestrial LAD. Globally, simulated LAI showed a weak evaluation with a correlation coefficient of 0.37 in Paracou and 0.63 in Tapajos against 8-day observations from MODIS satellites, and corresponding RMSEP of respectively 0.3 and 0.1 m2/m2.
+
 ```{r laidata}
 #| message: false
 daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
@@ -260,6 +266,8 @@ daily %>%
 
 ### Leaf Area Index per Age
 
+For comparisons with @yang2023, we also simulated Leaf Area Index per leaf-age class. In the figure 8 of @yang2023 Tapajos is represented by the subclass S1, characterised by an always higher values old LAI above 3 m2/m2 and lower values of young and mature LAI around 1.5 m2/m2, while Paracou is represented by the subclass S2, characterised with high values of old LAI and low value of young and mature LAI in wet season but a strong loss of old LAI, a strong increase in mature LAI, a slight increase of young LAI in dry season. Similarly, in our simulations we observed a high LAI of old leaves especially in Tapajos. It seems that old leaf area are overestimated in Tapajos, because a priori there is little interest in accumulating less efficient leaves, and therefore confirms the hypothesis that the basal flux of litter is not high enough for Tapajos. At Paracou, we simulated back the phenology of @yang2023 with increased young LAI and mature LAI in the dry season while old LAI is decreasing, but a bit later than in @yang2023 and with values of mature LAI similar to those of old LAI between 2 and 3.5 m2/m2.
+
 ```{r laiadata}
 #| message: false
 daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
@@ -316,6 +324,8 @@ daily %>%
 ```
 
 ### Evapotranspiration
+
+The new version of TROLL correctly simulated the phenology of evapotranspiration (ET, mm/day), with a lower ET in wet season and an higher evaporative demand in the dry season. Simulations are slightly underestimating the ET but globally daily values overlaps in most of the 15-days windows with a wet season flux simulated around 2 mm/day against 3 mm/day observed in Paracou and both around 3.5 mm/day in the dry season. Similarly in Tapajos, the wet season flux simulated drop to almost 1 mm/day despite being above 2 mm/day in observations and they both reach 3 mm/day in the dry season. Both simulations and observations are driven by daily maximum vapour pressure deficit with a correlation coefficient between 0.58 and 0.67 for observation, and more deterministic for simulations between 0.89 and 0.93. Globally, simulated ET showed a very good evaluation with a correlation coefficient of 0.73 in Paracou and 0.72 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 0.8 mm/day.
 
 ```{r etdata}
 #| message: false
@@ -426,6 +436,8 @@ daily %>%
 
 ### Relative Soil Water Content
 
+We only had soil water content measurement for Paracou. Moreover, soil water content measurement are measured with electric measurement of conductance and rely a lot on calibration. We thus decided to use Relative Soil water Content (RSWC, %) to avoid bias of tool calibration and focus on within-year variations. The new version of TROLL correctly simulated the phenology of RSWC, with a higher RSWC in wet season around 100% with fully saturated soils and a strong drop in RSWC in the dry season. Focusing on the drop in dry seasons, the mean value simulated across year in Paracou dropped to 80% but exceptionally dry years drop up to 50%. The observed conditions are harsher with a mean observed drop around 50% across years that is below 50 most years and drop to 40% the driest years. Globally, simulated RSWC showed a good evaluation at Paracou with a correlation coefficient of 0.77 against daily observations from eddy-flux towers, and corresponding RMSEP of 23 %.
+
 ```{r rswcdata}
 #| message: false
 #| warning: false
@@ -506,6 +518,8 @@ daily %>%
 
 ## Structure
 
+The main development of TROLL version 4 is the inclusion of a new explicit modelling of daily water and carbon fluxes as well as a new leaf phenology. We thus focused TROLL version 4 evaluation on fluxes, as forest structure and composition was extensively assessed in @maréchaux2017 . However here, we quickly investigate back forest structure and composition in Paracou and Tapajos.
+
 ```{r simforestdata}
 #| eval: false
 files <- list.files("results/run3/", pattern = "final_pattern.txt", 
@@ -524,6 +538,8 @@ write_tsv(troll_forest, "outputs/evaluation_forest.tsv")
 ```
 
 ### Forest
+
+We characterized global forests structure through their distribution of basal area (m2/ha) and logged abundance per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.
 
 ```{r str}
 #| message: false
@@ -599,6 +615,8 @@ structure %>%
 ```
 
 ### Understory
+
+Taking advantage of new inventories of understory in Paracou, we assessed TROLL version 4 ability to simulate understory. We found TROLL to understimate the number of small trees with DBH close to 1cm and overestimate bigger trees with DBH closer to 10. We ewpected this behaviour as TROLL only simulates one tree per square meter. Nonetheless we found back a basal area of 4 m2/ha despite an underestimation of 2,310 individuals per hectare against 3,787, observed.
 
 ```{r understory}
 #| message: false
@@ -679,6 +697,8 @@ understory %>%
 
 ### Species
 
+Observed species rank-abundance curves in Paracou and Tapajos revealed low evenness with a few dominating species even more intense in Tapajos. However, Tapajos data are based on only 8 very small plots of 0.25ha, which may not be representative despite their virtual pooling in two 1-ha plots, and the quality of the species identifications can be lower. Simulated rank-abundance curve in Paracou was similar to the observed one with a correlation coefficient of 0.95 but with higher evenness resulting in underestimation of dominant species abundances and overestimation of rare species abundances. Simulated rank-abundance curve in Tapajos was very similar to the one simulated in Paracou but differed a lot of the one in Tapajos with strong underestimation of dominant species abundances and overestimation of rare species abundances. But once again observation data in Tapajos might be question for species resolution.
+
 ```{r compodata}
 #| message: false
 #| warning: false
@@ -743,6 +763,8 @@ compositon %>%
 ```
 
 ### Functional
+
+Simulated functional trait distribution in Paracou and Tapajos matched the ones observed with quantiles correlations above 0.9 for all traits and sites, at th exception of leaf area in Paracou. However due to a poor species resolution in Tapajos we used mean genus values, which may result in an overestimation of assessment in Tapajos. Leaf area differences in Paracou come to the lack of very high leaf area species in the simulations compared to the Paracou plots, however the resulting correlation coefficient might have differed if we would have used log-transformed leaf area). Diving into the observed data, the high leaf area values are due to pioneer species including *Cecropia obtusa* and *sciadophylla*, *Sterculia speciosa* and *Perebea guianensis*. The three genus are present in the simulations inputs, but seems to lack in the final forest due to either a lack of forest gaps or a lack of survival.
 
 ```{r ftdata}
 #| message: false
