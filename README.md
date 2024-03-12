@@ -1,6 +1,6 @@
 # TROLL V4 Evaluation
 Sylvain Schmitt -
-Mar 4, 2024
+Mar 12, 2024
 
 The aim of these analyses is to evaluate the TROLL version 4 simulations
 of daily fluxes and the final structure and composition of the forest in
@@ -15,15 +15,17 @@ snakemake) and results are described in the following document:
 - Isabelle Maréchaux (isabelle.marechaux@inrae.fr)
 - Jérôme Chave (jerome.chave@univ-tlse3.fr)
 - Fabian J. Fischer (f.fischer@bristol.ac.uk)
+- *James Ball* *(jgcb3@cam.ac.uk)?*
+- Nicolas Barbier (nicolas.barbier@ird.fr)
+- Marion Boisseaux (marionboisseaux@gmail.com)
 - Damien Bonal (damien.bonal@inrae.fr)
 - Benoit Burban(benoit.burban@inrae.fr)
-- Nicolas Barbier (nicolas.barbier@ird.fr)
-- Gregoire Vincent (gregoire.vincent@ird.fr)
-- Philippe Verley (philippe.verley@ird.fr)
-- *James Ball* *(jgcb3@cam.ac.uk)?*
+- *Natalia Restrepo-Coupe (nataliacoupe@gmail.com)*
 - Géraldine Derroire (geraldine.derroire@cirad.fr)
-- Giacomo Selan (giacomo.sellan@cirad.fr)
-- *Jérémy Lischtein ()?*
+- *Jeremy Lichstein (jlichstein@ufl.edu)*
 - Daniela Nemetschek (Daniela.Krebber@ecofog.gf)
-- Marion Boisseaux (marionboisseaux@gmail.com)
+- *Scott Saleska (saleska@arizona.edu)*
+- Giacomo Selan (giacomo.sellan@cirad.fr)
+- Philippe Verley (philippe.verley@ird.fr)
+- Gregoire Vincent (gregoire.vincent@ird.fr)
 - Camille Ziegler (camille.ziegler9@gmail.com)

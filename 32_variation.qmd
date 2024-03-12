@@ -40,7 +40,8 @@ files %>%
   geom_errorbar(aes(ymin = l, ymax = h)) +
   facet_wrap(~ site, nrow = 2, scales = "free") +
   theme_bw() +
-  xlab("") + ylab("Growth Primary Productivity (kgC/m2/yr)")
+  xlab("") +
+  ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) 
 ```
 
 ```{r laivar}
@@ -73,7 +74,8 @@ files %>%
   geom_errorbar(aes(ymin = l, ymax = h)) +
   facet_wrap(~ site, nrow = 2, scales = "free") +
   theme_bw() +
-    xlab("") + ylab("Leaf Area Index (LAI m2/m2)")
+  xlab("") + 
+  ylab(expression("Leaf Area Index ["~m^2~m^{-2}~"]")) 
 ```
 
 ```{r etpvar}
@@ -108,7 +110,8 @@ files %>%
   geom_errorbar(aes(ymin = l, ymax = h)) +
   facet_wrap(~ site, nrow = 2, scales = "free") +
   theme_bw() +
-    xlab("") + ylab("Evapotranspiration (mm/day)")
+  xlab("") + 
+  ylab(expression("Evapotranspiration ["~mm~day^{-1}~"]")) 
 ```
 
 ```{r swcvar}
@@ -141,5 +144,6 @@ files %>%
   geom_errorbar(aes(ymin = l, ymax = h)) +
   facet_wrap(~ site, nrow = 2, scales = "free") +
   theme_bw() +
-  xlab("") + ylab("Soil Water Content (m3/m3)")
+  xlab("") + 
+  ylab(expression("Soil Water Content ["~m^{3}~m^{-3}~"]")) 
 ```

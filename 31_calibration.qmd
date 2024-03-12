@@ -2,6 +2,7 @@
 #| include: false 
 rm(list = ls())
 library(tidyverse) 
+cols <- c("sim" = "#0da1f8", "obs" = "#3f3f3f")
 ```
 
 # Calibration
@@ -205,20 +206,35 @@ best %>%
 
 ```{r bestwithin}
 #| message: false
-vroom::vroom("outputs/calib.tsv") %>% 
+#| fig-cap: "Annual cycle from fortnightly litterfall for Paracou and Tapajos. Each thin line represents one year, the thick lines mean polynomial smoothing among years, the point field sampling dates, and rectangles in the background correspond to the site's climatological dry season"
+g <- vroom::vroom("outputs/calib.tsv") %>% 
   mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
   filter(sim %in% best$sim) %>%
   select(-sim, -a0, -b0, -delta, -dt) %>% 
   gather(type, value, -site, -date) %>%  
-  ggplot(aes(yday(date), value, col = type, fill = type)) +
-  geom_smooth(method = "lm", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5) +
-  geom_line(aes(group = paste0(year(date), type)), alpha = 0.5) +
-  geom_point() +
+  mutate(day = yday(date)) %>% 
+  ggplot(aes(day, value)) +
+  geom_rect(aes(xmin = day, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(day = yday(as_date(c("2000-8-1", "2000-06-15"))),
+                             value = -Inf,
+                             end = yday(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_smooth(aes(col = type),
+              method = "lm", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5, se = FALSE) +
+  geom_line(aes(col = type, group = paste0(year(date), type)), alpha = 0.6) +
+  geom_point(aes(col = type), alpha = 0.7) +
   theme_bw() +
+  theme(legend.position = "bottom") +
   facet_wrap(~ site, scales = "free", nrow = 2) +
-  xlab("") + ylab("Observed litterfall (MgC/ha/yr)") +
+  xlab("") + 
   scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
-                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Litter traps", "TROLL")) +
+  ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
+ggsave("figures/fs01.png", g, dpi = 300, width = 5, height = 5, bg = "white")
+g
 ```
 
 ```{r bestamng}
@@ -234,5 +250,8 @@ vroom::vroom("outputs/calib.tsv") %>%
   theme_bw() +
   theme(legend.position = "bottom") +
   scale_color_discrete("", labels = c("field", "TROLL")) +
-  xlab("") + ylab("Litterfall (MgC/ha/yr)")
+  xlab("") + 
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Litter traps", "TROLL")) +
+  ylab(expression(Litterfall~"["~MgC~ha^{-1}~yr^{-1}~"]")) 
 ```
