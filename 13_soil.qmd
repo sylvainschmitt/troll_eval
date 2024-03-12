@@ -29,5 +29,6 @@ list(
   group_by(site, proportion_Silt, proportion_Clay, proportion_Sand,
            SOC, DBD, pH, CEC) %>% 
   summarise(depth = max(layer_thickness)) %>%
-  knitr::kable(col.names = c("", "silt", "clay", "sand", "SOC", "DBD", "pH", "CEC", "depth"))
+  knitr::kable(col.names = c("", "silt", "clay", "sand", "SOC", "DBD", "pH", "CEC", "depth"),
+               caption = "Soil parameters per site.")
 ```

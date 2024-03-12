@@ -72,6 +72,7 @@ ERA5-Land and FLUXNET2015 showed high correlation which comforted us in using ER
 
 ```{r comp}
 #| message: false
+#| fig-cap: "Comparisons of monthly means over ten years for Paracou between FLUXNET2015 and ERA5-Land weather data."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, fluxnet, -time, -site) %>% 
   left_join(read_tsv("data/climate/era5_Paracou.tsv") %>% 
@@ -109,6 +110,7 @@ We thus need to defined day limits in time at a half-hourly precision. For that 
 
 ```{r snetdailyvar}
 #| message: false
+#| fig-cap: "Half-hourly variaations of day net radiation across ten years at Paracou and Tapajos to define day limits to be used in TROLL simulations."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   group_by(site, time = hms::as_hms(time)) %>% 
     summarise(l = quantile(snet, 0.025, na.rm = TRUE), 
@@ -138,6 +140,7 @@ For representation and discussion purposes we defined dry season as 15-days peri
 
 ```{r ds}
 #| message: false
+#| fig-cap: "Fortnightly means of precipitation in Paracou and Tapajos across ten years used to define dry site's climatological dry season."
 read_tsv("outputs/fluxnet_climate.tsv") %>%
   group_by(site, date = floor_date(time, "15 days")) %>% 
   summarise(rainfall = sum(rainfall, na.rm = TRUE)) %>% 
@@ -166,6 +169,7 @@ For data exploration purposes, we represented climate variations at multiple tim
 
 ```{r yearly}
 #| message: false
+#| fig-cap: "Yearly means of climate variables at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = date(time)) %>% 
@@ -194,6 +198,7 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
 
 ```{r monthly}
 #| message: false
+#| fig-cap: "Mean annual cycle of monthly means of climate variables at Paracou and Tapajos across ten years"
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = floor_date(time, "month")) %>% 
@@ -223,10 +228,9 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
 
 ```{r 15days}
 #| message: false
-
+#| fig-cap: "Mean annual cycle of fortnightly means of climate variables at Paracou and Tapajos across ten years."
 floor_biweek <- function(full) 
   as_date(paste0(year(full), "-", month(full), "-", ifelse(day(full) > 15, 15, 1)))
-
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = floor_date(time, "15 days")) %>% 
@@ -254,6 +258,7 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
 
 ```{r week}
 #| message: false
+#| fig-cap: "Mean annual cycle of weekly means of climate variables at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = floor_date(time, "week")) %>% 
@@ -283,6 +288,7 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
 
 ```{r day}
 #| message: false
+#| fig-cap: "Mean annual cycle of daily means of climate variables at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = floor_date(time, "day")) %>% 
@@ -309,6 +315,7 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
 
 ```{r halfhourly}
 #| message: false
+#| fig-cap: "Mean daily cycle of half-hourly means of climate variables at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
   filter(variable %in% c("snet", "temperature", "vpd", "ws")) %>% 

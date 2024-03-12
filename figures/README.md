@@ -19,6 +19,7 @@ fs::dir_tree()
     ├── f05.png
     ├── f06.png
     ├── f07.png
+    ├── f08.png
     ├── fs01.png
     ├── fs02.png
     ├── fs03.png

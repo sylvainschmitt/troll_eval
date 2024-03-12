@@ -9,13 +9,7 @@ format:
     toc-depth: 2
 ---
 
-This folder will contains the results of the snakemake workflow used by analyses in the quarto document. In particular :
-
--   calib: detail
-
--   run2:
-
--   run3:
+This folder will contains the results of the snakemake workflow used by analyses in the quarto document.
 
 ```{r, comment=""}
 fs::dir_tree()

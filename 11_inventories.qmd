@@ -75,6 +75,7 @@ PI: Géraldine Derroire
 Access: DOIs are available on the CIRAD dataverse: <https://dataverse.cirad.fr/dataverse/paracou> .
 
 ```{r paracou}
+#| fig-cap: "Tree distributions in the 2015 inventory of Paracou plots. Point size represents the diameter, and the colour the species."
 read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
   filter(site == "Paracou", type == "default") %>% 
   ggplot(aes(x, y, size = dbh, col = species)) +
@@ -96,6 +97,7 @@ PIs: Giacomo Sellan, Gérladine Derroire, Jérôme Chave
 Access: Upon request?
 
 ```{r understory}
+#| fig-cap: "Tree distributions in the Understory inventory at Paracou. Point size represents the diameter, and the colour the species."
 read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
   filter(site == "Paracou", type == "understory") %>% 
   filter(!is.na(x), !is.na(y)) %>% 
@@ -117,6 +119,7 @@ PIs: ?
 Access: These data are available through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC).
 
 ```{r tapajos}
+#| fig-cap: "Tree distributions in the inventory of Tapajos plots. Point size represents the diameter, and the colour the species."
 read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
   filter(site == "Tapajos", type == "default") %>% 
   ggplot(aes(x, y, size = dbh, col = species)) +
@@ -135,6 +138,7 @@ Forest structure was simply assessed by DBH (m) classes using basal area (BA, m2
 
 ```{r str}
 #| message: false
+#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
 read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>% 
   filter(dbh_class >= 10) %>% 
   group_by(site, type, dbh_class, variable) %>% 
@@ -155,6 +159,7 @@ read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>%
 
 ```{r strunder}
 #| message: false
+#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
 read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>% 
   filter(dbh_class < 10) %>% 
   group_by(site, type, dbh_class, variable) %>% 
@@ -179,6 +184,7 @@ Forest composition was simply assessed using rank abundances curves for each plo
 
 ```{r comp}
 #| message: false
+#| fig-cap: "Species composition at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
 read_tsv("outputs/composition.tsv", show_col_types = FALSE) %>% 
   group_by(site, plot, variable) %>% 
   arrange(desc(observed)) %>% 

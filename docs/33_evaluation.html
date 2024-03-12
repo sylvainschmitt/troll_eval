@@ -403,20 +403,27 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>daily <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> daily <span class="sc">%&gt;%</span> </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(date, value, <span class="at">col =</span> type)) <span class="sc">+</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> monthly) <span class="sc">+</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Growth Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs02.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/gppdaily-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/gppdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Daily and monthly means of growth primary productivity for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -513,7 +520,12 @@ div.csl-indent {
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/gppevalplot-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/gppevalplot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of simulated versus observed daily means of GPP in Paracou and Tapajos.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -531,10 +543,11 @@ div.csl-indent {
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation fo daily means of GPP at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Evaluation fo daily means of GPP at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 9%">
 <col style="width: 10%">
@@ -645,7 +658,12 @@ div.csl-indent {
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Terrestrial"</span>, <span class="st">"Satellite"</span>, <span class="st">"Drone"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/laidaily-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/laidaily-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Daily and monthly means of leaf area index for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -680,7 +698,7 @@ div.csl-indent {
 <span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Terrestrial"</span>, <span class="st">"Satellite"</span>, <span class="st">"Drone"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Terrestrial"</span>, <span class="st">"Satellite"</span>, <span class="st">"Drone"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f04.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f05.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -707,10 +725,11 @@ div.csl-indent {
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation fo daily means of ET at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Evaluation fo daily means of ET at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 10%">
 <col style="width: 6%">
@@ -802,7 +821,12 @@ div.csl-indent {
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols_laid[<span class="fu">c</span>(<span class="st">"mature"</span>, <span class="st">"old"</span>, <span class="st">"young"</span>)]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/laiadaily-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/laiadaily-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Daily and monthly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Dark lines are the monthly means, semi-transparent lines are the daily means variations.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -842,7 +866,7 @@ div.csl-indent {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="33_evaluation_files/figure-html/laia15days-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
+<figcaption class="figure-caption">Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
 </div>
@@ -887,7 +911,12 @@ div.csl-indent {
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/etdaily-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/etdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Daily and monthly means of evapotranpsiration for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -952,7 +981,7 @@ div.csl-indent {
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f04.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -981,7 +1010,12 @@ div.csl-indent {
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/etevalplot-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/etevalplot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of simulated versus observed daily means of ET in Paracou and Tapajos.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -998,10 +1032,11 @@ div.csl-indent {
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation fo daily means of ET at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Evaluation fo daily means of ET at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 10%">
 <col style="width: 11%">
@@ -1090,7 +1125,12 @@ div.csl-indent {
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/rswcdaily-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/rswcdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Daily and monthly means of relative soil water content for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1125,7 +1165,7 @@ div.csl-indent {
 <span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs02.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1151,10 +1191,11 @@ div.csl-indent {
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation fo daily means of RSWC at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Evaluation fo daily means of RSWC at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 10%">
 <col style="width: 11%">
@@ -1274,7 +1315,12 @@ div.csl-indent {
 <span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/dbhstr-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/dbhstr-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1299,7 +1345,12 @@ div.csl-indent {
 <span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/dbhstreval-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/dbhstreval-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Quantiles comparisons of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1362,7 +1413,12 @@ div.csl-indent {
 <span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/understoryfig-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/understoryfig-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1389,7 +1445,12 @@ div.csl-indent {
 <span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Paracou"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/understoryeval-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/understoryeval-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Quantiles comparisons of the size structure estimated by TROLL at the Paracou with understory trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1426,7 +1487,7 @@ div.csl-indent {
 <span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> labs, <span class="fu">aes</span>(<span class="at">label =</span> label))</span>
-<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f05.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f06.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1485,7 +1546,7 @@ div.csl-indent {
 <span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()  <span class="sc">+</span></span>
 <span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f06.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f07.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1521,7 +1582,12 @@ div.csl-indent {
 <span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/compoquant-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/compoquant-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Quantiles comparisons of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -1582,7 +1648,12 @@ div.csl-indent {
 <span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/ftparfig-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/ftparfig-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1603,7 +1674,12 @@ div.csl-indent {
 <span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/ftparquant-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/ftparquant-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Quantiles comparisons of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1624,7 +1700,12 @@ div.csl-indent {
 <span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/fttapfig-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/fttapfig-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Evaluation of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1647,7 +1728,12 @@ div.csl-indent {
 <span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="33_evaluation_files/figure-html/ftaptquant-1.png" class="img-fluid" width="672"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="33_evaluation_files/figure-html/ftaptquant-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Quantiles comparisons of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="cell">
@@ -1672,7 +1758,7 @@ div.csl-indent {
 <span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f07.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f08.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">

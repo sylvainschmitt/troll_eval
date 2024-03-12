@@ -74,6 +74,7 @@ bind_rows(filter(fluxnet, site == "Paracou"), data) %>%
 
 ```{r fluxyear}
 #| message: false
+#| fig-cap: "Yearly means of fluxes at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
   ggplot(aes(date, value, col = site)) +
   geom_line(alpha = 0.5) +
@@ -87,6 +88,7 @@ read_tsv("outputs/fluxnet_fluxes.tsv") %>%
 
 ```{r flux15}
 #| message: false
+#| fig-cap: "Mean annual cycle of fortnightly means of fluxes at Paracou and Tapajos across ten years."
 floor_biweek <- function(full) 
   as_date(paste0(year(full), "-", month(full), "-", ifelse(day(full) > 15, 15, 1)))
 read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
@@ -116,6 +118,7 @@ Tapajos and Paracou Solar Induced Fluorescence (SIF) from TROPOMI satellites was
 
 ```{r sif}
 #| message: false
+#| fig-cap: "8-days variations of GPP derived from TROPOMI SIF at Paracou and Tapajos across twenty years."
 read_tsv("data/fluxes/rtsif.tsv") %>% 
   mutate(value = rtsif*15.343*365/10^3) %>% 
   ggplot(aes(date, value)) +
@@ -127,6 +130,7 @@ read_tsv("data/fluxes/rtsif.tsv") %>%
 
 ```{r sifweek}
 #| message: false
+#| fig-cap: "Mean annual cycle of 8-days GPP derived from TROPOMI SIF at Paracou and Tapajos across ten years."
 read_tsv("data/fluxes/rtsif.tsv") %>% 
   mutate(value = rtsif*15.343*365/10^3) %>% 
   mutate(week = week(date)) %>% 
@@ -183,6 +187,7 @@ read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
 
 ```{r swc}
 #| message: false
+#| fig-cap: "Mean annual cycle of daily means of soil water content at Paracou across ten years and for 5 differents depths."
 read_tsv("outputs/guyaflux_swc.tsv") %>% 
   mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
   group_by(depth, day = yday(date)) %>% 
@@ -259,6 +264,7 @@ obs_metrics <- read_tsv("outputs/litter.tsv") %>%
 ```{r litterinterannual}
 #| message: false
 #| warning: false
+#| fig-cap: "Fortnightly measurement of litterfall at Tapajos and Paracou. Time lapse between two sampling is over 15-days for few measurement indicated by point colour. Annual pike of litterfall are indicated by the red lines and thier value by the red points."
 read_tsv("outputs/litter.tsv") %>% 
   ggplot(aes(date, litterfall, col = dt)) +
   geom_line(col = "lightgrey", alpha = 0.5) +
@@ -276,6 +282,7 @@ read_tsv("outputs/litter.tsv") %>%
 ```{r litterintrannual}
 #| message: false
 #| warning: false
+#| fig-cap: "Annual cycle of fortnightly measurement of litterfall at Tapajos and Paracou. Annual pike of litterfall are indicated by the red point."
 read_tsv("outputs/litter.tsv") %>% 
   ggplot(aes(yday(date), litterfall, col = year(date))) +
   geom_smooth(method = "lm", formula = y ~ poly(x, 20, raw = TRUE)) +
@@ -293,6 +300,7 @@ read_tsv("outputs/litter.tsv") %>%
 
 ```{r litterindices}
 #| message: false
+#| fig-cap: "Relations betweens Litterfall pike date and ratioi across years at Paracou and Tapajos."
 obs_metrics %>% 
   ggplot(aes(pike_day, ratio, col = site, size = year)) +
   geom_point() +
@@ -358,6 +366,7 @@ bind_rows(pad, lad, lai) %>%
 
 ```{r laivar}
 #| message: false
+#| fig-cap: "Annual cycle of leaf area density variation at Paracou and Tapajos measured every 8-days by satellite (LAI) across ten years, every 15-days by drone in Paracou across three years, or every 15-days at Tapajos from the ground in Tapajos for three years."
 read_tsv("outputs/lai.tsv") %>% 
   mutate(week = week(date)) %>%  
   ggplot(aes(week, value, col = site, fill = site)) +

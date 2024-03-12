@@ -72,6 +72,7 @@ The leaf resistance parameter which is limiting the potential at turgor loss poi
 
 ```{r a0}
 #| message: false
+#| fig-cap: "Effect of the leaf resistance parameter a on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
  read_tsv("outputs/calib.tsv") %>% 
   filter(b0 == 0.02, delta == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = a0, fill = a0)) +
@@ -91,6 +92,7 @@ The leaf resistance parameter which is limiting the potential at turgor loss poi
 
 ```{r a0indices}
 #| message: false
+#| fig-cap: "Effect of the leaf resistance parameter a on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
 sim_metrics %>% 
   filter(b0 == 0.02, delta == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = a0)) +
@@ -108,6 +110,7 @@ The the tree height susceptibility parameter drives mainly the pike date but als
 
 ```{r b0}
 #| message: false
+#| fig-cap: "Effect of the tree height susceptibility parameter b on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
  read_tsv("outputs/calib.tsv") %>% 
   filter(a0 == 0.2, delta == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = b0, fill = b0)) +
@@ -127,6 +130,7 @@ The the tree height susceptibility parameter drives mainly the pike date but als
 
 ```{r b0indices}
 #| message: false
+#| fig-cap: "Effect of the tree height susceptibility parameter b on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
 sim_metrics %>% 
   filter(a0 == 0.2, delta == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = b0)) +
@@ -144,6 +148,7 @@ The base variation in residence time multiplying factor for drought shedding see
 
 ```{r delta}
 #| message: false
+#| fig-cap: "Effect of the base variation in residence time multiplying factor for drought shedding delta on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
 read_tsv("outputs/calib.tsv") %>% 
   filter(b0 == 0.02, a0 == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = delta, fill = delta)) +
@@ -163,6 +168,7 @@ read_tsv("outputs/calib.tsv") %>%
 
 ```{r deltaindices}
 #| message: false
+#| fig-cap: "Effect of the base variation in residence time multiplying factor for drought shedding delta on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
 sim_metrics %>% 
   filter(b0 == 0.02, a0 == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = delta)) +
@@ -201,12 +207,12 @@ best <- sim_metrics %>%
   slice_min(RMSEP) %>% 
   mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta))
 best %>% 
-  knitr::kable()
+  knitr::kable(caption = "Best phenology parameters values according to calibration with litterfall data.")
 ```
 
 ```{r bestwithin}
 #| message: false
-#| fig-cap: "Annual cycle from fortnightly litterfall for Paracou and Tapajos. Each thin line represents one year, the thick lines mean polynomial smoothing among years, the point field sampling dates, and rectangles in the background correspond to the site's climatological dry season"
+#| fig-cap: "Annual cycle from fortnightly litterfall for Paracou and Tapajos. Each thin line represents one year, the thick lines mean polynomial smoothing among years, the point field sampling dates, and rectangles in the background correspond to the site's climatological dry season."
 g <- vroom::vroom("outputs/calib.tsv") %>% 
   mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
   filter(sim %in% best$sim) %>%
@@ -239,6 +245,7 @@ g
 
 ```{r bestamng}
 #| message: false
+#| fig-cap: "Fortnightly litterfall for Paracou and Tapajos simulated in TROLL and measured with litter traps."
 vroom::vroom("outputs/calib.tsv") %>% 
   mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
   filter(sim %in% best$sim) %>%

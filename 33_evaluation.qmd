@@ -99,17 +99,20 @@ monthly <- daily %>%
 ```{r gppdaily}
 #| message: false
 #| warning: false
-daily %>% 
+#| fig-cap: "Daily and monthly means of growth primary productivity for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days."
+g <- daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
   geom_line(data = monthly) +
-  facet_wrap(~ site, scales = "free_x") +
+  facet_wrap(~ site, nrow = 2) +
   theme_bw() +
   theme(legend.position = "bottom") +
   xlab("") +
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
+ggsave("figures/fs02.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+g
 ```
 
 ```{r gpp15days}
@@ -177,6 +180,7 @@ g
 ```{r gppevalplot}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of simulated versus observed daily means of GPP in Paracou and Tapajos."
 daily %>% 
   pivot_wider(names_from = type, values_from = value) %>% 
   gather(type, observed, -site, -date, -variable, -par, -simulated) %>% 
@@ -205,7 +209,7 @@ daily %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Evaluation fo daily means of GPP at Paracou and Tapajos.")
 ```
 
 ### Leaf Area Index
@@ -231,6 +235,7 @@ monthly <- daily %>%
 ```{r laidaily}
 #| message: false
 #| warning: false
+#| fig-cap: "Daily and monthly means of leaf area index for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days."
 daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
@@ -277,7 +282,7 @@ g <- daily %>%
                      labels = c("Terrestrial", "Satellite", "Drone", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "obs", "sim")]), 
                      labels = c("Terrestrial", "Satellite", "Drone", "TROLL"))
-ggsave("figures/f04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -294,7 +299,7 @@ daily %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Evaluation fo daily means of ET at Paracou and Tapajos.")
 ```
 
 ### Leaf Area Index per Age
@@ -318,6 +323,7 @@ cols_laid <- c("young" = "#2bd22c", "mature" = "#197b14", "old" = "#ffa006")
 ```{r laiadaily}
 #| message: false
 #| warning: false
+#| fig-cap: "Daily and monthly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Dark lines are the monthly means, semi-transparent lines are the daily means variations."
 daily %>% 
   ggplot(aes(date, value, col = age)) +
   geom_line(alpha = 0.5) +
@@ -333,7 +339,7 @@ daily %>%
 ```{r laia15days}
 #| message: false
 #| warning: false
-#| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
+#| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
 g <- daily %>% 
   group_by(site, variable, age, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
@@ -391,6 +397,7 @@ monthly <- daily %>%
 ```{r etdaily}
 #| message: false
 #| warning: false
+#| fig-cap: "Daily and monthly means of evapotranpsiration for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations"
 daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
@@ -460,13 +467,14 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
 ```{r etevalplot}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of simulated versus observed daily means of ET in Paracou and Tapajos."
 daily %>% 
   pivot_wider(names_from = type, values_from = value) %>% 
   ggplot(aes(simulated ,observed, col = yday(date))) +
@@ -493,7 +501,7 @@ daily %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Evaluation fo daily means of ET at Paracou and Tapajos.")
 ```
 
 ### Relative Soil Water Content
@@ -524,6 +532,7 @@ monthly <- daily %>%
 ```{r rswcdaily}
 #| message: false
 #| warning: false
+#| fig-cap: "Daily and monthly means of relative soil water content for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations."
 daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
@@ -570,7 +579,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -586,7 +595,7 @@ daily %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Evaluation fo daily means of RSWC at Paracou and Tapajos.")
 ```
 
 ## Structure
@@ -644,6 +653,7 @@ structure <- read_tsv("outputs/evaluation_forest.tsv") %>%
 ```{r dbhstr}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 labs <- structure %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
   mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
@@ -672,6 +682,7 @@ filter(structure, variable %in% c("ba", "log_abundance")) %>%
 ```{r dbhstreval}
 #| message: false
 #| warning: false
+#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 structure %>% 
   filter(variable != "abundance") %>% 
   gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
@@ -725,6 +736,7 @@ understory <- read_tsv("outputs/evaluation_forest.tsv") %>%
 ```{r understoryfig}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 labs <- structure %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
   mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
@@ -753,6 +765,7 @@ filter(understory, variable %in% c("ba", "log_abundance")) %>%
 ```{r understoryeval}
 #| message: false
 #| warning: false
+#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou with understory trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 understory %>% 
   filter(site == "Paracou") %>% 
   filter(variable != "abundance") %>% 
@@ -808,7 +821,7 @@ g <- all_str %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL")) +
   geom_text(data = labs, aes(label = label))
-ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -859,13 +872,14 @@ g <- compositon %>%
   scale_y_log10()  +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
 ```{r compoquant}
 #| message: false
 #| warning: false
+#| fig-cap: "Quantiles comparisons of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 compositon %>% 
   ungroup() %>% 
   gather(quantile, value, -site, -rank, -variable, -type) %>% 
@@ -930,6 +944,7 @@ all_traits_q <- bind_rows(
 ```{r ftparfig}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
 read_tsv("outputs/functional_composition.tsv") %>% 
   filter(site == "Paracou") %>% 
   ggplot(aes(trait_value, group = plot)) +
@@ -948,6 +963,7 @@ read_tsv("outputs/functional_composition.tsv") %>%
 ```{r ftparquant}
 #| message: false
 #| warning: false
+#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
 all_traits_q %>% 
   filter(site == "Paracou") %>% 
   ggplot(aes(m_obs, m_sim)) +
@@ -966,6 +982,7 @@ all_traits_q %>%
 ```{r fttapfig}
 #| message: false
 #| warning: false
+#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
 read_tsv("outputs/functional_composition.tsv") %>% 
   filter(site == "Tapajos") %>% 
   ggplot(aes(trait_value, group = plot)) +
@@ -984,6 +1001,7 @@ read_tsv("outputs/functional_composition.tsv") %>%
 ```{r ftaptquant}
 #| message: false
 #| warning: false
+#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
 all_traits_q %>% 
   filter(site == "Tapajos") %>% 
   ggplot(aes(m_obs, m_sim)) +
@@ -1024,6 +1042,6 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
   scale_color_discrete("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```

@@ -309,10 +309,12 @@ div.csl-indent {
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, proportion_Silt, proportion_Clay, proportion_Sand,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>           SOC, DBD, pH, CEC) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">depth =</span> <span class="fu">max</span>(layer_thickness)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"silt"</span>, <span class="st">"clay"</span>, <span class="st">"sand"</span>, <span class="st">"SOC"</span>, <span class="st">"DBD"</span>, <span class="st">"pH"</span>, <span class="st">"CEC"</span>, <span class="st">"depth"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"silt"</span>, <span class="st">"clay"</span>, <span class="st">"sand"</span>, <span class="st">"SOC"</span>, <span class="st">"DBD"</span>, <span class="st">"pH"</span>, <span class="st">"CEC"</span>, <span class="st">"depth"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">caption =</span> <span class="st">"Soil parameters per site."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
+<caption>Soil parameters per site.</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>

@@ -15,6 +15,7 @@ We took advantage of the TALLO database [@jucker2022] to infer species allometri
 
 ```{r tallodist}
 #| message: false
+#| fig-cap: "Available data in Amazonia."
 ggplot(map_data("world"), aes(x = long, y = lat)) +
   geom_polygon(aes(group = group), fill="lightgray", colour = "white") +
   geom_point(data = read_csv("data/species/tallo.csv") %>% 
@@ -33,6 +34,7 @@ ggplot(map_data("world"), aes(x = long, y = lat)) +
 
 ```{r hdbh}
 #| message: false
+#| fig-cap: "Height (m) and diameter (cm) relationship for observed amazonian trees."
 read_csv("data/species/tallo.csv") %>% 
   filter(longitude <= -39, longitude >= -79, latitude >= -18, latitude <= 10) %>% 
   ggplot(aes(stem_diameter_cm, height_m)) +
@@ -91,12 +93,14 @@ We had good convergence and good post-predictive checks.
 
 ```{r rhat}
 #| message: false
+#| fig-cap: "Goodness of convergence assessed by Rhat. All Rhat are below 1.05 indicating a very good convergence of all chains."
 load('outputs/brms_tallo.Rdata')
 bayesplot::mcmc_rhat(bayesplot::rhat(fit$fit))
 ```
 
 ```{r ppc}
 #| message: false
+#| fig-cap: "Posterior post-predictive check of simulated response variable against observed values indicating a good representation of the whole distribution in posteriors."
 load('outputs/brms_tallo.Rdata')
 bayesplot::pp_check(fit)
 ```
@@ -109,6 +113,7 @@ sjPlot::tab_model(fit)
 ```
 
 ```{r ahhmax}
+#| fig-cap: "Inferred species allometric parameters hmax and ah and their relations."
 fit %>% 
   tidybayes::spread_draws(b_hmax_Intercept, r_species__hmax[species,],
                b_ah_Intercept, r_species__ah[species,]) %>% 
@@ -236,7 +241,7 @@ filtered %>%
   na.omit() %>% 
   group_by(trait) %>% 
   summarise(N = n()) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Available functional traits data per sepcies.")
 ```
 
 ```{r vlem}
@@ -254,10 +259,11 @@ raw %>%
   group_by(`Vleminckx 2021`, dataset) %>% 
   summarise(N = n()) %>% 
   pivot_wider(names_from = `Vleminckx 2021`, values_from = N) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Available functional traits data per species depending on the dataset and its overlap with Vleminchkx's data.")
 ```
 
 ```{r traitdistraw}
+#| fig-cap: "Raw distributions of functional traits data per dataset origin."
 raw %>% 
   mutate(trait = gsub("_", " ", trait)) %>% 
   ggplot(aes(dataset, value, col = dataset)) +
@@ -270,6 +276,7 @@ raw %>%
 
 ```{r traitdistrawcomp}
 #| message: false
+#| fig-cap: "Species traits means distributions per datasets in function of their median across datasets."
 raw %>% 
   select(species, dataset, trait, value) %>% 
   group_by(species, dataset, trait) %>% 
@@ -285,6 +292,7 @@ raw %>%
 ```
 
 ```{r rawcorr}
+#| fig-cap: "Species traits pairwise correlations."
 filtered %>% 
   select(-family, -genus, -species) %>% 
   cor(use = "pairwise.complete.obs") %>% 
@@ -310,6 +318,7 @@ complete(imputation) %>%
 
 ```{r dens}
 #| message: false
+#| fig-cap: "Traits density distribution before and after species trait values imputation by predictive means matching."
 vroom::vroom("outputs/imputation.tsv") %>% 
   filter(trait %in% troll$trait) %>% 
   ggplot(aes(value, col = type)) +
@@ -320,6 +329,7 @@ vroom::vroom("outputs/imputation.tsv") %>%
 
 ```{r pca1}
 #| message: false
+#| fig-cap: "Traits distribution in the first plan of a PCA before and after species trait values imputation by predictive means matching."
 data <- vroom::vroom("outputs/imputation.tsv") %>% 
   filter(trait %in% troll$trait) %>% 
   pivot_wider(names_from = trait, values_from = value) %>% 
@@ -337,6 +347,7 @@ autoplot(princomp(select(data, -family, -genus, -species, -type), cor = TRUE),
 ```
 
 ```{r pca2}
+#| fig-cap: "Traits distribution in the first plan of a PCA among sites after imputation by predictive means matching."
 data2 <- data %>% 
   filter(type == "imputed") %>% 
   mutate(tapajos = (species %in% tapajos$species)) %>% 
@@ -419,6 +430,7 @@ bind_rows(paracou, tapajos) %>%
 
 ```{r paracoudist}
 #| message: false
+#| fig-cap: "Functional composition at the Paracou site expressed in terms of density distribution per trait. The analyses have been done at the species level in Paracou."
 read_tsv("outputs/functional_composition.tsv") %>% 
   filter(site == "Paracou") %>% 
   ggplot(aes(trait_value, group = plot)) +
@@ -432,6 +444,7 @@ read_tsv("outputs/functional_composition.tsv") %>%
 
 ```{r tapajosdist}
 #| message: false
+#| fig-cap: "Functional composition at the Tapajos site expressed in terms of density distribution per trait. The analyses have been done at the genus level in Tapajos."
 read_tsv("outputs/functional_composition.tsv") %>% 
   filter(site == "Tapajos") %>% 
   ggplot(aes(trait_value, group = plot)) +
