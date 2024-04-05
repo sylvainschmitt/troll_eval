@@ -25,6 +25,7 @@ book:
         - 32_variation.qmd
         - 33_evaluation.qmd
   appendices:
+    - 98_companion_figures.qmd
     - 99_references.qmd
     
 bibliography: references.bib

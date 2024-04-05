@@ -9,7 +9,7 @@ format:
     toc-depth: 2
 ---
 
-This folder will contains all The figures for the manuscript.
+This folder will contains all The figures for the manuscript and the companion paper.
 
 ```{r, comment=""}
 fs::dir_tree()

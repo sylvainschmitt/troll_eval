@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9015: companion figures
 -   troll_eval 0.1.0.9014: all captions
 -   troll_eval 0.1.0.9013: figures colour scales and units & legend for msc (all legends to add)
 -   troll_eval 0.1.0.9012: all texts
