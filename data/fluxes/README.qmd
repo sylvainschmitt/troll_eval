@@ -20,6 +20,7 @@ This folder contains our point to fluxes data used to evaluate the TROLL model o
 -   Tapajos leaf area density (LAD) was retrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>
 -   Tapajos and Paracou leaf area index (LAI) per age was retrieved from @yang2023: <https://essd.copernicus.org/preprints/essd-2022-436/essd-2022-436.pdf>
 -   Tapajos and Paracou Solar Induced Fluorescence (SIF) from TROPOMI satellites retrieved from <https://figshare.com/ndownloader/articles/19336346/versions/2> and processed in the R script get_sif.R resulting in the rtsif.tsv file
+-   Tapajos and Paracou leaf area per age from Yang et al. (2023) retrieved from <https://figshare.com/articles/dataset/Leaf_age-dependent_LAI_seasonality_product_Lad-LAI_over_tropical_and_subtropical_evergreen_broadleaved_forests/21700955/4> and processed in the R script get_lai_age.R resulting the lai_age.tsv file.
 
 ```{r, comment=""}
 fs::dir_tree()

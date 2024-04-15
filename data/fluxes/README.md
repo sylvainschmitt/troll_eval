@@ -1,6 +1,6 @@
 # Fluxes data
 Sylvain Schmitt -
-Mar 6, 2024
+Apr 15, 2024
 
 This folder contains our point to fluxes data used to evaluate the TROLL
 model outputs:
@@ -27,6 +27,11 @@ model outputs:
   satellites retrieved from
   <https://figshare.com/ndownloader/articles/19336346/versions/2> and
   processed in the R script get_sif.R resulting in the rtsif.tsv file
+- Tapajos and Paracou leaf area per age from Yang et al. (2023)
+  retrieved from
+  <https://figshare.com/articles/dataset/Leaf_age-dependent_LAI_seasonality_product_Lad-LAI_over_tropical_and_subtropical_evergreen_broadleaved_forests/21700955/4>
+  and processed in the R script get_lai_age.R resulting the lai_age.tsv
+  file.
 
 ``` r
 fs::dir_tree()
@@ -85,7 +90,9 @@ fs::dir_tree()
     │   ├── YS-20220920-135633.tif
     │   ├── YS-20221110-133704.tif
     │   └── YS-20221130-131126.tif
+    ├── get_lai_age.R
     ├── get_sif.R
+    ├── lai_age.tsv
     ├── litterfall_2003_2022.csv
     ├── nph15726-sup-0002-notess4.xlsx
     ├── paddense_central.gpkg

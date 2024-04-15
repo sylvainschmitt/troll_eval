@@ -311,7 +311,7 @@ obs_metrics %>%
 
 ## Canopy structure
 
-Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Area Density (LAD) and Plant Area Density (PAD) from local observation using terrestrial or drone LIDAR remotely-sensed by MODIS. LIDAR data includes drone data from Paracou provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.) and terrestrial data from Tapajos etrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>. Remotely-sensed data from MODIS were retrieved from PLUMBER2 on Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>.
+Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Area Density (LAD) and Plant Area Density (PAD) from local observation using terrestrial or drone LIDAR remotely-sensed by MODIS. LIDAR data includes drone data from Paracou provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.) and terrestrial data from Tapajos etrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>. Remotely-sensed data from MODIS were retrieved from PLUMBER2 on Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>. Additionally leaf area index per leaf cohort (LAI_age) was retrieved from @yang2023.
 
 ```{r lai}
 #| eval: false
@@ -379,4 +379,30 @@ read_tsv("outputs/lai.tsv") %>%
   facet_wrap(~ variable) +
   scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+```
+
+```{r laiagevar}
+#| message: false
+#| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves from @yang2023. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season."
+cols_laid <- c("young" = "#2bd22c", "mature" = "#197b14", "old" = "#ffa006")
+read_tsv("data/fluxes/lai_age.tsv") %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+            ymin = -Inf, ymax = Inf, alpha = 0.5,
+            data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                              m = -Inf,
+                              end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                              site = c("Paracou", "Tapajos"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = age), col = NA, alpha = 0.2) +
+  geom_smooth(aes(col = age), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_grid(type ~ site, scales = "free_x") +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
+  scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
+  scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
 ```

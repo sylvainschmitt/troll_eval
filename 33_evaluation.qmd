@@ -348,6 +348,10 @@ g <- daily %>%
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
             m = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(type = "TROLL") %>% 
+  bind_rows(read_tsv("data/fluxes/lai_age.tsv") %>% 
+              filter(type == "time series") %>% 
+              mutate(type = "Yang et al. (2023)")) %>% 
   ggplot(aes(week, m)) +
   geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
            ymin = -Inf, ymax = Inf, alpha = 0.5,
@@ -358,11 +362,10 @@ g <- daily %>%
   geom_ribbon(aes(ymin = l, ymax = h, fill = age), col = NA, alpha = 0.2) +
   geom_smooth(aes(col = age), se = FALSE) +
   theme_bw() +
-  theme(legend.position = "bottom") +
   scale_fill_discrete("") +
   scale_color_discrete("") +
-  facet_wrap(~ site, scales = "free_x") +
-    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+  facet_grid(site~ type) +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
