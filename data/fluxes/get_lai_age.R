@@ -1,5 +1,6 @@
 # download at https://figshare.com/articles/dataset/Leaf_age-dependent_LAI_seasonality_product_Lad-LAI_over_tropical_and_subtropical_evergreen_broadleaved_forests/21700955/4
 
+library(tidyverse)
 library(sf)
 library(terra)
 
@@ -17,10 +18,18 @@ utils::unzip("data/fluxes/lai_age/Lad-LAI_timeseries_025deg_2001-2018.zip",
 # sites
 sites <- tibble(
   site = c("Paracou", "Tapajos"),
-  latitude = c(5.27877, -2.85667),
-  longitude = c(-52.92486, -54.9588900),
+  latitude = c(5, -3),
+  longitude = c(-53, -55),
 ) %>% 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+
+# control fig
+library(leaflet)
+r <- rast("data/fluxes/lai_age/Lad-LAI_seasonality_025deg/LAI_young_025deg_RTSIF-GPP/LAI_young_025deg_1.tif")
+leaflet(sites) %>% 
+  addTiles() %>% 
+  addMarkers() %>% 
+  addRasterImage(r)
 
 # seasonality
 cohorts <- c("young", "mature", "old")
@@ -29,7 +38,7 @@ lai_seas <- lapply(cohorts, function(coh)
                     coh, "_025deg_RTSIF-GPP/"), 
              full.names = T) %>% 
     rast() %>% 
-    extract(sites, exact = T) %>% 
+    terra::extract(sites, exact = T) %>% 
     select(-ID) %>% 
     mutate(site = sites$site) %>% 
     gather(date, lai, -site) %>% 
@@ -51,7 +60,7 @@ lai_ts <- lapply(cohorts, function(coh)
                     coh, "_025deg_RTSIF-GPP_2001-2018/"), 
              full.names = T) %>% 
     rast() %>% 
-    extract(sites, exact = T) %>% 
+    terra::extract(sites, exact = T) %>% 
     select(-ID) %>% 
     mutate(site = sites$site) %>% 
     gather(date, lai, -site) %>% 
