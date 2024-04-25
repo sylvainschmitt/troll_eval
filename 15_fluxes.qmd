@@ -36,8 +36,15 @@ fluxnet <- list(
   mutate(et = ifelse(hour(time) %in% 7:18, et, NA)) %>% 
   mutate(vpd = vpd/10,
          gpp = gpp/100, par = snet*2.27*60*30/10^3) %>% 
-  select(site, time, vpd, par, gpp, et)
+  select(site, time, vpd, par, gpp, et, rainfall, ws,temperature)
 fluxnet_tapajos <- filter(fluxnet, site == "Tapajos")
+era <- vroom::vroom("data/climate/era5_tapajos.csv") %>% 
+  filter(year(date) > 2001) %>% 
+  mutate(time = as_datetime(date), rainfall = precipitation) %>% 
+  select(time, rainfall)
+fluxnet_tapajos <- fluxnet_tapajos %>% 
+  select(-rainfall) %>% 
+  left_join(era)
 time_freq <- 0.5 # TROLL v4
 start <- as_datetime(as_date(min(fluxnet_tapajos$time))) # to start from 00:30
 stop <- max(fluxnet_tapajos$time) + 30*60 # to stop at 23:00
@@ -47,7 +54,7 @@ data <- left_join(tibble(time = time),
     by = "time"
   ) %>%
   group_by(date = as_date(time)) %>%
-  mutate(across(c(vpd, gpp),
+  mutate(across(c(temperature, vpd, ws, gpp),
                 ~ zoo::na.spline(., time, na.rm = FALSE))) %>% 
   mutate(across(c(par, et),
                 ~ zoo::na.approx(., time, na.rm = FALSE))) %>% 
@@ -62,12 +69,13 @@ bind_rows(filter(fluxnet, site == "Paracou"), data) %>%
   gather(variable, value, -site, -time) %>% 
   group_by(site, variable, date = date(time)) %>%
   select(-time) %>% 
-  mutate(value = ifelse(value %in% c("et", "par"),
+  mutate(value = ifelse(value %in% c("et", "par", "rainfall"),
                            sum(value, na.rm = T), value)) %>% 
   mutate(value = ifelse(variable %in% c("vpd_max"),
                            max(value, na.rm = T), value)) %>% 
   summarise_all(mean, na.rm = T) %>% 
-  mutate(value = ifelse(variable %in% c("et", "gpp") & site == "Tapajos" & year(date) %in% 2006:2009,
+  mutate(value = ifelse(variable %in% c("et", "gpp") & 
+                          site == "Tapajos" & year(date) %in% 2006:2009,
                            NA, value)) %>% 
   write_tsv("outputs/fluxnet_fluxes.tsv")
 ```

@@ -82,13 +82,12 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
               mutate(observed = value*10^2*365/10^3) %>% 
               select(-value)) %>% 
   left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
-              filter(variable == "par") %>% 
-              rename(par = value) %>% 
-              select(-variable)) %>% 
+              filter(variable %in% c("par", "vpd_max", "temperature", "ws")) %>% 
+              rename(determinant = variable, determinant_value = value)) %>% 
   left_join(read_tsv("data/fluxes/rtsif.tsv") %>% 
               mutate(satellite = rtsif*15.343*365/10^3) %>% 
               select(-rtsif)) %>% 
-  gather(type, value, -site, -date, -variable, -par)
+  gather(type, value, -site, -date, -variable, -determinant, -determinant_value)
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), variable, type) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
@@ -158,13 +157,13 @@ g
 #| warning: false
 #| fig-cap: "Daily averages of growth primary productivity as a function of incoming photosynthetically active radiation for model-, satellite- and tower-based estimates at Paracou and Tapajos."
 g <- daily %>% 
-  ggplot(aes(par/10^2, value, col = type)) +
+  filter(determinant == "par") %>% 
+  ggplot(aes(determinant_value/10^2, value, col = type)) +
   geom_point(alpha = 0.1) +
   theme_bw() +
   facet_wrap(~ site) +
   theme(legend.position = "bottom") +
   geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
-  facet_wrap(~ site) +
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
   xlab(expression("Incoming PAR ["~mol~m^{-~2}~day^{-~1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("sim", "sat", "obs")]), 
@@ -177,13 +176,43 @@ ggsave("figures/f03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
+```{r gppdet}
+#| message: false
+#| warning: false
+#| fig-cap: "Daily averages of growth primary productivity as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
+g <- daily %>% 
+  mutate(determinant_value = ifelse(determinant == "par", 
+                                    determinant_value/10^2, determinant_value)) %>% 
+  mutate(det_long = recode(determinant, 
+                           "par" = 'Incoming~PAR~"["~mol~m^{-~2}~day^{-~1}~"]"',
+                           "temperature" = 'Temperature~"["~degree~C~"]"',
+                            "vpd_max" = '"Vapour Pressure Deficit ["~kPa~day^{-~1}~"]"',
+                           "ws" = 'Wind~Speed~"["~m^{2}~s^{-~1}~"]"')) %>% 
+  ggplot(aes(determinant_value, value, col = type)) +
+  geom_point(alpha = 0.1) +
+  theme_bw() +
+  facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
+  theme(legend.position = "bottom") +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
+  ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
+  xlab("") +
+  scale_color_manual("", values = as.vector(cols[c("sim", "sat", "obs")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  ylim(0, NA) +
+  ggpubr::stat_cor()
+ggsave("figures/fs11.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+g
+```
+
 ```{r gppevalplot}
 #| message: false
 #| warning: false
 #| fig-cap: "Evaluation of simulated versus observed daily means of GPP in Paracou and Tapajos."
 daily %>% 
   pivot_wider(names_from = type, values_from = value) %>% 
-  gather(type, observed, -site, -date, -variable, -par, -simulated) %>% 
+  gather(type, observed, -site, -date, -variable, -determinant, -determinant_value, -simulated) %>% 
   ggplot(aes(simulated,observed, col = yday(date))) +
   facet_grid(site ~ type) +
   theme_bw() +
@@ -199,7 +228,7 @@ daily %>%
 ```{r evaltab}
 daily %>% 
   pivot_wider(names_from = type, values_from = value) %>% 
-  gather(type, observed, -site, -date, -variable, -par, -simulated) %>% 
+  gather(type, observed, -site, -date, -variable, -determinant, -determinant_value, -simulated) %>% 
   na.omit() %>% 
   nest_by(site, variable, type) %>% 
   mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
@@ -386,10 +415,9 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
               mutate(observed = value*20) %>% 
               select(-value)) %>% 
   left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
-              filter(variable == "vpd_max") %>% 
-              rename(vpdmax = value) %>% 
-              select(-variable)) %>% 
-  gather(type, value, -site, -date, -variable, -vpdmax)
+              filter(variable %in% c("par", "vpd_max", "temperature", "ws")) %>% 
+              rename(determinant = variable, determinant_value = value)) %>% 
+  gather(type, value, -site, -date, -variable, -determinant, -determinant_value)
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), variable, type) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
@@ -456,7 +484,8 @@ g
 #| warning: false
 #| fig-cap: "Daily averages of evapotranspiration as a function of daily maximum vapour pressure deficit for model- and tower-based estimates at Paracou and Tapajos."
 g <- daily %>% 
-  ggplot(aes(vpdmax, value, col = type)) +
+  filter(determinant == "vpd_max") %>% 
+  ggplot(aes(determinant_value, value, col = type)) +
   geom_point(alpha = 0.1) +
   theme_bw() +
   facet_wrap(~ site) +
@@ -471,6 +500,36 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
 ggsave("figures/f04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```
+
+```{r etdet}
+#| message: false
+#| warning: false
+#| fig-cap: "Daily averages of growth primary productivity as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
+g <- daily %>% 
+  mutate(determinant_value = ifelse(determinant == "par", 
+                                    determinant_value/10^2, determinant_value)) %>% 
+  mutate(det_long = recode(determinant, 
+                           "par" = 'Incoming~PAR~"["~mol~m^{-~2}~day^{-~1}~"]"',
+                           "temperature" = 'Temperature~"["~degree~C~"]"',
+                            "vpd_max" = '"Vapour Pressure Deficit ["~kPa~day^{-~1}~"]"',
+                           "ws" = 'Wind~Speed~"["~m^{2}~s^{-~1}~"]"')) %>% 
+  ggplot(aes(determinant_value, value, col = type)) +
+  geom_point(alpha = 0.1) +
+  theme_bw() +
+  facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
+  theme(legend.position = "bottom") +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
+  ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + 
+  xlab("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  ylim(0, NA) +
+  ggpubr::stat_cor()
+ggsave("figures/fs12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
