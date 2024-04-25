@@ -239,7 +239,7 @@ g <- vroom::vroom("outputs/calib.tsv") %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Litter traps", "TROLL")) +
   ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
-ggsave("figures/fs01.png", g, dpi = 300, width = 5, height = 5, bg = "white")
+ggsave("figures/fs02.png", g, dpi = 300, width = 5, height = 5, bg = "white")
 g
 ```
 

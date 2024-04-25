@@ -319,12 +319,27 @@ complete(imputation) %>%
 ```{r dens}
 #| message: false
 #| fig-cap: "Traits density distribution before and after species trait values imputation by predictive means matching."
-vroom::vroom("outputs/imputation.tsv") %>% 
-  filter(trait %in% troll$trait) %>% 
-  ggplot(aes(value, col = type)) +
-  geom_density() +
+t <- vroom::vroom("outputs/imputation.tsv") %>% 
+  filter(trait %in% c("ah", "dbhmax", "hmax", "TLP")) %>% 
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+labels <- t %>% 
+  group_by(trait, type) %>% 
+  summarise(N = n()) %>% 
+  pivot_wider(names_from = type, values_from = N) %>% 
+  mutate(label = paste0("Raw: ", raw, "\nImputed:", imputed)) %>% 
+  ungroup() %>% 
+  mutate(value = c(-2, 0.1, 1, 30),
+         density = c(0.25, 5, 1, 0.05)) %>% 
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+g <- ggplot(t, aes(value)) +
+  geom_density(aes(col = type)) +
+  geom_text(data = labels, aes(label = label, y = density)) +
   theme_bw() +
-  facet_wrap(~ trait, scales = "free")
+  facet_wrap(~ trait_long, scales = "free", labeller = label_parsed) +
+  scale_color_discrete("") +
+  theme(legend.position = "bottom", axis.title = element_blank())
+ggsave("figures/fs01.png", g, dpi = 300, width = 5, height = 5, bg = "white")
+g
 ```
 
 ```{r pca1}

@@ -111,7 +111,7 @@ g <- daily %>%
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-ggsave("figures/fs02.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+ggsave("figures/fs03.png", g, dpi = 300, width = 10, height = 5, bg = "white")
 g
 ```
 
@@ -370,7 +370,7 @@ g <- daily %>%
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
-ggsave("figures/fs04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -582,7 +582,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -1027,17 +1027,18 @@ all_traits_q %>%
 #| warning: false
 #| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou and the genus level in Tapajos."
 g <- read_tsv("outputs/functional_composition.tsv") %>%
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[max]",
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
                              "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
-                             "tlp" = "TLP", "wsg" = "WSG")) %>% 
+                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long)) %>% 
   ggplot(aes(trait_value, group = plot)) +
   geom_density(aes(col = "Observed")) +
   geom_density(aes(col = "Simulated"), 
                data = troll_traitdist %>% 
-                   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[max]",
+                   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]",
+                                              "hmax" = "h[lim]",
                              "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
-                             "tlp" = "TLP", "wsg" = "WSG")) %>% 
+                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long))) +
   facet_wrap(~ varlong, scales = "free", labeller = label_parsed) +
   theme_bw() +
