@@ -110,7 +110,7 @@ g <- daily %>%
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-ggsave("figures/fs03.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+ggsave("figures/fs04.png", g, dpi = 300, width = 10, height = 5, bg = "white")
 g
 ```
 
@@ -152,30 +152,6 @@ ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
-```{r gpppar}
-#| message: false
-#| warning: false
-#| fig-cap: "Daily averages of growth primary productivity as a function of incoming photosynthetically active radiation for model-, satellite- and tower-based estimates at Paracou and Tapajos."
-g <- daily %>% 
-  filter(determinant == "par") %>% 
-  ggplot(aes(determinant_value/10^2, value, col = type)) +
-  geom_point(alpha = 0.1) +
-  theme_bw() +
-  facet_wrap(~ site) +
-  theme(legend.position = "bottom") +
-  geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
-  ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
-  xlab(expression("Incoming PAR ["~mol~m^{-~2}~day^{-~1}~"]")) +
-  scale_color_manual("", values = as.vector(cols[c("sim", "sat", "obs")]), 
-                     labels = c("Tower", "Satellite", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
-                     labels = c("Tower", "Satellite", "TROLL")) +
-  ylim(0, NA) +
-  ggpubr::stat_cor()
-ggsave("figures/f03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
-g
-```
-
 ```{r gppdet}
 #| message: false
 #| warning: false
@@ -193,16 +169,16 @@ g <- daily %>%
   theme_bw() +
   facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
   theme(legend.position = "bottom") +
-  geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
   xlab("") +
-  scale_color_manual("", values = as.vector(cols[c("sim", "sat", "obs")]), 
+  scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
-  ylim(0, NA) +
+  ylim(0, 7.5) +
   ggpubr::stat_cor()
-ggsave("figures/fs11.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f03.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
@@ -253,7 +229,17 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
   mutate(type = "simulated") %>% 
   rename(value = simulated) %>% 
   bind_rows(read_tsv("outputs/lai.tsv") %>% 
-              rename(type = variable))
+              rename(type = variable)) %>% 
+  bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx") %>% 
+              mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+              mutate(site = "Tapajos", type = "PhenoCam", value = `Camera_LAI (m^2 m^-2)`) %>% 
+              select(date, value, site, type)) %>% 
+    mutate(type = recode(type, 
+                       "LAD" = "LAI (Smith et al., 2019)",
+                       "LAI" = "LAI Modis",
+                       "PAD" = "PAI (Barbier, Verley, Vincent, unpublished)",
+                       "PhenoCam" = "PhenoCam (Wu et al. 2016)",
+                       "simulated" = "TROLL"))
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), type) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
@@ -274,8 +260,8 @@ daily %>%
   theme(legend.position = "bottom") +
   xlab("") + 
   ylab(expression("Leaf Area Index ["~m^2~m^{-2}~"]")) +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sat", "obs", "sim")]), 
-                     labels = c("Terrestrial", "Satellite", "Drone", "TROLL"))
+  scale_color_discrete("") +
+  guides(col = guide_legend(nrow = 2))
 ```
 
 ```{r lai15days}
@@ -301,25 +287,30 @@ g <- daily %>%
   geom_smooth(aes(col = type), se = FALSE) +
   theme_bw() +
   theme(legend.position = "bottom") +
-  scale_fill_discrete("") +
-  scale_color_discrete("") +
+  scale_fill_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#3f3f3f",  "#0da1f8")) +
+  scale_color_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#3f3f3f",  "#0da1f8")) +
   facet_wrap(~ site, scales = "free_x") +
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sat", "obs", "sim")]), 
-                     labels = c("Terrestrial", "Satellite", "Drone", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "obs", "sim")]), 
-                     labels = c("Terrestrial", "Satellite", "Drone", "TROLL"))
+  guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2))
 ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
 ```{r laievaltab}
+#| message: false
 daily %>% 
+  group_by(site, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, type, week) %>% 
+  summarise(value = mean(value, na.rm = TRUE)) %>% 
   pivot_wider(names_from = type, values_from = value) %>% 
-  gather(type, observed, -site, -date, -simulated) %>% 
+  rename(simulated = TROLL) %>% 
+  gather(type, observed, -site, -week, -simulated) %>% 
   na.omit() %>% 
+  ungroup() %>% 
   nest_by(site, type) %>% 
   mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
          CC = cor(data$simulated, data$observed),
@@ -328,7 +319,7 @@ daily %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable(caption = "Evaluation fo daily means of ET at Paracou and Tapajos.")
+  knitr::kable(caption = "Evaluation fo monthly means of LAI at Paracou and Tapajos.")
 ```
 
 ### Leaf Area Index per Age
@@ -380,7 +371,28 @@ g <- daily %>%
   mutate(type = "TROLL") %>% 
   bind_rows(read_tsv("data/fluxes/lai_age.tsv") %>% 
               filter(type == "time series") %>% 
-              mutate(type = "Yang et al. (2023)")) %>% 
+              mutate(type = "Yang et al. (2023)\nReanalysis")) %>% 
+  bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 2) %>% 
+              rename(young = `Obs_LAIyoung (m^2 m^-2)`,
+                     mature = `Obs_LAImature (m^2 m^-2)`,
+                     old = `Obs_LAIold (m^2 m^-2)`) %>% 
+              mutate(site = "Tapajos", type = "Wu et al. (2016)\nPhenoCam") %>% 
+              mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+              mutate(week = week(date)) %>% 
+              select(site, week, type, young, mature, old) %>% 
+              gather(age, m, -site, -week, -type)) %>% 
+  # bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
+  #             mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
+  #             rename(young = `LAIyoung (m^2 m^-2)`,
+  #                    mature = `LAImature (m^2 m^-2)`,
+  #                    old = `LAIold (m^2 m^-2)`) %>% 
+  #             mutate(type = "Chen et al. (in prep)") %>% 
+  #             mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  #             mutate(week = week(date)) %>% 
+  #             select(site, week, type, young, mature, old) %>% 
+  #             gather(age, m, -site, -week, -type)) %>% 
+  mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016)\nPhenoCam",
+                                        "Yang et al. (2023)\nReanalysis"))) %>% 
   ggplot(aes(week, m)) +
   geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
            ymin = -Inf, ymax = Inf, alpha = 0.5,
@@ -398,9 +410,110 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
-  scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
-ggsave("figures/fs05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+  scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
+  theme(legend.position = "bottom")
+ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
+```
+
+```{r laia15daysb}
+#| message: false
+#| warning: false
+#| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
+g <- daily %>% 
+  group_by(site, variable, age, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, variable, age, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(type = "TROLL") %>% 
+  bind_rows(read_tsv("data/fluxes/lai_age.tsv") %>% 
+              filter(type == "time series") %>% 
+              mutate(type = "Yang et al. (2023) Renalaysis")) %>% 
+  bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 2) %>% 
+              rename(young = `Obs_LAIyoung (m^2 m^-2)`,
+                     mature = `Obs_LAImature (m^2 m^-2)`,
+                     old = `Obs_LAIold (m^2 m^-2)`) %>% 
+              mutate(site = "Tapajos", type = "Wu et al. (2016) PhenoCam") %>% 
+              mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+              mutate(week = week(date)) %>% 
+              select(site, week, type, young, mature, old) %>% 
+              gather(age, m, -site, -week, -type)) %>% 
+  # bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
+  #             mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
+  #             rename(young = `LAIyoung (m^2 m^-2)`,
+  #                    mature = `LAImature (m^2 m^-2)`,
+  #                    old = `LAIold (m^2 m^-2)`) %>% 
+  #             mutate(type = "Chen et al. (in prep)") %>% 
+  #             mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  #             mutate(week = week(date)) %>% 
+  #             select(site, week, type, young, mature, old) %>% 
+  #             gather(age, m, -site, -week, -type)) %>% 
+  mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016) PhenoCam",
+                                        "Yang et al. (2023) Renalaysis"))) %>% 
+  group_by(site, variable, age, type) %>% 
+  # mutate(m = m / mean(m)) %>% 
+  mutate(m = as.vector(scale(m))) %>% 
+  mutate(age = factor(age, levels = c("old", "mature", "young"))) %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_smooth(aes(col = type), se = FALSE) +
+  theme_bw() +
+  scale_color_manual("", values = c("#0da1f8",  "#3f3f3f", "#fb7754")) +
+  facet_grid(age ~ site) +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Normalised Leaf Area Index")) + xlab("") +
+  theme(legend.position = "bottom")
+ggsave("figures/fs07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```
+
+```{r laistrata}
+#| message: false
+#| eval: false
+#| fig-cap: "Mean annual cycle from monthly means of leaf area index per strata at Tapajos. Rectangles in the background correspond to the site’s climatological dry season."
+troll <- list(
+    lai_young = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
+    lai_mature = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
+      mutate(iter = as.numeric(iter)) %>% na.omit(),
+    lai_old = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
+      mutate(iter = as.numeric(iter)) %>% na.omit()
+  ) %>% bind_rows(.id = "variable") %>% 
+  mutate(date = as_date("2004/01/01")+iter) %>% 
+  select(-iter) %>% 
+  gather(height, value, -date, -variable) %>% 
+  separate(height, c("h", "height"), convert = T) %>% 
+  mutate(canopy = ifelse(height < 20, "lower", "upper")) %>% 
+  group_by(canopy, date) %>% 
+  summarise(value = sum(value)) %>% 
+  mutate(site = "Tapajos", variable = "LAI") %>% 
+  mutate(week = week(date), year = year(date)) %>% 
+  mutate(type = "TROLL")
+obs <- read_tsv("outputs/lai_tapajos_strat.tsv") %>% 
+  mutate(type = "LAI (Smith et al., 2019)")
+bind_rows(troll, obs) %>% 
+ggplot(aes(week, value)) +
+    geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+            ymin = -Inf, ymax = Inf, alpha = 0.5,
+            data = data.frame(week = week(as_date(c("2000-06-15"))),
+                              value = -Inf,
+                              end = week(as_date(c("2000-11-1"))))) +
+  geom_line(aes(group = paste(year, canopy), col = canopy), alpha = 0.5) +
+  geom_smooth(aes(col = canopy), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  facet_wrap(~ type)
 ```
 
 ### Evapotranspiration
@@ -429,17 +542,19 @@ monthly <- daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Daily and monthly means of evapotranpsiration for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations"
-daily %>% 
+g <- daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
   geom_line(data = monthly) +
-  facet_wrap(~ site, scales = "free_x") +
+  facet_wrap(~ site, nrow = 2) +
   theme_bw() +
   theme(legend.position = "bottom") +
   xlab("") + 
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
+ggsave("figures/fs05.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+g
 ```
 
 ```{r et15days}
@@ -479,34 +594,10 @@ ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
-```{r etvpd}
-#| message: false
-#| warning: false
-#| fig-cap: "Daily averages of evapotranspiration as a function of daily maximum vapour pressure deficit for model- and tower-based estimates at Paracou and Tapajos."
-g <- daily %>% 
-  filter(determinant == "vpd_max") %>% 
-  ggplot(aes(determinant_value, value, col = type)) +
-  geom_point(alpha = 0.1) +
-  theme_bw() +
-  facet_wrap(~ site) +
-  theme(legend.position = "bottom") +
-  facet_wrap(~ site) +
-  ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + 
-  xlab(expression("daily maximum Vapour Pressure deficit ["~kPa~day^{-~1}~"]")) + 
-  ylim(0, NA) +
-  ggpubr::stat_cor() +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL"))
-ggsave("figures/f04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
-g
-```
-
 ```{r etdet}
 #| message: false
 #| warning: false
-#| fig-cap: "Daily averages of growth primary productivity as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
+#| fig-cap: "Daily averages of evapotranspiration as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
 g <- daily %>% 
   mutate(determinant_value = ifelse(determinant == "par", 
                                     determinant_value/10^2, determinant_value)) %>% 
@@ -520,16 +611,16 @@ g <- daily %>%
   theme_bw() +
   facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
   theme(legend.position = "bottom") +
-  geom_smooth(method = "lm", formula = "y ~ 1+log(x)", se = FALSE) +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + 
   xlab("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL")) +
-  ylim(0, NA) +
+  ylim(0, 5.5) +
   ggpubr::stat_cor()
-ggsave("figures/fs12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f04.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
@@ -579,6 +670,7 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
               filter(variable == "swc10") %>% 
               group_by(site, year = year(date)) %>% 
               mutate(observed = value / quantile(value, 0.95, na.rm = T)) %>% 
+              mutate(observed = ifelse(observed > 1, 1, observed)) %>% 
               ungroup() %>% 
               mutate(variable = "rswc10") %>% 
               select(-year, -value)) %>% 
@@ -612,7 +704,7 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of relative soil water content for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-g <- daily %>% 
+g0 <- daily %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -641,7 +733,33 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g <- daily %>% 
+  group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date), year = year(date), m = value) %>% 
+  na.omit() %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_line(aes(group = paste(year, type), col = type), alpha = 0.5) +
+  geom_smooth(aes(col = type), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ site, scales = "free_x") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Relative Soil Water Content ["~"%"~"]")) + xlab("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL"))
+ggsave("figures/fs06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -708,8 +826,16 @@ structure <- read_tsv("outputs/evaluation_forest.tsv") %>%
             m = quantile(value, 0.5, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   na.omit() %>% 
-  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~m^{-~2}~"]"',
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
                           "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+# read_tsv("outputs/structure.tsv") %>% 
+#               filter(type != "understory") %>% 
+#               select(-type) %>% 
+#   group_by(site, variable, plot) %>% 
+#   summarise(observed = sum(observed)) %>% 
+#   summarise(l = quantile(observed, 0.025, na.rm = TRUE), 
+#             m = quantile(observed, 0.5, na.rm = TRUE), 
+#             h = quantile(observed, 0.975, na.rm = TRUE))
 ```
 
 ```{r dbhstr}
@@ -791,7 +917,7 @@ understory <- read_tsv("outputs/evaluation_forest.tsv") %>%
             m = quantile(value, 0.5, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   na.omit() %>% 
-  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~m^{-~2}~"]"',
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
                           "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
 ```
 
@@ -799,7 +925,7 @@ understory <- read_tsv("outputs/evaluation_forest.tsv") %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-labs <- structure %>% 
+labs <- understory %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
   mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
   group_by(variable, varlong, type, site) %>% 
@@ -870,6 +996,8 @@ labs <- all_str %>%
   ungroup() %>% 
   mutate(dbh_class = c(8, 120, 120, 8, 120, 120)) %>% 
   mutate(m = c(0.2, 7, 5, 3, 2, 2))
+labs$label[1] <- "Field: 4\nTROLL: 4"
+labs$label[4] <- "Field: 3787\nTROLL: 2312"
 g <- all_str %>% 
   ggplot(aes(dbh_class, m)) +
   geom_linerange(aes(ymin = l, ymax = h, col = type)) +
@@ -883,7 +1011,7 @@ g <- all_str %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL")) +
   geom_text(data = labs, aes(label = label))
-ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -934,7 +1062,7 @@ g <- compositon %>%
   scale_y_log10()  +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -1089,6 +1217,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
                              "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+  filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long)) %>% 
   ggplot(aes(trait_value, group = plot)) +
   geom_density(aes(col = "Observed")) +
@@ -1098,13 +1227,16 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
                                               "hmax" = "h[lim]",
                              "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+                 filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long))) +
-  facet_wrap(~ varlong, scales = "free", labeller = label_parsed) +
+  facet_wrap(~ varlong, scales = "free", labeller = label_parsed, nrow = 2) +
   theme_bw() +
-  theme(axis.title = element_blank(), legend.position = c(0.8, 0.1)) +
+  theme(axis.title = element_blank(), legend.position = "bottom",
+        axis.ticks.y = element_blank(), axis.text.y = element_blank(),
+        panel.spacing = unit(0,'lines'), axis.text.x = element_text(angle = 90)) +
   scale_color_discrete("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```

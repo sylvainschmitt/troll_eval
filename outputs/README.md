@@ -1,6 +1,6 @@
 # Outputs of analyses
 Sylvain Schmitt -
-Mar 7, 2024
+May 2, 2024
 
 This folder will contains the outputs of analyses from the quarto
 document. In particular :
@@ -27,6 +27,8 @@ document. In particular :
 - inventories.tsv: consolidated inventories data from the inventories
   chapter
 - lai.tsv: consolidated canopy metrics from the fluxes chapter
+- lai_tapajos_strat.tsv: consolidated canopy metrics from the fluxes
+  chapter for Tapajos strata
 - litter.tsv: consolidated litter data from the fluxes chapter
 - paracou_soil_troll.tsv: Paracou soil data ready for TROLL inputs
 - paracou_species_troll.tsv: Paracou species data ready for TROLL inputs
@@ -58,6 +60,7 @@ fs::dir_tree()
     ├── imputation.tsv
     ├── inventories.tsv
     ├── lai.tsv
+    ├── lai_tapajos_strat.tsv
     ├── litter.tsv
     ├── paracou_soil_troll.tsv
     ├── paracou_species_troll.tsv

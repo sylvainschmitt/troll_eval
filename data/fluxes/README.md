@@ -1,6 +1,6 @@
 # Fluxes data
 Sylvain Schmitt -
-Apr 15, 2024
+Apr 29, 2024
 
 This folder contains our point to fluxes data used to evaluate the TROLL
 model outputs:
@@ -32,6 +32,9 @@ model outputs:
   <https://figshare.com/articles/dataset/Leaf_age-dependent_LAI_seasonality_product_Lad-LAI_over_tropical_and_subtropical_evergreen_broadleaved_forests/21700955/4>
   and processed in the R script get_lai_age.R resulting the lai_age.tsv
   file.
+- Data_LAI_new.xlsx: LAI seasonality of leaf age cohorts. The first two
+  sheets are observed by Jin Wu. The third one are those predicted by
+  Xiuzhi Chen et al. (pers. com.).
 
 ``` r
 fs::dir_tree()
@@ -46,6 +49,7 @@ fs::dir_tree()
     │   │   └── lba_km67_litter_archive.txt
     │   └── guide
     │       └── Online_Version_CD10_Litter_Tapajos.html
+    ├── Data_LAI_new.xlsx
     ├── GF-Guy_2004-2014_FLUXNET2015_Met.nc
     ├── README.md
     ├── README.qmd

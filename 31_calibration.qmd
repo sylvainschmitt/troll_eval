@@ -72,8 +72,9 @@ The leaf resistance parameter which is limiting the potential at turgor loss poi
 
 ```{r a0}
 #| message: false
+#| warning: false
 #| fig-cap: "Effect of the leaf resistance parameter a on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
- read_tsv("outputs/calib.tsv") %>% 
+ga1 <- read_tsv("outputs/calib.tsv") %>% 
   filter(b0 == 0.02, delta == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = a0, fill = a0)) +
   geom_point(alpha = 0.5) +
@@ -88,12 +89,14 @@ The leaf resistance parameter which is limiting the potential at turgor loss poi
   scale_color_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
   scale_fill_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
   theme(legend.position = "bottom")
+ga1
 ```
 
 ```{r a0indices}
 #| message: false
+#| warning: false
 #| fig-cap: "Effect of the leaf resistance parameter a on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
-sim_metrics %>% 
+ga2 <- sim_metrics %>% 
   filter(b0 == 0.02, delta == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = a0)) +
   geom_point() +
@@ -104,14 +107,16 @@ sim_metrics %>%
   scale_color_viridis_c() +
   scale_color_viridis_c("a0 | b0 = 0.02, delta = 0.2") +
   theme(legend.position = "bottom")
+ga2
 ```
 
 The the tree height susceptibility parameter drives mainly the pike date but also the pike intensity for values above 0.1. Indeed low values close to 0.01 show a pike starting in September, whereas high values have a pike starting in December.
 
 ```{r b0}
 #| message: false
+#| warning: false
 #| fig-cap: "Effect of the tree height susceptibility parameter b on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
- read_tsv("outputs/calib.tsv") %>% 
+gb1 <- read_tsv("outputs/calib.tsv") %>% 
   filter(a0 == 0.2, delta == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = b0, fill = b0)) +
   geom_point(alpha = 0.5) +
@@ -126,12 +131,14 @@ The the tree height susceptibility parameter drives mainly the pike date but als
   scale_color_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
   scale_fill_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
   theme(legend.position = "bottom")
+gb1
 ```
 
 ```{r b0indices}
 #| message: false
+#| warning: false
 #| fig-cap: "Effect of the tree height susceptibility parameter b on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
-sim_metrics %>% 
+gb2 <- sim_metrics %>% 
   filter(a0 == 0.2, delta == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = b0)) +
   geom_point() +
@@ -142,14 +149,16 @@ sim_metrics %>%
   scale_color_viridis_c() +
   scale_color_viridis_c("b0 | a0 = 0.2, delta = 0.2") +
   theme(legend.position = "bottom")
+gb2
 ```
 
 The base variation in residence time multiplying factor for drought shedding seems to have a lighter influence on litterfall pike intensity and date, at least for default values of the two other parameters.
 
 ```{r delta}
 #| message: false
+#| warning: false
 #| fig-cap: "Effect of the base variation in residence time multiplying factor for drought shedding delta on the annual cycle from fortnightly litterfall for Paracou and Tapajos."
-read_tsv("outputs/calib.tsv") %>% 
+gd1 <- read_tsv("outputs/calib.tsv") %>% 
   filter(b0 == 0.02, a0 == 0.2) %>% 
   ggplot(aes(yday(date), simulated, col = delta, fill = delta)) +
   geom_point(alpha = 0.5) +
@@ -164,12 +173,14 @@ read_tsv("outputs/calib.tsv") %>%
   scale_color_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
   scale_fill_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
   theme(legend.position = "bottom")
+gd1
 ```
 
 ```{r deltaindices}
 #| message: false
+#| warngin: false
 #| fig-cap: "Effect of the base variation in residence time multiplying factor for drought shedding delta on the relation between Litterfall pike date and ratioi across years at Paracou and Tapajos."
-sim_metrics %>% 
+gd2 <- sim_metrics %>% 
   filter(b0 == 0.02, a0 == 0.2, type == "simulated") %>% 
   ggplot(aes(pike_day, ratio, col = delta)) +
   geom_point() +
@@ -180,6 +191,28 @@ sim_metrics %>%
   scale_color_viridis_c() +
   scale_color_viridis_c("delta | a0 = 0.2, b0 = 0.02") +
   theme(legend.position = "bottom")
+gd2
+```
+
+```{r fs02}
+#| eval: false
+g <- cowplot::plot_grid(ga1 + 
+                          ggtitle("a0 | b0 = 0.02, delta = 0.2") +
+                          theme(legend.position = "none"), 
+                        gb1+ 
+                          ggtitle("b0 | a0 = 0.2, delta = 0.2") +
+                          theme(legend.position = "none"), 
+                        gd1+ 
+                          ggtitle("delta | a0 = 0.2, b0 = 0.02") +
+                          theme(legend.position = "none"), 
+                        ga2 +
+                          scale_color_viridis_c(""),
+                        gb2 +
+                          scale_color_viridis_c(""), 
+                        gd2 +
+                          scale_color_viridis_c(""),
+                        nrow = 2)
+ggsave("figures/fs02.png", g, dpi = 300, width = 16, height = 8, bg = "white")
 ```
 
 ## Best parameters
@@ -239,7 +272,7 @@ g <- vroom::vroom("outputs/calib.tsv") %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Litter traps", "TROLL")) +
   ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
-ggsave("figures/fs02.png", g, dpi = 300, width = 5, height = 5, bg = "white")
+ggsave("figures/fs03.png", g, dpi = 300, width = 5, height = 5, bg = "white")
 g
 ```
 

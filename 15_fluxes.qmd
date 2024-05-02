@@ -319,7 +319,7 @@ obs_metrics %>%
 
 ## Canopy structure
 
-Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Area Density (LAD) and Plant Area Density (PAD) from local observation using terrestrial or drone LIDAR remotely-sensed by MODIS. LIDAR data includes drone data from Paracou provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.) and terrestrial data from Tapajos etrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>. Remotely-sensed data from MODIS were retrieved from PLUMBER2 on Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>. Additionally leaf area index per leaf cohort (LAI_age) was retrieved from @yang2023.
+Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Area Density (LAD) and Plant Area Density (PAD) from local observation using terrestrial or drone LIDAR remotely-sensed by MODIS. LIDAR data includes drone data from Paracou provided by Nicolas Barbier Bonal (G. Vincent & N. Barbier pers. com.) and terrestrial data from Tapajos etrieved from @smith2019: <https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.15726>. Remotely-sensed data from MODIS were retrieved from PLUMBER2 on Research Data Australia: <https://researchdata.edu.au/plumber2-forcing-evaluation-surface-models/1656048>. Leaf area index was also extracted from PhenoCam of @wu2017 by X. Chen (pers. com.). Leaf area index per leaf cohort (LAI_age) was retrieved from @yang2023, from PhenoCam of @wu2017 by X. Chen (pers. com.), and reanalaysed by X. Chen et al. (in prep).
 
 ```{r lai}
 #| eval: false
@@ -374,8 +374,13 @@ bind_rows(pad, lad, lai) %>%
 
 ```{r laivar}
 #| message: false
-#| fig-cap: "Annual cycle of leaf area density variation at Paracou and Tapajos measured every 8-days by satellite (LAI) across ten years, every 15-days by drone in Paracou across three years, or every 15-days at Tapajos from the ground in Tapajos for three years."
+#| fig-cap: "Annual cycle of leaf area density variation at Paracou and Tapajos measured every 8-days by satellite (LAI) across ten years, every 15-days by drone in Paracou across three years, or every 15-days at Tapajos from the ground in Tapajos for three years or from PhenoCam in Tapajos for one year (Wu et al. 2016)."
 read_tsv("outputs/lai.tsv") %>% 
+  bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx") %>% 
+              mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+              mutate(site = "Tapajos", variable = "PhenoCam", 
+                     value = `Camera_LAI (m^2 m^-2)`) %>% 
+              select(date, value, site, variable)) %>% 
   mutate(week = week(date)) %>%  
   ggplot(aes(week, value, col = site, fill = site)) +
   geom_line(aes(group = year(date))) +
@@ -413,4 +418,83 @@ read_tsv("data/fluxes/lai_age.tsv") %>%
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
+```
+
+```{r laiwu}
+#| message: false
+#| fig-cap: "Mean annual cycle from monthlu means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves from PhenoCam of @wu2017 by X. Chen (pers. com.), and reanalaysed by X. Chen et al. (in prep). Rectangles in the background correspond to the site’s climatological dry season."
+lai_age_wu <- readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 2) %>% 
+  rename(young = `Obs_LAIyoung (m^2 m^-2)`,
+         mature = `Obs_LAImature (m^2 m^-2)`,
+         old = `Obs_LAIold (m^2 m^-2)`) %>% 
+  mutate(site = "Tapajos", type = "Wu et al. (2016)") %>% 
+  mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  mutate(week = week(date)) %>% 
+  select(site, week, type, young, mature, old) %>% 
+  gather(age, m, -site, -week, -type)
+lai_age_chen <- readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
+  mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
+  rename(young = `LAIyoung (m^2 m^-2)`,
+         mature = `LAImature (m^2 m^-2)`,
+         old = `LAIold (m^2 m^-2)`) %>% 
+  mutate(type = "Chen et al. (in prep)") %>% 
+  mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  mutate(week = week(date)) %>% 
+  select(site, week, type, young, mature, old) %>% 
+  gather(age, m, -site, -week, -type)
+cols_laid <- c("young" = "#2bd22c", "mature" = "#197b14", "old" = "#ffa006")
+bind_rows(lai_age_wu, lai_age_chen) %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+            ymin = -Inf, ymax = Inf, alpha = 0.5,
+            data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                              m = -Inf,
+                              end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                              site = c("Paracou", "Tapajos"))) +
+  geom_smooth(aes(col = age), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_grid(type ~ site, scales = "free_x") +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
+  scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
+  scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
+```
+
+```{r laistrata}
+#| message: false
+#| fig-cap: "Mean annual cycle from monthly means of leaf area index per strata at Tapajos. Rectangles in the background correspond to the site’s climatological dry season."
+dates <- readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
+                  "abs_height", col_names = FALSE, skip = 0, n_max = 1) %>% 
+  select(-`...1`) %>% 
+  gather(key, date) %>% 
+  mutate(key = as.character(1:n()))
+readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
+                  "abs_height", col_names = c("height", dates$key), skip = 1) %>% 
+  mutate(canopy = ifelse(height < 20, "lower", "upper")) %>% 
+  gather(key, lad, -height, -canopy) %>% 
+  left_join(dates) %>% 
+  mutate(date = as_date(date)) %>%
+  group_by(date, canopy) %>% 
+  summarise(value = sum(lad)) %>% 
+  mutate(site = "Tapajos", variable = "LAI") %>% 
+  mutate(week = week(date), year = year(date)) %>% 
+  write_tsv(file = "outputs/lai_tapajos_strat.tsv")
+read_tsv("outputs/lai_tapajos_strat.tsv") %>% 
+  ggplot(aes(week, value)) +
+    geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+            ymin = -Inf, ymax = Inf, alpha = 0.5,
+            data = data.frame(week = week(as_date(c("2000-06-15"))),
+                              value = -Inf,
+                              end = week(as_date(c("2000-11-1"))))) +
+  geom_line(aes(group = paste(year, canopy), col = canopy)) +
+  geom_smooth(aes(col = canopy), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
+  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) 
 ```

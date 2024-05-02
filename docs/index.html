@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sylvain Schmitt">
-<meta name="dcterms.date" content="2024-04-05">
+<meta name="dcterms.date" content="2024-05-02">
 
 <title>TROLL V4 Evaluation</title>
 <style>
@@ -96,7 +96,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
 <script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
@@ -104,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
 <script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
 <link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
-<script src="site_libs/leaflet-binding-2.2.0/leaflet.js"></script>
+<script src="site_libs/leaflet-binding-2.2.2/leaflet.js"></script>
 
 
 </head>
@@ -295,7 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 5, 2024</p>
+      <p class="date">May 2, 2024</p>
     </div>
   </div>
   
@@ -325,32 +326,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addMarkers</span>(<span class="at">label =</span> <span class="sc">~</span>site, <span class="at">labelOptions =</span> <span class="fu">labelOptions</span>(<span class="at">noHide =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a19db2ee16705e4829fb" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-a19db2ee16705e4829fb">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[[5.27877,-2.85667],[-52.92486,-54.95889],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,["Paracou","Tapajos"],{"interactive":false,"permanent":true,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-2.85667,5.27877],"lng":[-54.95889,-52.92486]}},"evals":[],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-95e4ece9fbe6c6c81628" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-95e4ece9fbe6c6c81628">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[[5.27877,-2.85667],[-52.92486,-54.95889],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,["Paracou","Tapajos"],{"interactive":false,"permanent":true,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-2.85667,5.27877],"lng":[-54.95889,-52.92486]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
 <section id="poeple" class="level2">
 <h2 class="anchored" data-anchor-id="poeple">Poeple</h2>
 <ul>
-<li>Sylvain Schmitt (sylvain.schmitt@cirad.fr)</li>
-<li>Isabelle Maréchaux (isabelle.marechaux@inrae.fr)</li>
-<li>Jérôme Chave (jerome.chave@univ-tlse3.fr)</li>
-<li>Fabian J. Fischer (f.fischer@bristol.ac.uk)</li>
-<li><em>James Ball</em> <em>(jgcb3@cam.ac.uk)?</em></li>
-<li>Nicolas Barbier (nicolas.barbier@ird.fr)</li>
-<li>Marion Boisseaux (marionboisseaux@gmail.com)</li>
-<li>Damien Bonal (damien.bonal@inrae.fr)</li>
-<li>Benoit Burban(benoit.burban@inrae.fr)</li>
-<li><em>Natalia Restrepo-Coupe (nataliacoupe@gmail.com)</em></li>
-<li>Géraldine Derroire (geraldine.derroire@cirad.fr)</li>
-<li><em>Jeremy Lichstein (jlichstein@ufl.edu)</em></li>
-<li>Daniela Nemetschek (Daniela.Krebber@ecofog.gf)</li>
-<li><em>Scott Saleska (saleska@arizona.edu)</em></li>
-<li>Giacomo Selan (giacomo.sellan@cirad.fr)</li>
-<li>Philippe Verley (philippe.verley@ird.fr)</li>
-<li>Gregoire Vincent (gregoire.vincent@ird.fr)</li>
-<li>Camille Ziegler (camille.ziegler9@gmail.com)</li>
+<li><p>Sylvain Schmitt (sylvain.schmitt@cirad.fr)</p></li>
+<li><p>Fabian J. Fischer (f.fischer@bristol.ac.uk)</p></li>
+<li><p>James Ball (jgcb3@cam.ac.uk)</p></li>
+<li><p>Nicolas Barbier (nicolas.barbier@ird.fr)</p></li>
+<li><p>Marion Boisseaux (marionboisseaux@gmail.com)</p></li>
+<li><p>Damien Bonal (damien.bonal@inrae.fr)</p></li>
+<li><p>Benoit Burban (benoit.burban@inrae.fr)</p></li>
+<li><p>Xiuzhi Chen (henxzh73@mail.sysu.edu.cn)</p>
+<p>Géraldine Derroire (geraldine.derroire@cirad.fr)</p></li>
+<li><p>Jeremy Lichstein (jlichstein@ufl.edu)</p></li>
+<li><p>Daniela Nemetschek (Daniela.Krebber@ecofog.gf)</p></li>
+<li><p>Natalia Restrepo-Coupe (nataliacoupe@gmail.com)</p></li>
+<li><p>Scott Saleska (saleska@arizona.edu)</p></li>
+<li><p>Giacomo Selan (giacomo.sellan@cirad.fr)</p></li>
+<li><p>Philippe Verley (philippe.verley@ird.fr)</p></li>
+<li><p>Gregoire Vincent (gregoire.vincent@ird.fr)</p></li>
+<li><p>Camille Ziegler (camille.ziegler9@gmail.com)</p></li>
+<li><p>Jérôme Chave (jerome.chave@univ-tlse3.fr)</p></li>
+<li><p>Isabelle Maréchaux (isabelle.marechaux@inrae.fr)</p></li>
 </ul>
 
 
