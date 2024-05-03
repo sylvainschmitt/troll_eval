@@ -18,12 +18,13 @@ trollwater <- list(
   Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
-  mutate(swc10 = SWC_0, swc20 = SWC_1, swc80 = SWC_3,
+  mutate(swc0 = SWC_0, swc1 = SWC_1, swc2 = SWC_2,  swc3 = SWC_3,  swc4 = SWC_4,
          et = (transpitation_0 + transpitation_1 + transpitation_2 + 
-                 transpitation_3 + transpitation_4 + evaporation)*1000) %>% 
-  select(site, date, swc10, swc20, swc80, et) %>% 
+                 transpitation_3 + transpitation_4 + evaporation + 
+                 (precipitation/1000-throughfall))*1000) %>% 
+  select(site, date, swc0, swc1, swc2, swc3, swc4, et) %>% 
   group_by(site, year = year(date)) %>% 
-  mutate(rswc10 = swc10/quantile(swc10, 0.95, na.rm = T)) %>% 
+  mutate(rswc10 = swc0/quantile(swc0, 0.95, na.rm = T)) %>% 
   ungroup() %>% 
   select(-year) %>% 
   gather(variable, simulated, -site, -date)
@@ -472,7 +473,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Normalised Leaf Area Index")) + xlab("") +
   theme(legend.position = "bottom")
-ggsave("figures/fs07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -536,6 +537,22 @@ monthly <- daily %>%
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
             value = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE))
+daily_etp <- read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  mutate(ws = ws) %>% # u10
+  mutate(rgnet = snet) %>% # already rgnet
+  mutate(es = 0.6108*exp((17.27*temperature)/(237.3+temperature))) %>% 
+  mutate(ea = es - vpd) %>% 
+  mutate(delta = 4098*es/(237.3+temperature)) %>% 
+  mutate(z = 30) %>% # with 30-m canopy
+  mutate(p = 101.3*((293-0.0065*z)/293)^5.26) %>% 
+  mutate(gamma = 0.655*10^(-3)*p) %>% 
+  mutate(etp = (0.408*delta*rgnet+gamma*(900/(temperature+273))*ws*vpd)/
+           (delta+gamma*(1+0.34*ws))) %>% 
+  mutate(etp = etp/1000) %>% 
+  group_by(site, date = date(time)) %>% 
+  summarise(value = sum(etp)) %>% 
+  mutate(type = "etp") %>% 
+  select(site, date, type, value)
 ```
 
 ```{r etdaily}
@@ -562,6 +579,7 @@ g
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of evapotranspiration for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
 g <- daily %>% 
+  bind_rows(daily_etp) %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -586,10 +604,10 @@ g <- daily %>%
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + xlab("") +
-    scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL"))
+    scale_color_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
+                     labels = c("Potential", "Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
+                     labels = c("Potential", "Tower", "TROLL"))
 ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
@@ -704,35 +722,6 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of relative soil water content for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-g0 <- daily %>% 
-  group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
-  summarise_all(mean, na.rm = T) %>%
-  mutate(week = week(date)) %>%  
-  group_by(site, variable, type, week) %>% 
-  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
-            m = mean(value, na.rm = TRUE), 
-            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
-  ggplot(aes(week, m)) +
-  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
-           ymin = -Inf, ymax = Inf, alpha = 0.5,
-           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
-                             m = -Inf,
-                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
-                             site = c("Paracou", "Tapajos"))) +
-  geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
-  geom_smooth(aes(col = type), se = FALSE) +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  scale_fill_discrete("") +
-  scale_color_discrete("") +
-  facet_wrap(~ site, scales = "free_x") +
-    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
-                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
-  ylab(expression("Relative Soil Water Content ["~"%"~"]")) + xlab("") +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL"))
 g <- daily %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
@@ -776,6 +765,58 @@ daily %>%
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
   knitr::kable(caption = "Evaluation fo daily means of RSWC at Paracou and Tapajos.")
+```
+
+```{r swc}
+#| message: false
+#| warning: false
+#| fig-cap: "Mean annual cycle from daily means of soil water content for Paracou and Tapajos at different depths. The depth value indicates the maximum depth of the layer. Dark lines are the daily means across years, and bands are the intervals of means across ten years The vertical yellow bands in the background  correspond to the site's climatological dry season."
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
+  filter(grepl("^swc", variable)) %>% 
+  mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
+  mutate(depth = recode(paste(site, depth), 
+                        "Paracou 0" = 0.1,
+                        "Tapajos 0" = 0.1,
+                        "Paracou 1" = 0.33,
+                        "Tapajos 1" = 0.5,
+                        "Paracou 2" = 0.73,
+                        "Tapajos 2" = 1.5,
+                        "Paracou 3" = 1.53,
+                        "Tapajos 3" = 4,
+                        "Paracou 4" = 2.5,
+                        "Tapajos 4" = 16.1)) %>% 
+  mutate(day = yday(date), type = 'simulated', value = simulated) %>% 
+  select(site, date, day, type, depth, value) %>% 
+  bind_rows(read_tsv("outputs/guyaflux_swc.tsv") %>% 
+              mutate(depth = as.numeric(gsub("swc", "", variable))/100) %>%
+              mutate(day = yday(date), type = 'observed') %>% 
+              select(site, date, day, type, depth, value))
+g <- daily %>% 
+  group_by(site, depth, type, day = yday(date)) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(depth = as.factor(depth)) %>% 
+  ggplot(aes(day, m)) +
+  geom_rect(aes(xmin = day, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(day = yday(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = yday(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, col = depth, fill = depth, group = depth),
+              col = NA, alpha = 0.2) +
+  geom_line(aes(col = depth, fill = depth, group = depth)) +
+  theme_bw() +
+  scale_color_viridis_d("Depth (m)", direction = -1) +
+  scale_fill_viridis_d("Depth (m)", direction = -1) +
+  theme(axis.title.x = element_blank()) +
+  ylab(expression(Soil~Water~Content~"["~m^{3}~m^{-~3}~"]")) +
+  scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
+                    labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  facet_wrap(~ type ~ site, nrow = 2, scales = "free_y")
+ggsave("figures/fs07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ## Structure

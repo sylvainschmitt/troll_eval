@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9019: adding etp and swc for all depth in evaluation and companion figures
 -   troll_eval 0.1.0.9018: LAI per age and all figs update
 -   troll_eval 0.1.0.9017: all determinants of GPP and ET figs
 -   troll_eval 0.1.0.9016: adding Yang et al. 2023 data and figures

@@ -91,6 +91,17 @@ g
 g <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
    filter(grepl("^swc", variable)) %>% 
   mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
+  mutate(depth = recode(paste(site, depth), 
+                        "Paracou 0" = 0.1,
+                        "Tapajos 0" = 0.1,
+                        "Paracou 1" = 0.33,
+                        "Tapajos 1" = 0.5,
+                        "Paracou 2" = 0.73,
+                        "Tapajos 2" = 1.5,
+                        "Paracou 3" = 1.53,
+                        "Tapajos 3" = 4,
+                        "Paracou 4" = 2.5,
+                        "Tapajos 4" = 16.1)) %>% 
   group_by(site, depth, day = yday(date)) %>% 
   summarise(l = quantile(simulated, 0.025, na.rm = TRUE), 
             m = mean(simulated, na.rm = TRUE), 
@@ -114,7 +125,7 @@ g <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
   scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   facet_wrap(~ site, nrow = 2, scales = "free_y")
-# ggsave("figures/companion_f03.png", g, dpi = 300, width = 8, height = 6, bg = "white")
+ggsave("figures/companion_f03.png", g, dpi = 300, width = 8, height = 6, bg = "white")
 g
 ```
 
