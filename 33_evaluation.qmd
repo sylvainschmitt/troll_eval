@@ -413,7 +413,7 @@ g <- daily %>%
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   theme(legend.position = "bottom")
-ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -473,7 +473,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Normalised Leaf Area Index")) + xlab("") +
   theme(legend.position = "bottom")
-ggsave("figures/fs08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
