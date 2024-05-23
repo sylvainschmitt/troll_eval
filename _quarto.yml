@@ -24,6 +24,7 @@ book:
         - 31_calibration.qmd
         - 32_variation.qmd
         - 33_evaluation.qmd
+        - 33_evaluation2.qmd
   appendices:
     - 98_companion_figures.qmd
     - 99_references.qmd

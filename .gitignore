@@ -7,3 +7,4 @@
 # snakemake
 .snakemake
 /.quarto/
+results2
