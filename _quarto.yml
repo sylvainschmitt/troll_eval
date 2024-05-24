@@ -19,12 +19,15 @@ book:
       chapters: 
         - 21_methods.qmd
         - 22_tools.qmd
-    - part: 30_results.qmd
+    - part: 30_calibration.qmd
       chapters: 
-        - 31_calibration.qmd
-        - 32_variation.qmd
-        - 33_evaluation.qmd
-        - 33_evaluation2.qmd
+        - 31_structure.qmd
+        - 32_phenology.qmd
+    - part: 40_evaluation.qmd
+      chapters: 
+        - 41_variation.qmd
+        - 42_forest.qmd
+        - 43_fluxes.qmd
   appendices:
     - 98_companion_figures.qmd
     - 99_references.qmd

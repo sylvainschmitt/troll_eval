@@ -4,36 +4,16 @@ library(tidyverse)
 cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8", "sat" = "#fb7754")
 ```
 
-# Evaluation 2
+# Fluxes
 
-Evaluation of the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
-
-## Allometries
-
-```{r}
-data.frame(dbh = seq(1, 100, 1)) %>% 
-  mutate(allometry = list(data.frame(a = c(2.13, 2), 
-                                     b = c(0.63, 0.59), 
-                                     sigma = c(0.29, 0.35),
-                                     type = c("base", "calib")))) %>% 
-  unnest(allometry) %>% 
-  mutate(cr = exp(a+b*log(dbh)),
-         cr_l = exp(a+b*log(dbh)+sigma),
-         cr_h = exp(a+b*log(dbh)-sigma)) %>% 
-  ggplot(aes(dbh, cr, col = type)) +
-  geom_ribbon(aes(ymin = cr_l, ymax = cr_h, fill = type), col = NA, alpha = 0.2) +
-  geom_line() +
-  theme_bw()
-```
-
-## Fluxes
+Evaluation of the TROLL version 4 simulations of daily fluxes in relation to field observations and remote sensing at two Amazonian sites.
 
 ```{r fluxes}
 #| eval: false
 trollwater <- list(
-  Tapajos_base = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
-     mutate(date = as_date("2002/01/01")+iter),
-  Tapajos_calib = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
+  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
+     mutate(date = as_date("2004/01/01")+iter),
+  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(swc0 = SWC_0, swc1 = SWC_1, swc2 = SWC_2,  swc3 = SWC_3,  swc4 = SWC_4,
@@ -47,9 +27,9 @@ trollwater <- list(
   select(-year) %>% 
   gather(variable, simulated, -site, -date)
 trollsum <- list(
-  Tapajos_base = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
-     mutate(date = as_date("2002/01/01")+iter),
-  Tapajos_calib = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
+  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_sumstats.txt") %>% 
+     mutate(date = as_date("2004/01/01")+iter),
+  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   select(-npp, -rday, -rnight, -rstem) %>% 
@@ -57,26 +37,26 @@ trollsum <- list(
   select(-iter, -litterfall) %>% 
   gather(variable, simulated, -site, -date)
 lai <- list(
-  Tapajos_base = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
-     mutate(date = as_date("2002/01/01")+iter),
-  Tapajos_calib = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
+  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIdynamics.txt") %>% 
+     mutate(date = as_date("2004/01/01")+iter),
+  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(variable = "lai", simulated = LAI) %>% 
   select(site, date, variable, simulated)
 lai_age <- list(
-  Tapajos_base = list(
+  Paracou = list(
+    lai_young = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIyoung.txt"),
+    lai_mature = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAImature.txt") %>% 
+      mutate(iter = as.numeric(iter)) %>% na.omit(),
+    lai_old = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIold.txt") %>% 
+      mutate(iter = as.numeric(iter)) %>% na.omit()
+  ) %>% bind_rows(.id = "variable"),
+  Tapajos = list(
     lai_young = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
     lai_mature = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
     lai_old = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
-      mutate(iter = as.numeric(iter)) %>% na.omit()
-  ) %>% bind_rows(.id = "variable"),
-  Tapajos_calib = list(
-    lai_young = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
-      mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results2/run3/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable")
 ) %>% bind_rows(.id = "site") %>% 
@@ -86,16 +66,17 @@ lai_age <- list(
   group_by(site, variable, date) %>% 
   summarise(simulated = sum(value))
 bind_rows(trollwater, trollsum, lai, lai_age) %>% 
-  write_tsv("outputs/evaluation_fluxes2.tsv")
+  write_tsv("outputs/evaluation_fluxes.tsv")
 ```
 
-### Growth Primary Productivity
+## Growth Primary Productivity
+
+The new version of TROLL correctly simulated the phenology of Growth Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.
 
 ```{r gppdata}
 #| message: false
-daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>% 
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
   filter(variable == "gpp") %>% 
-  mutate(site2 = site, site = "Tapajos") %>% 
   left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
               mutate(observed = value*10^2*365/10^3) %>% 
               select(-value)) %>% 
@@ -105,8 +86,6 @@ daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>%
   left_join(read_tsv("data/fluxes/rtsif.tsv") %>% 
               mutate(satellite = rtsif*15.343*365/10^3) %>% 
               select(-rtsif)) %>% 
-  mutate(site = site2) %>% 
-  select(-site2) %>% 
   gather(type, value, -site, -date, -variable, -determinant, -determinant_value)
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), variable, type) %>% 
@@ -119,7 +98,7 @@ monthly <- daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Daily and monthly means of growth primary productivity for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days."
-daily %>% 
+g <- daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
   geom_line(data = monthly) +
@@ -130,13 +109,15 @@ daily %>%
   ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
+ggsave("figures/fs04.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+g
 ```
 
 ```{r gpp15days}
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of growth primary productivity for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -145,6 +126,12 @@ daily %>%
             m = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
   geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
   geom_smooth(aes(col = type), se = FALSE) +
   theme_bw() +
@@ -160,13 +147,15 @@ daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
+ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r gppdet}
 #| message: false
 #| warning: false
 #| fig-cap: "Daily averages of growth primary productivity as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
-daily %>% 
+g <- daily %>% 
   mutate(determinant_value = ifelse(determinant == "par", 
                                     determinant_value/10^2, determinant_value)) %>% 
   mutate(det_long = recode(determinant, 
@@ -188,6 +177,8 @@ daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 7.5) +
   ggpubr::stat_cor()
+ggsave("figures/f03.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+g
 ```
 
 ```{r gppevalplot}
@@ -225,13 +216,14 @@ daily %>%
   knitr::kable(caption = "Evaluation fo daily means of GPP at Paracou and Tapajos.")
 ```
 
-### Leaf Area Index
+## Leaf Area Index
+
+We had multiples data to evaluate canopy dynamics and resulting Leaf Area Index (LAI, m2/m2) that were not in agreement and unfortunately not in the same time period. LAI from MODIS shows a base value around 6 m2/m2 most of the years and a small increase below 0.2 m2/m3 in the dry season that pike in the middle of the dry season at both Paracou and Tapajos. Field measures with drone lidar showed a greater variation in Paracou with lowest values of 5.5 m2/m2 in April to June and highest values of almost 6 m2/m2 in December. Oppositely, field measures with terrestrial lidar in Tapajos showed no variation of LAI stable around 5.75 m2/m2 the whole year. This results thus question the use of MODIS LAI for TROLL evaluation. Indeed simulated LAI followed also the same phenology with an crease of LAI during the dry season but with values matching drone data in Paracou and not MODIS product. In Tapajos, the simulations showed even higher variations of LAI, that did not correspond to both MODIS and terrestrial LAD. Globally, simulated LAI showed a weak evaluation with a correlation coefficient of 0.37 in Paracou and 0.63 in Tapajos against 8-day observations from MODIS satellites, and corresponding RMSEP of respectively 0.3 and 0.1 m2/m2.
 
 ```{r laidata}
 #| message: false
-daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>% 
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
   filter(variable == "lai") %>% 
-  mutate(site2 = site, site = "Tapajos") %>% 
   select(-variable) %>% 
   mutate(type = "simulated") %>% 
   rename(value = simulated) %>% 
@@ -246,9 +238,7 @@ daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>%
                        "LAI" = "LAI Modis",
                        "PAD" = "PAI (Barbier, Verley, Vincent, unpublished)",
                        "PhenoCam" = "PhenoCam (Wu et al. 2016)",
-                       "simulated" = "TROLL")) %>% 
-    mutate(site = site2) %>% 
-  select(-site2)
+                       "simulated" = "TROLL"))
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), type) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
@@ -277,7 +267,7 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   group_by(site, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -286,6 +276,12 @@ daily %>%
             m = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
   geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
   geom_smooth(aes(col = type), se = FALSE) +
   theme_bw() +
@@ -297,19 +293,44 @@ daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2))
+ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
-### Leaf Area Index per Age
+```{r laievaltab}
+#| message: false
+daily %>% 
+  group_by(site, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, type, week) %>% 
+  summarise(value = mean(value, na.rm = TRUE)) %>% 
+  pivot_wider(names_from = type, values_from = value) %>% 
+  rename(simulated = TROLL) %>% 
+  gather(type, observed, -site, -week, -simulated) %>% 
+  na.omit() %>% 
+  ungroup() %>% 
+  nest_by(site, type) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation fo monthly means of LAI at Paracou and Tapajos.")
+```
+
+## Leaf Area Index per Age
+
+For comparisons with @yang2023, we also simulated Leaf Area Index per leaf-age class. In the figure 8 of @yang2023 Tapajos is represented by the subclass S1, characterised by an always higher values old LAI above 3 m2/m2 and lower values of young and mature LAI around 1.5 m2/m2, while Paracou is represented by the subclass S2, characterised with high values of old LAI and low value of young and mature LAI in wet season but a strong loss of old LAI, a strong increase in mature LAI, a slight increase of young LAI in dry season. Similarly, in our simulations we observed a high LAI of old leaves especially in Tapajos. It seems that old leaf area are overestimated in Tapajos, because a priori there is little interest in accumulating less efficient leaves, and therefore confirms the hypothesis that the basal flux of litter is not high enough for Tapajos. At Paracou, we simulated back the phenology of @yang2023 with increased young LAI and mature LAI in the dry season while old LAI is decreasing, but a bit later than in @yang2023 and with values of mature LAI similar to those of old LAI between 2 and 3.5 m2/m2.
 
 ```{r laiadata}
 #| message: false
-daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>% 
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
   filter(variable %in% c("lai_mature", "lai_old", "lai_young")) %>% 
-  mutate(site2 = site, site = "Tapajos") %>% 
   separate(variable, c("variable", "age")) %>% 
-  rename(value = simulated) %>% 
-    mutate(site = site2) %>% 
-  select(-site2)
+  rename(value = simulated)
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), variable, age) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
@@ -338,7 +359,7 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   group_by(site, variable, age, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -359,9 +380,25 @@ daily %>%
               mutate(week = week(date)) %>% 
               select(site, week, type, young, mature, old) %>% 
               gather(age, m, -site, -week, -type)) %>% 
+  # bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
+  #             mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
+  #             rename(young = `LAIyoung (m^2 m^-2)`,
+  #                    mature = `LAImature (m^2 m^-2)`,
+  #                    old = `LAIold (m^2 m^-2)`) %>% 
+  #             mutate(type = "Chen et al. (in prep)") %>% 
+  #             mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  #             mutate(week = week(date)) %>% 
+  #             select(site, week, type, young, mature, old) %>% 
+  #             gather(age, m, -site, -week, -type)) %>% 
   mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016)\nPhenoCam",
                                         "Yang et al. (2023)\nReanalysis"))) %>% 
   ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
   geom_ribbon(aes(ymin = l, ymax = h, fill = age), col = NA, alpha = 0.2) +
   geom_smooth(aes(col = age), se = FALSE) +
   theme_bw() +
@@ -374,13 +411,15 @@ daily %>%
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   theme(legend.position = "bottom")
+ggsave("figures/fs08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r laia15daysb}
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   group_by(site, variable, age, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -401,12 +440,29 @@ daily %>%
               mutate(week = week(date)) %>% 
               select(site, week, type, young, mature, old) %>% 
               gather(age, m, -site, -week, -type)) %>% 
+  # bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
+  #             mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
+  #             rename(young = `LAIyoung (m^2 m^-2)`,
+  #                    mature = `LAImature (m^2 m^-2)`,
+  #                    old = `LAIold (m^2 m^-2)`) %>% 
+  #             mutate(type = "Chen et al. (in prep)") %>% 
+  #             mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
+  #             mutate(week = week(date)) %>% 
+  #             select(site, week, type, young, mature, old) %>% 
+  #             gather(age, m, -site, -week, -type)) %>% 
   mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016) PhenoCam",
                                         "Yang et al. (2023) Renalaysis"))) %>% 
   group_by(site, variable, age, type) %>% 
+  # mutate(m = m / mean(m)) %>% 
   mutate(m = as.vector(scale(m))) %>% 
   mutate(age = factor(age, levels = c("old", "mature", "young"))) %>% 
   ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
   geom_smooth(aes(col = type), se = FALSE) +
   theme_bw() +
   scale_color_manual("", values = c("#0da1f8",  "#3f3f3f", "#fb7754")) +
@@ -415,6 +471,8 @@ daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Normalised Leaf Area Index")) + xlab("") +
   theme(legend.position = "bottom")
+ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r laistrata}
@@ -457,21 +515,20 @@ ggplot(aes(week, value)) +
   facet_wrap(~ type)
 ```
 
-### Evapotranspiration
+## Evapotranspiration
+
+The new version of TROLL correctly simulated the phenology of evapotranspiration (ET, mm/day), with a lower ET in wet season and an higher evaporative demand in the dry season. Simulations are slightly underestimating the ET but globally daily values overlaps in most of the 15-days windows with a wet season flux simulated around 2 mm/day against 3 mm/day observed in Paracou and both around 3.5 mm/day in the dry season. Similarly in Tapajos, the wet season flux simulated drop to almost 1 mm/day despite being above 2 mm/day in observations and they both reach 3 mm/day in the dry season. Both simulations and observations are driven by daily maximum vapour pressure deficit with a correlation coefficient between 0.58 and 0.67 for observation, and more deterministic for simulations between 0.89 and 0.93. Globally, simulated ET showed a very good evaluation with a correlation coefficient of 0.73 in Paracou and 0.72 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 0.8 mm/day.
 
 ```{r etdata}
 #| message: false
-daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>% 
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
   filter(variable == "et") %>% 
-  mutate(site2 = site, site = "Tapajos") %>% 
   left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
               mutate(observed = value*20) %>% 
               select(-value)) %>% 
   left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
               filter(variable %in% c("par", "vpd_max", "temperature", "ws")) %>% 
               rename(determinant = variable, determinant_value = value)) %>% 
-    mutate(site = site2) %>% 
-  select(-site2) %>% 
   gather(type, value, -site, -date, -variable, -determinant, -determinant_value)
 monthly <- daily %>% 
   group_by(site, date = floor_date(date, "month"), variable, type) %>% 
@@ -500,7 +557,7 @@ daily_etp <- read_tsv("outputs/fluxnet_climate.tsv") %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Daily and monthly means of evapotranpsiration for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations"
-daily %>% 
+g <- daily %>% 
   ggplot(aes(date, value, col = type)) +
   geom_line(alpha = 0.5) +
   geom_line(data = monthly) +
@@ -511,13 +568,15 @@ daily %>%
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
+ggsave("figures/fs05.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+g
 ```
 
 ```{r et15days}
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of evapotranspiration for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   bind_rows(daily_etp) %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
@@ -547,13 +606,15 @@ daily %>%
                      labels = c("Potential", "Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
                      labels = c("Potential", "Tower", "TROLL"))
+ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r etdet}
 #| message: false
 #| warning: false
 #| fig-cap: "Daily averages of evapotranspiration as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos."
-daily %>% 
+g <- daily %>% 
   mutate(determinant_value = ifelse(determinant == "par", 
                                     determinant_value/10^2, determinant_value)) %>% 
   mutate(det_long = recode(determinant, 
@@ -575,6 +636,8 @@ daily %>%
                      labels = c("Tower", "TROLL")) +
   ylim(0, 5.5) +
   ggpubr::stat_cor()
+ggsave("figures/f04.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+g
 ```
 
 ```{r etevalplot}
@@ -610,14 +673,15 @@ daily %>%
   knitr::kable(caption = "Evaluation fo daily means of ET at Paracou and Tapajos.")
 ```
 
-### Relative Soil Water Content
+## Relative Soil Water Content
+
+We only had soil water content measurement for Paracou. Moreover, soil water content measurement are measured with electric measurement of conductance and rely a lot on calibration. We thus decided to use Relative Soil water Content (RSWC, %) to avoid bias of tool calibration and focus on within-year variations. The new version of TROLL correctly simulated the phenology of RSWC, with a higher RSWC in wet season around 100% with fully saturated soils and a strong drop in RSWC in the dry season. Focusing on the drop in dry seasons, the mean value simulated across year in Paracou dropped to 80% but exceptionally dry years drop up to 50%. The observed conditions are harsher with a mean observed drop around 50% across years that is below 50 most years and drop to 40% the driest years. Globally, simulated RSWC showed a good evaluation at Paracou with a correlation coefficient of 0.77 against daily observations from eddy-flux towers, and corresponding RMSEP of 23 %.
 
 ```{r rswcdata}
 #| message: false
 #| warning: false
-daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>% 
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
   filter(variable == "rswc10") %>% 
-  mutate(site2 = site, site = "Tapajos") %>% 
   left_join(read_tsv("outputs/guyaflux_swc.tsv") %>% 
               filter(variable == "swc10") %>% 
               group_by(site, year = year(date)) %>% 
@@ -626,8 +690,6 @@ daily <- read_tsv("outputs/evaluation_fluxes2.tsv") %>%
               ungroup() %>% 
               mutate(variable = "rswc10") %>% 
               select(-year, -value)) %>% 
-    mutate(site = site2) %>% 
-  select(-site2) %>% 
   gather(type, value, -site, -date, -variable) %>% 
   na.omit()
 monthly <- daily %>% 
@@ -658,7 +720,7 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of relative soil water content for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
-daily %>% 
+g <- daily %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date), year = year(date), m = value) %>% 
@@ -684,256 +746,73 @@ daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
+ggsave("figures/fs06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
-## Structure
-
-The main development of TROLL version 4 is the inclusion of a new explicit modelling of daily water and carbon fluxes as well as a new leaf phenology. We thus focused TROLL version 4 evaluation on fluxes, as forest structure and composition was extensively assessed in @maréchaux2017 . However here, we quickly investigate back forest structure and composition in Paracou and Tapajos.
-
-```{r simforestdata}
-#| eval: false
-files <- list.files("results2/run3/", pattern = "final_pattern.txt", 
-                    recursive = T, full.names = T) 
-names(files) <- list.files("results2/run3/", pattern = "final_pattern.txt", 
-                    recursive = T, full.names = F) 
-troll_forest <- files %>% 
-  lapply(vroom::vroom) %>% 
-  bind_rows(.id = "file") %>% 
-  separate(file, "sim", "/") %>% 
-  separate(sim, c("site", "repetition")) %>%
-  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
-  mutate(species = gsub("_", " ", s_name)) %>% 
-  mutate(dbh = dbh*100)
-write_tsv(troll_forest, "outputs/evaluation_forest2.tsv")
-```
-
-### Forest
-
-```{r str}
-#| message: false
-structure <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
-  filter(dbh >= 10) %>% 
-  mutate(plot = repetition) %>% 
-  select(site, plot, dbh) %>% 
-  mutate(dbh_class = cut(dbh, breaks = seq(10, 200, by = 10), 
-                         labels = seq(10, 190, by = 10)+5)) %>% 
-  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
-  group_by(site, plot, dbh_class) %>% 
-  summarise(abundance = n()/4,
-            ba = sum((dbh/2)^2*pi)/10^4/4) %>% 
-  mutate(log_abundance = log10(abundance)) %>% 
-  gather(variable, simulated, -site, -dbh_class, -plot) %>% 
-  full_join(read_tsv("outputs/structure.tsv") %>% 
-              filter(type != "understory") %>% 
-              select(-type)) %>% 
-  gather(type, value, -site, -dbh_class, -variable, -plot) %>% 
-  group_by(site, dbh_class, variable, type) %>% 
-  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
-            m = quantile(value, 0.5, na.rm = TRUE), 
-            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+```{r rswcevaltab}
+daily %>% 
+  pivot_wider(names_from = type, values_from = value) %>% 
   na.omit() %>% 
-  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
-                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+  nest_by(site, variable) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation fo daily means of RSWC at Paracou and Tapajos.")
 ```
 
-```{r dbhstr}
+```{r swc}
 #| message: false
 #| warning: false
-#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-labs <- structure %>% 
-  filter(variable %in% c("ba", "log_abundance")) %>% 
-  mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
-  group_by(variable, varlong, type, site) %>% 
-  summarise(total = sum(m)) %>% 
-  group_by(variable, site) %>% 
-  pivot_wider(names_from = type, values_from = total) %>% 
-  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
-  mutate(dbh_class = 120) %>% 
-  mutate(m = ifelse(variable == "log_abundance", 1.5, 5)) 
-filter(structure, variable %in% c("ba", "log_abundance")) %>% 
-  ggplot(aes(dbh_class, m)) +
-  geom_linerange(aes(ymin = l, ymax = h, col = type)) +
-  geom_point(aes(col = type)) +
-  geom_line(aes(col = type)) +
-  theme_bw() +
-  facet_grid(varlong ~ site, scales = "free_y", labeller = label_parsed) +
-  xlab("DBH [ cm ]") + ylab("") +
-  scale_color_discrete("") +
-  theme(legend.position = "bottom") +
-  geom_text(data = labs, aes(label = label)) +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL"))
-```
-
-```{r dbhstreval}
-#| message: false
-#| warning: false
-#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-structure %>% 
-  filter(variable != "abundance") %>% 
-  gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
-  mutate(type = str_sub(type, 1, 3)) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value) %>% 
-  ggplot(aes(m_obs, m_sim, col = dbh_class)) +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
-  geom_point() +
-  facet_wrap(~ site ~ varlong, scales = "free", labeller = label_parsed) +
-  theme_bw() +
-  geom_abline() +
-  ylab("Simulated") + xlab("Observed") +
-  scale_color_viridis_c(guide = "none") +
-  ggpubr::stat_cor() 
-```
-
-## Composition
-
-### Species
-
-```{r compodata}
-#| message: false
-#| warning: false
-compositon <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
-  filter(dbh >= 10) %>% 
-  mutate(plot = repetition) %>% 
-  mutate(species = gsub("_", " ", s_name)) %>% 
-  select(site, plot, species) %>% 
-  group_by(site, plot, species) %>% 
-  summarise(simulated = n()/4) %>% 
-  mutate(variable = "abundance") %>% 
-  select(site, plot, species, variable, simulated) %>% 
-  full_join(read_tsv("outputs/composition.tsv")) %>% 
-  gather(type, value, -site, -plot, -variable, -species) %>% 
-  group_by(site, plot, variable, type) %>% 
-  arrange(desc(value)) %>% 
-  mutate(rank = 1:n()) %>% 
-  group_by(site, rank, type, variable) %>% 
+#| fig-cap: "Mean annual cycle from daily means of soil water content for Paracou and Tapajos at different depths. The depth value indicates the maximum depth of the layer. Dark lines are the daily means across years, and bands are the intervals of means across ten years The vertical yellow bands in the background  correspond to the site's climatological dry season."
+daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
+  filter(grepl("^swc", variable)) %>% 
+  mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
+  mutate(depth = recode(paste(site, depth), 
+                        "Paracou 0" = 0.1,
+                        "Tapajos 0" = 0.1,
+                        "Paracou 1" = 0.33,
+                        "Tapajos 1" = 0.5,
+                        "Paracou 2" = 0.73,
+                        "Tapajos 2" = 1.5,
+                        "Paracou 3" = 1.53,
+                        "Tapajos 3" = 4,
+                        "Paracou 4" = 2.5,
+                        "Tapajos 4" = 16.1)) %>% 
+  mutate(day = yday(date), type = 'simulated', value = simulated) %>% 
+  select(site, date, day, type, depth, value) %>% 
+  bind_rows(read_tsv("outputs/guyaflux_swc.tsv") %>% 
+              mutate(depth = as.numeric(gsub("swc", "", variable))/100) %>%
+              mutate(day = yday(date), type = 'observed') %>% 
+              select(site, date, day, type, depth, value))
+g <- daily %>% 
+  group_by(site, depth, type, day = yday(date)) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
-            m = quantile(value, 0.5, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
-  filter(rank < 115)
-```
-
-```{r compofig}
-#| message: false
-#| warning: false
-#| fig-cap: "Evaluation of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-compositon %>% 
-  ggplot(aes(rank, m, col = type)) +
-  geom_line(aes(y = l), linewidth = 0.5, linetype = "dashed") +
-  geom_line(aes(y = h), linewidth = 0.5, linetype = "dashed") +
-  geom_line() +
+  mutate(depth = as.factor(depth)) %>% 
+  ggplot(aes(day, m)) +
+  geom_rect(aes(xmin = day, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(day = yday(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = yday(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, col = depth, fill = depth, group = depth),
+              col = NA, alpha = 0.2) +
+  geom_line(aes(col = depth, fill = depth, group = depth)) +
   theme_bw() +
-  facet_wrap(~ site) +
-  xlab("Rank") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
-  scale_color_discrete("") +
-  theme(legend.position = "bottom") +
-  scale_y_log10()  +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL"))
-```
-
-```{r compoquant}
-#| message: false
-#| warning: false
-#| fig-cap: "Quantiles comparisons of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-compositon %>% 
-  ungroup() %>% 
-  gather(quantile, value, -site, -rank, -variable, -type) %>% 
-  mutate(type = str_sub(type, 1, 3)) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value) %>% 
-  ggplot(aes(m_obs, m_sim, col = rank)) +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
-  geom_point() +
-  facet_wrap(~ site, scales = "free") +
-  theme_bw() +
-  geom_abline() +
-  ylab(expression("Simulated abundance ["~ha^{-~1}~"]")) +
-  xlab(expression("Observed abundance ["~ha^{-~1}~"]")) +
-  scale_y_log10() + scale_x_log10() +
-  scale_color_viridis_c(guide = "none") +
-  ggpubr::stat_cor()
-```
-
-### Functional
-
-```{r ftdata}
-#| message: false
-#| warning: false
-troll_traits <- list(
-    read_tsv("outputs/paracou_species_troll.tsv"),
-    read_tsv("outputs/tapajos_species_troll.tsv")
-) %>% bind_rows() %>% 
-  unique() %>% 
-  rename_all(~ gsub("s_", "", .)) %>% 
-  select(-seedmass, -regionalfreq) %>% 
-  rename(species = name) %>% 
-  mutate(species = gsub("_", " ", species)) %>% 
-  gather(trait, trait_value, -species)
-troll_traitdist <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
-  filter(dbh >= 10) %>% 
-  mutate(plot = repetition) %>% 
-  select(site, plot, species) %>% 
-  left_join(troll_traits)
-all_traits_q <- bind_rows(
-  mutate(troll_traitdist, type = "sim"),
-  mutate(read_tsv("outputs/functional_composition.tsv"), type = "obs")
-) %>% 
-  group_by(site, trait, plot, type) %>% 
-  summarise(quantile = list(quantile(trait_value, seq(0, 1, length.out = 100)))) %>% 
-  unnest_longer(quantile) %>% 
-  group_by(site, trait, type, quantile_id)%>% 
-  summarise(l = quantile(quantile, 0.025, na.rm = TRUE), 
-            m = quantile(quantile, 0.5, na.rm = TRUE), 
-            h = quantile(quantile, 0.975, na.rm = TRUE)) %>% 
-  gather(quantile, value, -site, -trait, -type, -quantile_id) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  ungroup() %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value)
-```
-
-```{r fttapfig}
-#| message: false
-#| warning: false
-#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
-read_tsv("outputs/functional_composition.tsv") %>% 
-  filter(site == "Tapajos") %>% 
-  ggplot(aes(trait_value, group = plot)) +
-  geom_density(aes(col = "Observed")) +
-  geom_density(aes(col = "Simulated"),
-               data = filter(troll_traitdist, site == "Tapajos")) +
-  facet_wrap(~ trait, scales = "free") +
-  theme_bw() +
-  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
-  theme(axis.title = element_blank(), legend.position = "bottom") +
-  scale_color_discrete("") +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL"))
-```
-
-```{r ftaptquant}
-#| message: false
-#| warning: false
-#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
-all_traits_q %>% 
-  filter(site == "Tapajos") %>% 
-  ggplot(aes(m_obs, m_sim)) +
-  geom_abline(col = "blue") +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim), alpha = .5) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs), alpha = .5) +
-  geom_point() +
-  theme_bw() +
-  facet_wrap(~ trait, scales = "free") +
-  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
-  xlab("Observed trait quantiles") +
-  ylab("Simulated trait quantiles") +
-  ggpubr::stat_cor() + 
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL"))
+  scale_color_viridis_d("Depth (m)", direction = -1) +
+  scale_fill_viridis_d("Depth (m)", direction = -1) +
+  theme(axis.title.x = element_blank()) +
+  ylab(expression(Soil~Water~Content~"["~m^{3}~m^{-~3}~"]")) +
+  scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
+                    labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  facet_wrap(~ type ~ site, nrow = 2, scales = "free_y")
+ggsave("figures/fs07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```

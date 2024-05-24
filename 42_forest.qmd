@@ -1,0 +1,472 @@
+```{r setup}
+#| include: false 
+library(tidyverse) 
+cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8", "sat" = "#fb7754")
+```
+
+# Forest
+
+Evaluation of the TROLL version 4 final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
+
+## Structure
+
+The main development of TROLL version 4 is the inclusion of a new explicit modelling of daily water and carbon fluxes as well as a new leaf phenology. We thus focused TROLL version 4 evaluation on fluxes, as forest structure and composition was extensively assessed in @maréchaux2017 . However here, we quickly investigate back forest structure and composition in Paracou and Tapajos.
+
+```{r simforestdata}
+#| eval: false
+files <- list.files("results/run3/", pattern = "final_pattern.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "final_pattern.txt", 
+                    recursive = T, full.names = F) 
+troll_forest <- files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  mutate(species = gsub("_", " ", s_name)) %>% 
+  mutate(dbh = dbh*100)
+write_tsv(troll_forest, "outputs/evaluation_forest.tsv")
+```
+
+### Forest
+
+We characterized global forests structure through their distribution of basal area (m2/ha) and logged abundance per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.
+
+```{r str}
+#| message: false
+structure <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  select(site, plot, dbh) %>% 
+  mutate(dbh_class = cut(dbh, breaks = seq(10, 200, by = 10), 
+                         labels = seq(10, 190, by = 10)+5)) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  group_by(site, plot, dbh_class) %>% 
+  summarise(abundance = n()/4,
+            ba = sum((dbh/2)^2*pi)/10^4/4) %>% 
+  mutate(log_abundance = log10(abundance)) %>% 
+  gather(variable, simulated, -site, -dbh_class, -plot) %>% 
+  full_join(read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory") %>% 
+              select(-type)) %>% 
+  gather(type, value, -site, -dbh_class, -variable, -plot) %>% 
+  group_by(site, dbh_class, variable, type) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = quantile(value, 0.5, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  na.omit() %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+# read_tsv("outputs/structure.tsv") %>% 
+#               filter(type != "understory") %>% 
+#               select(-type) %>% 
+#   group_by(site, variable, plot) %>% 
+#   summarise(observed = sum(observed)) %>% 
+#   summarise(l = quantile(observed, 0.025, na.rm = TRUE), 
+#             m = quantile(observed, 0.5, na.rm = TRUE), 
+#             h = quantile(observed, 0.975, na.rm = TRUE))
+```
+
+```{r dbhstr}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+labs <- structure %>% 
+  filter(variable %in% c("ba", "log_abundance")) %>% 
+  mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
+  group_by(variable, varlong, type, site) %>% 
+  summarise(total = sum(m)) %>% 
+  group_by(variable, site) %>% 
+  pivot_wider(names_from = type, values_from = total) %>% 
+  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
+  mutate(dbh_class = 120) %>% 
+  mutate(m = ifelse(variable == "log_abundance", 1.5, 5)) 
+filter(structure, variable %in% c("ba", "log_abundance")) %>% 
+  ggplot(aes(dbh_class, m)) +
+  geom_linerange(aes(ymin = l, ymax = h, col = type)) +
+  geom_point(aes(col = type)) +
+  geom_line(aes(col = type)) +
+  theme_bw() +
+  facet_grid(varlong ~ site, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("") +
+  scale_color_discrete("") +
+  theme(legend.position = "bottom") +
+  geom_text(data = labs, aes(label = label)) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+```
+
+```{r dbhstreval}
+#| message: false
+#| warning: false
+#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+structure %>% 
+  filter(variable != "abundance") %>% 
+  gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
+  mutate(type = str_sub(type, 1, 3)) %>% 
+  mutate(quantile = paste0(quantile, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = quantile, values_from = value) %>% 
+  ggplot(aes(m_obs, m_sim, col = dbh_class)) +
+  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
+  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
+  geom_point() +
+  facet_wrap(~ site ~ varlong, scales = "free", labeller = label_parsed) +
+  theme_bw() +
+  geom_abline() +
+  ylab("Simulated") + xlab("Observed") +
+  scale_color_viridis_c(guide = "none") +
+  ggpubr::stat_cor() 
+```
+
+### Understory
+
+Taking advantage of new inventories of understory in Paracou, we assessed TROLL version 4 ability to simulate understory. We found TROLL to understimate the number of small trees with DBH close to 1cm and overestimate bigger trees with DBH closer to 10. We ewpected this behaviour as TROLL only simulates one tree per square meter. Nonetheless we found back a basal area of 4 m2/ha despite an underestimation of 2,310 individuals per hectare against 3,787, observed.
+
+```{r understory}
+#| message: false
+understory <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+  filter(dbh <= 10) %>% 
+  mutate(plot = repetition) %>% 
+  select(site, plot, dbh) %>% 
+  mutate(dbh_class = cut(dbh, breaks = seq(1, 10, by = 1), 
+                         labels = seq(1, 9, by = 1)+0.5)) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  group_by(site, plot, dbh_class) %>% 
+  summarise(abundance = n()/4,
+            ba = sum((dbh/2)^2*pi)/10^4/4) %>% 
+  mutate(log_abundance = log10(abundance)) %>% 
+  gather(variable, simulated, -site, -dbh_class, -plot) %>% 
+  full_join(read_tsv("outputs/structure.tsv") %>% 
+            filter(type == "understory") %>% 
+              select(-type)) %>% 
+  gather(type, value, -site, -dbh_class, -variable, -plot) %>% 
+  group_by(site, dbh_class, variable, type) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = quantile(value, 0.5, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  na.omit() %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+```
+
+```{r understoryfig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+labs <- understory %>% 
+  filter(variable %in% c("ba", "log_abundance")) %>% 
+  mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
+  group_by(variable, varlong, type, site) %>% 
+  summarise(total = sum(m)) %>% 
+  group_by(variable, site) %>% 
+  pivot_wider(names_from = type, values_from = total) %>% 
+  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
+  mutate(dbh_class = 5) %>% 
+  mutate(m = ifelse(variable == "log_abundance", 3, 0.6)) 
+filter(understory, variable %in% c("ba", "log_abundance")) %>% 
+  ggplot(aes(dbh_class, m)) +
+  geom_linerange(aes(ymin = l, ymax = h, col = type)) +
+  geom_point(aes(col = type)) +
+  geom_line(aes(col = type)) +
+  theme_bw() +
+  facet_grid(varlong ~ site, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("") +
+  scale_color_discrete("") +
+  theme(legend.position = "bottom") +
+  geom_text(data = labs, aes(label = label)) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+```
+
+```{r understoryeval}
+#| message: false
+#| warning: false
+#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou with understory trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+understory %>% 
+  filter(site == "Paracou") %>% 
+  filter(variable != "abundance") %>% 
+  gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
+  mutate(type = str_sub(type, 1, 3)) %>% 
+  mutate(quantile = paste0(quantile, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = quantile, values_from = value) %>% 
+  ggplot(aes(m_obs, m_sim, col = dbh_class)) +
+  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
+  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
+  geom_point() +
+  facet_wrap(~ varlong, scales = "free", labeller = label_parsed) +
+  theme_bw() +
+  geom_abline() +
+  ylab("Simulated") + xlab("Observed") +
+  scale_color_viridis_c(guide = "none") +
+  ggpubr::stat_cor() +
+  ggtitle("Paracou")
+```
+
+### All
+
+```{r allstr}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+all_str <- bind_rows(
+  mutate(understory, site = '"Paracou "<= "10 cm"'),
+  mutate(structure, site = ifelse(site == "Paracou", '"Paracou ">= "10 cm"', '"Tapajos ">= "10 cm"'))
+  ) %>% filter(variable %in% c("ba", "log_abundance"))
+labs <- all_str %>% 
+  filter(variable %in% c("ba", "log_abundance")) %>% 
+  mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
+  group_by(variable, varlong, type, site) %>% 
+  summarise(total = sum(m)) %>% 
+  group_by(variable, site) %>% 
+  pivot_wider(names_from = type, values_from = total) %>% 
+  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
+  ungroup() %>% 
+  mutate(dbh_class = c(8, 120, 120, 8, 120, 120)) %>% 
+  mutate(m = c(0.2, 7, 5, 3, 2, 2))
+labs$label[1] <- "Field: 4\nTROLL: 4"
+labs$label[4] <- "Field: 3787\nTROLL: 2312"
+g <- all_str %>% 
+  ggplot(aes(dbh_class, m)) +
+  geom_linerange(aes(ymin = l, ymax = h, col = type)) +
+  geom_point(aes(col = type)) +
+  geom_line(aes(col = type)) +
+  theme_bw() +
+  facet_wrap(varlong ~ site, scales = "free", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("") +
+  scale_color_discrete("") +
+  theme(legend.position = "bottom") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL")) +
+  geom_text(data = labs, aes(label = label))
+ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```
+
+## Composition
+
+### Species
+
+Observed species rank-abundance curves in Paracou and Tapajos revealed low evenness with a few dominating species even more intense in Tapajos. However, Tapajos data are based on only 8 very small plots of 0.25ha, which may not be representative despite their virtual pooling in two 1-ha plots, and the quality of the species identifications can be lower. Simulated rank-abundance curve in Paracou was similar to the observed one with a correlation coefficient of 0.95 but with higher evenness resulting in underestimation of dominant species abundances and overestimation of rare species abundances. Simulated rank-abundance curve in Tapajos was very similar to the one simulated in Paracou but differed a lot of the one in Tapajos with strong underestimation of dominant species abundances and overestimation of rare species abundances. But once again observation data in Tapajos might be question for species resolution.
+
+```{r compodata}
+#| message: false
+#| warning: false
+compositon <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  mutate(species = gsub("_", " ", s_name)) %>% 
+  select(site, plot, species) %>% 
+  group_by(site, plot, species) %>% 
+  summarise(simulated = n()/4) %>% 
+  mutate(variable = "abundance") %>% 
+  select(site, plot, species, variable, simulated) %>% 
+  full_join(read_tsv("outputs/composition.tsv")) %>% 
+  gather(type, value, -site, -plot, -variable, -species) %>% 
+  group_by(site, plot, variable, type) %>% 
+  arrange(desc(value)) %>% 
+  mutate(rank = 1:n()) %>% 
+  group_by(site, rank, type, variable) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = quantile(value, 0.5, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  filter(rank < 115)
+```
+
+```{r compofig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+g <- compositon %>% 
+  ggplot(aes(rank, m, col = type)) +
+  geom_line(aes(y = l), linewidth = 0.5, linetype = "dashed") +
+  geom_line(aes(y = h), linewidth = 0.5, linetype = "dashed") +
+  geom_line() +
+  theme_bw() +
+  facet_wrap(~ site) +
+  xlab("Rank") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  scale_color_discrete("") +
+  theme(legend.position = "bottom") +
+  scale_y_log10()  +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```
+
+```{r compoquant}
+#| message: false
+#| warning: false
+#| fig-cap: "Quantiles comparisons of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+compositon %>% 
+  ungroup() %>% 
+  gather(quantile, value, -site, -rank, -variable, -type) %>% 
+  mutate(type = str_sub(type, 1, 3)) %>% 
+  mutate(quantile = paste0(quantile, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = quantile, values_from = value) %>% 
+  ggplot(aes(m_obs, m_sim, col = rank)) +
+  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
+  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free") +
+  theme_bw() +
+  geom_abline() +
+  ylab(expression("Simulated abundance ["~ha^{-~1}~"]")) +
+  xlab(expression("Observed abundance ["~ha^{-~1}~"]")) +
+  scale_y_log10() + scale_x_log10() +
+  scale_color_viridis_c(guide = "none") +
+  ggpubr::stat_cor()
+```
+
+### Functional
+
+Simulated functional trait distribution in Paracou and Tapajos matched the ones observed with quantiles correlations above 0.9 for all traits and sites, at th exception of leaf area in Paracou. However due to a poor species resolution in Tapajos we used mean genus values, which may result in an overestimation of assessment in Tapajos. Leaf area differences in Paracou come to the lack of very high leaf area species in the simulations compared to the Paracou plots, however the resulting correlation coefficient might have differed if we would have used log-transformed leaf area). Diving into the observed data, the high leaf area values are due to pioneer species including *Cecropia obtusa* and *sciadophylla*, *Sterculia speciosa* and *Perebea guianensis*. The three genus are present in the simulations inputs, but seems to lack in the final forest due to either a lack of forest gaps or a lack of survival.
+
+```{r ftdata}
+#| message: false
+#| warning: false
+troll_traits <- list(
+    read_tsv("outputs/paracou_species_troll.tsv"),
+    read_tsv("outputs/tapajos_species_troll.tsv")
+) %>% bind_rows() %>% 
+  unique() %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  rename(species = name) %>% 
+  mutate(species = gsub("_", " ", species)) %>% 
+  gather(trait, trait_value, -species)
+troll_traitdist <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  select(site, plot, species) %>% 
+  left_join(troll_traits)
+all_traits_q <- bind_rows(
+  mutate(troll_traitdist, type = "sim"),
+  mutate(read_tsv("outputs/functional_composition.tsv"), type = "obs")
+) %>% 
+  group_by(site, trait, plot, type) %>% 
+  summarise(quantile = list(quantile(trait_value, seq(0, 1, length.out = 100)))) %>% 
+  unnest_longer(quantile) %>% 
+  group_by(site, trait, type, quantile_id)%>% 
+  summarise(l = quantile(quantile, 0.025, na.rm = TRUE), 
+            m = quantile(quantile, 0.5, na.rm = TRUE), 
+            h = quantile(quantile, 0.975, na.rm = TRUE)) %>% 
+  gather(quantile, value, -site, -trait, -type, -quantile_id) %>% 
+  mutate(quantile = paste0(quantile, "_", type)) %>% 
+  ungroup() %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = quantile, values_from = value)
+```
+
+```{r ftparfig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
+read_tsv("outputs/functional_composition.tsv") %>% 
+  filter(site == "Paracou") %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  geom_density(aes(col = "Observed")) +
+  geom_density(aes(col = "Simulated"),
+               data = filter(troll_traitdist, site == "Paracou")) +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  ggtitle("Paracou", "546,498 inds represented on 577,761 (94.59%)") +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_color_discrete("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+```
+
+```{r ftparquant}
+#| message: false
+#| warning: false
+#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
+all_traits_q %>% 
+  filter(site == "Paracou") %>% 
+  ggplot(aes(m_obs, m_sim)) +
+  geom_abline(col = "blue") +
+  geom_linerange(aes(ymin = l_sim, ymax = h_sim), alpha = .5) +
+  geom_linerange(aes(xmin = l_obs, xmax = h_obs), alpha = .5) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ trait, scales = "free") +
+  ggtitle("Paracou", "546,498 inds represented on 577,761 (94.59%)") +
+  xlab("Observed trait quantiles") +
+  ylab("Simulated trait quantiles") +
+  ggpubr::stat_cor()
+```
+
+```{r fttapfig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
+read_tsv("outputs/functional_composition.tsv") %>% 
+  filter(site == "Tapajos") %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  geom_density(aes(col = "Observed")) +
+  geom_density(aes(col = "Simulated"),
+               data = filter(troll_traitdist, site == "Tapajos")) +
+  facet_wrap(~ trait, scales = "free") +
+  theme_bw() +
+  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
+  theme(axis.title = element_blank(), legend.position = "bottom") +
+  scale_color_discrete("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+```
+
+```{r ftaptquant}
+#| message: false
+#| warning: false
+#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
+all_traits_q %>% 
+  filter(site == "Tapajos") %>% 
+  ggplot(aes(m_obs, m_sim)) +
+  geom_abline(col = "blue") +
+  geom_linerange(aes(ymin = l_sim, ymax = h_sim), alpha = .5) +
+  geom_linerange(aes(xmin = l_obs, xmax = h_obs), alpha = .5) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ trait, scales = "free") +
+  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
+  xlab("Observed trait quantiles") +
+  ylab("Simulated trait quantiles") +
+  ggpubr::stat_cor() + 
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+```
+
+```{r ftallfig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou and the genus level in Tapajos."
+g <- read_tsv("outputs/functional_composition.tsv") %>%
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
+                             "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
+                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+  filter(!(trait %in% c("ah", "hmax"))) %>% 
+  mutate(varlong = paste0('"', site, ':"~', trait_long)) %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  geom_density(aes(col = "Observed")) +
+  geom_density(aes(col = "Simulated"), 
+               data = troll_traitdist %>% 
+                   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]",
+                                              "hmax" = "h[lim]",
+                             "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
+                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+                 filter(!(trait %in% c("ah", "hmax"))) %>% 
+  mutate(varlong = paste0('"', site, ':"~', trait_long))) +
+  facet_wrap(~ varlong, scales = "free", labeller = label_parsed, nrow = 2) +
+  theme_bw() +
+  theme(axis.title = element_blank(), legend.position = "bottom",
+        axis.ticks.y = element_blank(), axis.text.y = element_blank(),
+        panel.spacing = unit(0,'lines'), axis.text.x = element_text(angle = 90)) +
+  scale_color_discrete("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```

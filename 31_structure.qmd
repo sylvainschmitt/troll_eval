@@ -1,0 +1,11 @@
+```{r setup}
+#| include: false 
+rm(list = ls())
+library(tidyverse) 
+cols <- c("sim" = "#0da1f8", "obs" = "#3f3f3f")
+```
+
+# Structure
+
+Calibration of forest structure parameters (crown radius allometry and mortality)
+

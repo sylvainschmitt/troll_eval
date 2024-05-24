@@ -5,7 +5,7 @@ library(tidyverse)
 cols <- c("sim" = "#0da1f8", "obs" = "#3f3f3f")
 ```
 
-# Calibration
+# Phenology
 
 Calibration of the new leaf phenology modules against observed litterfall in Paracou and Tapajos. Parameters include:
 

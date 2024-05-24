@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>TROLL V4 Evaluation - Tools</title>
+<title>TROLL V4 Evaluation - Evaluation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,26 +20,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -49,8 +30,8 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./30_calibration.html" rel="next">
-<link href="./21_methods.html" rel="prev">
+<link href="./41_variation.html" rel="next">
+<link href="./32_phenology.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -93,7 +74,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./20_experiment.html">Experiment</a></li><li class="breadcrumb-item"><a href="./22_tools.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Tools</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./40_evaluation.html">Evaluation</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -176,7 +157,7 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./22_tools.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Tools</span></a>
+  <a href="./22_tools.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Tools</span></a>
   </div>
 </li>
       </ul>
@@ -204,7 +185,7 @@ div.csl-indent {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./40_evaluation.html" class="sidebar-item-text sidebar-link">
+            <a href="./40_evaluation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Evaluation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -257,22 +238,14 @@ div.csl-indent {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#rcontroll-version-4" id="toc-rcontroll-version-4" class="nav-link active" data-scroll-target="#rcontroll-version-4">rcontroll version 4</a></li>
-  <li><a href="#singularity-encapsulation" id="toc-singularity-encapsulation" class="nav-link" data-scroll-target="#singularity-encapsulation">singularity encapsulation</a></li>
-  <li><a href="#snakemake-workflow" id="toc-snakemake-workflow" class="nav-link" data-scroll-target="#snakemake-workflow">snakemake workflow</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">Tools</span></h1>
+<h1 class="title">Evaluation</h1>
 </div>
 
 
@@ -287,34 +260,9 @@ div.csl-indent {
 
 </header>
 
-<p>The analyses developed in TROLL version 4 evaluation rely mainly on the development of a new version of rcontroll integrating this new version of TROLL, the encapsulation of this new version with other R pacakges in a singularity image, and the snakemake worklfow to automatically run the virtual experiment in a cluster with slurm. The rest of the analyses are done directly in the quarto book.</p>
-<section id="rcontroll-version-4" class="level2">
-<h2 class="anchored" data-anchor-id="rcontroll-version-4">rcontroll version 4</h2>
-<p>A new version of rcontroll <span class="citation" data-cites="schmitt2023">(<a href="99_references.html#ref-schmitt2023" role="doc-biblioref">Schmitt et al. 2023</a>)</span> has been developed for TROLL version 4 evaluation available on the corresponding branch on GitHub: <a href="https://github.com/sylvainschmitt/rcontroll/tree/TROLLV4" class="uri">https://github.com/sylvainschmitt/rcontroll/tree/TROLLV4</a> . This version mainly includes the inclusion of the new C++ code, the adaptation of inputs parameters and outputs in rcontroll objects and plots. The download of ERA5-Land data has also been updated. Every improvement since the version published on CRAN are described here: <a href="https://github.com/sylvainschmitt/rcontroll/blob/TROLLV4/NEWS.md" class="uri">https://github.com/sylvainschmitt/rcontroll/blob/TROLLV4/NEWS.md</a> (starting from rcontroll 0.2.0.9001).</p>
-</section>
-<section id="singularity-encapsulation" class="level2">
-<h2 class="anchored" data-anchor-id="singularity-encapsulation">singularity encapsulation</h2>
-<p>To ease portability, reproducibility and integration into a workflow we encapsulated rcontroll with TROLL version 4 and other useful R packages for the analyses in a singularity image. The singularity recipe is available in <code>singularity/Singularity</code> with the R code in <code>isingularity\install.R</code>. The code is copied from <a href="https://github.com/sylvainschmitt/singularity-troll" class="uri">https://github.com/sylvainschmitt/singularity-troll</a>. Once singularity installed (linux only but WSL can help windows users), you can install the image with the following command:</p>
-<pre><code>sudo singularity build troll.sif Singularity</code></pre>
-<p>Then the snakemake workflow will automatically use the corresponding image. In case you want to test it manually use the following command:</p>
-<pre><code>singularity shell -e troll.sif </code></pre>
-</section>
-<section id="snakemake-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="snakemake-workflow">snakemake workflow</h2>
-<p>To ease portability, reproducibility, and sustainability of the analyses, all virtual experiments have been included in a single snakemake workflow including thus calibration, variation, and evaluation defined in <code>Snakefile</code>. Once snakemake installed you can easily run the workflow locally. However the number of simulations is very high for calibration and spin-up simulations are very long so we recommend that you uses an high performance computing (HPC) platform. Most will include snakemake and singularity, and a submission script is already ready for cluster that uses slurm. In case you want to adjust virtual experiments definitions you can adjust the <code>config/config_calib.yml</code> file. To test the worklfow locally you can use a dry run:</p>
-<pre><code>snakemake -np -j 1</code></pre>
-<p>On the HPC you first need to activate the snakemake module, for instance:</p>
-<pre><code>module load bioinfo/Snakemake/7.20.0</code></pre>
-<p>Than used (and adapt) the predefined submission script:</p>
-<pre><code>sbatch job.sh</code></pre>
+<p>This section develop the evaluation of simulation variations, forest structure and composition, and carbon, water and leaf fluxes.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
-<div id="ref-schmitt2023" class="csl-entry" role="listitem">
-Schmitt, Sylvain, Guillaume Salzet, Fabian Jörg Fischer, Isabelle Maréchaux, and Jerome Chave. 2023. <span>“<span><em>Rcontroll</em></span>: An R Interface for the Individual<span>-</span>Based Forest Dynamics Simulator <span><em>TROLL</em></span>.”</span> <em>Methods in Ecology and Evolution</em> 14 (11): 2749–57. <a href="https://doi.org/10.1111/2041-210x.14215">https://doi.org/10.1111/2041-210x.14215</a>.
-</div>
-</div>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -552,13 +500,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./21_methods.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Methods</span></span>
+      <a href="./32_phenology.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Phenology</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./30_calibration.html" class="pagination-link">
-        <span class="nav-page-text">Calibration</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./41_variation.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-title">Variation</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

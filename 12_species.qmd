@@ -128,41 +128,6 @@ fit %>%
   xlab(expression(a[h])) + ylab(expression(h[max]))
 ```
 
-```{r crown_radius_allometry, eval=F}
-library(tidyverse)
-library(sf)
-library(brms)
-x <- tibble(
-  site = c("Paracou", "Tapajos"),
-  latitude = c(5.27877, -2.85667),
-  longitude = c(-52.92486, -54.9588900),
-) %>% 
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>% 
-  st_buffer(10^6)
-trees <- read_csv("data/species/tallo.csv") %>% 
-  filter(longitude <= -39, longitude >= -79, latitude >= -18, latitude <= 10) %>% 
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>% 
-  st_intersection(x) %>% 
-  filter(!is.na(crown_radius_m))
-trees %>% 
-  group_by(site) %>% 
-  summarise(N = n())
-ggplot(trees, aes(crown_radius_m, stem_diameter_cm, col = site)) +
-  geom_point() +
-  theme_bw() + 
-  geom_smooth(method = "lm")
-fit <- brm(bf(crown_radius_m ~ exp(cra + crb*log(stem_diameter_cm)), 
-              cra ~ site,
-              crb ~ site,
-              nl = TRUE), 
-           prior = c(
-             prior(normal(0, 10), nlpar = "cra"),
-             prior(normal(0, 10), nlpar = "crb")
-             ),
-           data = trees, chains = 2, cores = 2, threads = 10)
-summary(fit)
-```
-
 ## Functional traits
 
 We further combined the obtained coefficient from `TALLO` with the following datasets:

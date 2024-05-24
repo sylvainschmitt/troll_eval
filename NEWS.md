@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9021: new book structure for forest structure calibration to come
 -   troll_eval 0.1.0.9020: figs numbers
 -   troll_eval 0.1.0.9019: adding etp and swc for all depth in evaluation and companion figures
 -   troll_eval 0.1.0.9018: LAI per age and all figs update
