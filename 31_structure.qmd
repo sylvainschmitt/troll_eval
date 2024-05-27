@@ -1,6 +1,5 @@
 ```{r setup}
 #| include: false 
-rm(list = ls())
 library(tidyverse) 
 library(knitr)
 library(sf)
@@ -18,7 +17,7 @@ Calibration of forest structure parameters (crown radius allometry and mortality
 
 We gathered all Tallo measurements of crown radius and diameter in a radius of 10-km of Tapajos for trees above 10-cm. We randomly selected 10 trees per class diameter of decimetre a thousand times and computed crown radius intercepts and slopes. We obtained a parameter distribution with a correlation of 0.91, a linear regression of $b_{CR} = -0.39+0.57 \times a_{CR}$, and a standard variation of 0.08. Dashed lines shows Paracou values, which are lower than the observations.
 
-```{r}
+```{r tapajostalloparams}
 #| message: false
 #| warning: false
 tapajos <- tibble(
@@ -50,7 +49,7 @@ params <- read_csv("data/species/tallo.csv") %>%
   filter(a > 0, b > 0)
 ```
 
-```{r}
+```{r tapajostalloparamsfig}
 #| message: false
 ggplot(params, aes(a, b)) +
   geom_vline(xintercept = 2.13, linetype = "dashed") +
@@ -69,7 +68,7 @@ ggplot(params, aes(a, b)) +
 
 We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b. b was computed using the linear equation plus the error. We used $3 \sigma$ for the error. We obtained a calibration grid of **11,193 simulations**. Dashed lines shows Paracou values which are thus lower. The last figure shows the corresponding projected allometries of crown radius.
 
-```{r prep}
+```{r prepparamspace}
 pars <- data.frame(parameter = c("a", "error_b", "m"),
                    low = c(1.4, -4*0.08, 0.01),
                    high = c(2.4, 4*0.08, 0.03),
@@ -86,7 +85,7 @@ grid <- data.frame(a = seq(pars$low[1], pars$high[1], by = pars$by[1])) %>%
 kable(pars)
 ```
 
-```{r}
+```{r abplot}
 grid %>% 
   ggplot(aes(a, b)) +
   geom_vline(xintercept = 2.13, linetype = "dashed") +
@@ -98,7 +97,7 @@ grid %>%
   ylab(expression(b[CR]))
 ```
 
-```{r}
+```{r amplot}
 grid %>% 
   ggplot(aes(a, m)) +
   geom_vline(xintercept = 2.13, linetype = "dashed") +
@@ -109,7 +108,7 @@ grid %>%
   ylab(expression(m))
 ```
 
-```{r}
+```{r crallomplot}
 grid %>% 
   mutate(dbh = list(seq(1, 150, 1)/100)) %>% 
   unnest(dbh) %>% 
@@ -122,4 +121,159 @@ grid %>%
   geom_line(col = "black", linetype = "dashed",
             data = data.frame(dbh = seq(1, 150, 1)/100) %>% 
               mutate(cr = exp(2.13+0.63*log(dbh))))
+```
+
+## Parameters effect
+
+```{r calib, eval=FALSE}
+files <- list.files("results/calib_structure/", full.names = TRUE)
+names(files) <- list.files("results/calib_structure/", full.names = FALSE)
+result <- lapply(files, data.table::fread, header = FALSE, skip = 1, select = 35, col.names = "dbh")
+calib <- result %>% 
+  bind_rows(.id = "file") %>% 
+  mutate(dbh_cm = dbh*100) %>% 
+  filter(dbh_cm >= 10) %>% 
+  mutate(dbh_class = cut(dbh_cm, breaks = seq(10, 200, by = 10), 
+                         labels = seq(10, 190, by = 10)+5)) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  group_by(file, dbh_class) %>% 
+  summarise(log_abundance = log10(n()/9),
+            ba = sum((dbh_cm/2)^2*pi)/10^4/9) %>% 
+  separate(file, c("site", "a", "b", "m"), "_") %>% 
+  mutate(m = gsub(".tsv", "", m)) %>% 
+  mutate_at(c("a", "b", "m"), as.numeric) %>% 
+  mutate(b = -0.39 + 0.57*a + b) %>% 
+  select(-site) %>% 
+  gather(variable, value, -a, -b, -m, -dbh_class) %>% 
+  na.omit()
+write_tsv(calib, "outputs/calib_structure.tsv")
+```
+
+```{r aCR}
+#| message: false
+#| warning: false
+obs <-  read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+   rename(value = observed) %>% 
+   select(-type) %>% 
+   unique() %>% 
+   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+read_tsv("outputs/calib_structure.tsv") %>% 
+  # filter(b == 0.33075, m == 0.025) %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"')) %>% 
+  ggplot(aes(dbh_class, value)) +
+  geom_line(aes(col = a, group = paste(a, b, m))) +
+  geom_point(data = obs, col = "red") +
+  theme_bw() +
+  scale_color_viridis_c(expression(a[CR])) +
+  facet_wrap(~ varlong, nrow = 2, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("")
+```
+
+```{r bCR}
+#| message: false
+#| warning: false
+obs <-  read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+   rename(value = observed) %>% 
+   select(-type) %>% 
+   unique() %>% 
+   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+read_tsv("outputs/calib_structure.tsv") %>% 
+  # filter(a == 2.150, m == 0.025) %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"')) %>% 
+  ggplot(aes(dbh_class, value)) +
+  geom_line(aes(col = b, group = paste(a, b, m))) +
+  geom_point(data = obs, col = "red") +
+  theme_bw() +
+  scale_color_viridis_c(expression(b[CR])) +
+  facet_wrap(~ varlong, nrow = 2, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("")
+```
+
+```{r m}
+#| message: false
+#| warning: false
+obs <-  read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+   rename(value = observed) %>% 
+   select(-type) %>% 
+   unique() %>% 
+   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+read_tsv("outputs/calib_structure.tsv") %>% 
+  # filter(a == 2.150, b == 0.33075) %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"')) %>% 
+  ggplot(aes(dbh_class, value)) +
+  geom_line(aes(col = m, group = paste(a, b, m))) +
+  geom_point(data = obs, col = "red") +
+  theme_bw() +
+  scale_color_viridis_c(expression(m)) +
+  facet_wrap(~ varlong, nrow = 2, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("")
+```
+
+## Best parameters
+
+```{r best}
+#| message: false
+#| warning: false
+obs <-  read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+   rename(value = observed) %>% 
+   select(-type) %>% 
+   unique() %>% 
+   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+best <- read_tsv("outputs/calib_structure.tsv") %>% 
+  rename(simulated = value) %>% 
+  left_join(read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+              select(-type, -plot, -site) %>% 
+              unique()) %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  gather(type, value, -a, -b, -m, -dbh_class, -variable) %>% 
+  group_by(variable) %>% 
+  mutate(value = as.vector(scale(value))) %>% 
+  mutate(variable = paste0(variable, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = variable, values_from = value) %>% 
+  mutate(error = sqrt((ba_observed - ba_simulated)^2
+                      +(log_abundance_observed - log_abundance_simulated)^2)) %>% 
+  group_by(a, b, m) %>% 
+  summarise(RMSEP = sqrt(mean(error^2))) %>% 
+  ungroup() %>% 
+  slice_min(RMSEP) %>% 
+  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m))
+best %>% 
+  knitr::kable(caption = "Best structure parameters at Tapajos according to calibration with inventory data.")
+```
+
+```{r bestfig}
+#| message: false
+#| warning: false
+obs <-  read_tsv("outputs/structure.tsv") %>% 
+              filter(type != "understory", site == "Tapajos", variable != "abundance") %>% 
+   rename(value = observed) %>% 
+   select(-type) %>% 
+   unique() %>% 
+   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+read_tsv("outputs/calib_structure.tsv") %>% 
+  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
+  filter(sim == best$sim) %>% 
+  mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
+                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"')) %>% 
+  ggplot(aes(dbh_class, value)) +
+  geom_line() +
+  geom_point(data = obs, col = "red") +
+  theme_bw() +
+  scale_color_viridis_c(expression(m)) +
+  facet_wrap(~ varlong, nrow = 2, scales = "free_y", labeller = label_parsed) +
+  xlab("DBH [ cm ]") + ylab("")
 ```
