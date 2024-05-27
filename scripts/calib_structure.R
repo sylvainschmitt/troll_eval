@@ -6,9 +6,9 @@ sink(log_file, append = TRUE)
 # snakemake vars
 fileout <- snakemake@output[[1]]
 site <- as.character(snakemake@params$site)
-cra <- as.numeric(snakemake@params$a0)
-crberr <- as.numeric(snakemake@params$b0)
-m <- as.numeric(snakemake@params$delta)
+cra <- as.numeric(snakemake@params$cra)
+crberr <- as.numeric(snakemake@params$crberr)
+m <- as.numeric(snakemake@params$m)
 verbose <- snakemake@params$verbose
 test <- snakemake@params$test
 test_years <- snakemake@params$test_years
@@ -31,12 +31,15 @@ n <- 12*600
 if(test)
   n <- 12
 crb = -0.39 + 0.57*cra + crberr
+pars <- generate_parameters(nbiter = n,
+                            cols = 300,
+                            rows = 300,
+                            CR_a = cra, 
+                            CR_b = crb, 
+                            m = m)
 sim <- troll(
   name = name,
-  global = generate_parameters(nbiter = n,
-                               CR_a = cra, 
-                               CR_b = crb, 
-                               m = m),
+  global = pars,
   species = TROLLv3_species,
   climate = TROLLv3_climatedaytime12,
   daily = TROLLv3_daytimevar,

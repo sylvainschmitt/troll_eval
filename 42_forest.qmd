@@ -329,8 +329,8 @@ Simulated functional trait distribution in Paracou and Tapajos matched the ones 
 #| message: false
 #| warning: false
 troll_traits <- list(
-    read_tsv("outputs/paracou_species_troll.tsv"),
-    read_tsv("outputs/tapajos_species_troll.tsv")
+    read_tsv("outputs/Paracou_species_troll.tsv"),
+    read_tsv("outputs/Tapajos_species_troll.tsv")
 ) %>% bind_rows() %>% 
   unique() %>% 
   rename_all(~ gsub("s_", "", .)) %>% 

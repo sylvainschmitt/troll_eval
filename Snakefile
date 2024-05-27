@@ -1,4 +1,4 @@
-configfile: "config/config_dag.yml"
+configfile: "config/config_calib.yml"
 
 ruleorder: prepare_spinup > spinup
 ruleorder: prepare_run > run

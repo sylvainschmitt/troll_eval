@@ -173,8 +173,8 @@ g
 #| warning: false
 #| fig-cap: "Functional composition estimated by TROLL at the Paracou and Tapajos site expressed in terms of distribution per trait and site."
 troll_traits <- list(
-    read_tsv("outputs/paracou_species_troll.tsv"),
-    read_tsv("outputs/tapajos_species_troll.tsv")
+    read_tsv("outputs/Paracou_species_troll.tsv"),
+    read_tsv("outputs/Tapajos_species_troll.tsv")
 ) %>% bind_rows() %>% 
   unique() %>% 
   rename_all(~ gsub("s_", "", .)) %>% 

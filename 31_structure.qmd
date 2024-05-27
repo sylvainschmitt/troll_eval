@@ -67,7 +67,7 @@ ggplot(params, aes(a, b)) +
 
 ## Parameters space
 
-We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b. b was computed using the linear equation plus the error. We used $3 \sigma$ for the error. We obtained a calibration grid of **8,610 simulations (too much?)**. Dashed lines shows Paracou values which are thus lower. The last figure shows the corresponding projected allometries of crown radius.
+We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b. b was computed using the linear equation plus the error. We used $3 \sigma$ for the error. We obtained a calibration grid of **11,193 simulations**. Dashed lines shows Paracou values which are thus lower. The last figure shows the corresponding projected allometries of crown radius.
 
 ```{r prep}
 pars <- data.frame(parameter = c("a", "error_b", "m"),
