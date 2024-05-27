@@ -71,9 +71,9 @@ We prepared the parameter space for calibration defining low limit, high limit, 
 
 ```{r prep}
 pars <- data.frame(parameter = c("a", "error_b", "m"),
-                   low = c(1.8, -3*0.08, 0.01),
-                   high = c(2.2, 3*0.08, 0.03),
-                   by = c(0.01, 0.05, 0.001))
+                   low = c(1.4, -4*0.08, 0.01),
+                   high = c(2.4, 4*0.08, 0.03),
+                   by = c(0.025, 0.05, 0.001))
 grid <- data.frame(a = seq(pars$low[1], pars$high[1], by = pars$by[1])) %>% 
   mutate(error_b = list(seq(pars$low[2], pars$high[2], by = pars$by[2]))) %>% 
   unnest(error_b) %>% 

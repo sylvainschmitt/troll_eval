@@ -9,7 +9,7 @@ rule run2:
     benchmark:
         "results/benchmarks/run2_{site}_{a0}_{b0}_{delta}.benchmark.txt"
     singularity:
-        config["troll"]
+        config["troll4"]
     threads: 1
     params:
         site="{site}",

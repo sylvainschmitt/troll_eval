@@ -1,11 +1,11 @@
-# TROLL and associated R packages Singularity container
+# TROLL 4.0 and associated R packages Singularity container
 Sylvain Schmitt -
-Feb 22, 2024
+May 24, 2024
 
 The singularity image is used by the snakemake pipeline and is copied
 from https://github.com/sylvainschmitt/singularity-troll .
 
-**TROLL and associated R packages**
+**TROLL 4.0 and associated R packages**
 
 This container includes:
 
@@ -27,29 +27,13 @@ Singularity container based on the recipe:
 **build**:
 
 ``` bash
-sudo singularity build troll.sif Singularity
+sudo singularity build troll4.sif Singularity
 ```
-
-**pull**:
-
-``` bash
-singularity pull https://github.com/sylvainschmitt/singularity-troll/releases/download/0.0.1/sylvainschmitt-singularity-r-troll.latest.sif
-```
-
-**snakemake**:
-
-``` python
-    singularity: 
-        "https://github.com/sylvainschmitt/singularity-troll/releases/download/0.0.1/sylvainschmitt-singularity-troll.latest.sif"
-```
-
-> Note: use the –contain option if you want to avoid conflicts with your
-> local R install
 
 **usage**:
 
 ``` bash
-singularity shell -e -B "/home/sschmitt/Documents/data" troll.sif 
+singularity shell -e -B "/home/sschmitt/Documents/data" troll4.sif 
 ```
 
 > `-e` to avoid conflict with local environment and `-B` to bind the

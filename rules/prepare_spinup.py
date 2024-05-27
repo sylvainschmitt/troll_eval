@@ -9,7 +9,7 @@ rule prepare_spinup:
     benchmark:
         "results/benchmarks/prepare_spinup_{site}.benchmark.txt"
     singularity:
-        config["troll"]
+        config["troll4"]
     threads: 1
     params:
         spinup=config["spinup"],

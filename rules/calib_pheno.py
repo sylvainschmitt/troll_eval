@@ -1,4 +1,4 @@
-rule calib:
+rule calib_pheno:
     input:
         expand("results/run2/{site}_{a0}_{b0}_{delta}",
                 site=config["sites"],

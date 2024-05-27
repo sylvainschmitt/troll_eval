@@ -371,9 +371,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pars <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">parameter =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"error_b"</span>, <span class="st">"m"</span>),</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">low =</span> <span class="fu">c</span>(<span class="fl">1.8</span>, <span class="sc">-</span><span class="dv">3</span><span class="sc">*</span><span class="fl">0.08</span>, <span class="fl">0.01</span>),</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">high =</span> <span class="fu">c</span>(<span class="fl">2.2</span>, <span class="dv">3</span><span class="sc">*</span><span class="fl">0.08</span>, <span class="fl">0.03</span>),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">by =</span> <span class="fu">c</span>(<span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="fl">0.001</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">low =</span> <span class="fu">c</span>(<span class="fl">1.4</span>, <span class="sc">-</span><span class="dv">4</span><span class="sc">*</span><span class="fl">0.08</span>, <span class="fl">0.01</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">high =</span> <span class="fu">c</span>(<span class="fl">2.4</span>, <span class="dv">4</span><span class="sc">*</span><span class="fl">0.08</span>, <span class="fl">0.03</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">by =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.05</span>, <span class="fl">0.001</span>))</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="fu">seq</span>(pars<span class="sc">$</span>low[<span class="dv">1</span>], pars<span class="sc">$</span>high[<span class="dv">1</span>], <span class="at">by =</span> pars<span class="sc">$</span>by[<span class="dv">1</span>])) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">error_b =</span> <span class="fu">list</span>(<span class="fu">seq</span>(pars<span class="sc">$</span>low[<span class="dv">2</span>], pars<span class="sc">$</span>high[<span class="dv">2</span>], <span class="at">by =</span> pars<span class="sc">$</span>by[<span class="dv">2</span>]))) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(error_b) <span class="sc">%&gt;%</span> </span>
@@ -400,14 +400,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">a</td>
-<td style="text-align: right;">1.80</td>
-<td style="text-align: right;">2.20</td>
-<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">1.40</td>
+<td style="text-align: right;">2.40</td>
+<td style="text-align: right;">0.025</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">error_b</td>
-<td style="text-align: right;">-0.24</td>
-<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">-0.32</td>
+<td style="text-align: right;">0.32</td>
 <td style="text-align: right;">0.050</td>
 </tr>
 <tr class="odd">

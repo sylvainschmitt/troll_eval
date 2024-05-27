@@ -9,7 +9,7 @@ rule prepare_run:
     benchmark:
         "results/benchmarks/prepare_run_{site}.benchmark.txt"
     singularity:
-        config["troll"]
+        config["troll4"]
     threads: 1
     params:
         site="{site}"
