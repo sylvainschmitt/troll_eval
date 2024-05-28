@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sylvain Schmitt">
-<meta name="dcterms.date" content="2024-05-27">
+<meta name="dcterms.date" content="2024-05-28">
 
 <title>TROLL V4 Evaluation</title>
 <style>
@@ -317,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 27, 2024</p>
+      <p class="date">May 28, 2024</p>
     </div>
   </div>
   
@@ -329,7 +329,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1 unnumbered">
 <h1 class="unnumbered">Introduction</h1>
-<p>The aim of these analyses is to evaluate the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.</p>
+<p>The aim of these analyses is to evaluate the TROLL 4.0 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.</p>
 <section id="study-sites" class="level2">
 <h2 class="anchored" data-anchor-id="study-sites">Study sites</h2>
 <p>We have four sites with long-term eddy flux tower in Amazonia but we were only able to collect data from 2 in Brazil and 1 in French Guiana with free access. As BR-Sa3 also known as Km83 is in a logged forest on a shorter period and with lower rainfall registered in the flux tower we will focus on GF-Guy, hereafter Paracou, and BR-Sa1, hereafter Tapajos.</p>
@@ -347,33 +347,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addMarkers</span>(<span class="at">label =</span> <span class="sc">~</span>site, <span class="at">labelOptions =</span> <span class="fu">labelOptions</span>(<span class="at">noHide =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item" id="htmlwidget-5cd9a98ed66ae91e439c" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-5cd9a98ed66ae91e439c">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[[5.27877,-2.85667],[-52.92486,-54.95889],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,["Paracou","Tapajos"],{"interactive":false,"permanent":true,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-2.85667,5.27877],"lng":[-54.95889,-52.92486]}},"evals":[],"jsHooks":[]}</script>
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-af07c9308611f08e5ddf" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-af07c9308611f08e5ddf">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addMarkers","args":[[5.27877,-2.85667],[-52.92486,-54.95889],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,["Paracou","Tapajos"],{"interactive":false,"permanent":true,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-2.85667,5.27877],"lng":[-54.95889,-52.92486]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
 <section id="poeple" class="level2">
 <h2 class="anchored" data-anchor-id="poeple">Poeple</h2>
 <ul>
-<li><p>Sylvain Schmitt (sylvain.schmitt@cirad.fr)</p></li>
-<li><p>Fabian J. Fischer (f.fischer@bristol.ac.uk)</p></li>
-<li><p>James Ball (jgcb3@cam.ac.uk)</p></li>
-<li><p>Nicolas Barbier (nicolas.barbier@ird.fr)</p></li>
-<li><p>Marion Boisseaux (marionboisseaux@gmail.com)</p></li>
-<li><p>Damien Bonal (damien.bonal@inrae.fr)</p></li>
-<li><p>Benoit Burban (benoit.burban@inrae.fr)</p></li>
-<li><p>Xiuzhi Chen (henxzh73@mail.sysu.edu.cn)</p>
-<p>Géraldine Derroire (geraldine.derroire@cirad.fr)</p></li>
-<li><p>Jeremy Lichstein (jlichstein@ufl.edu)</p></li>
-<li><p>Daniela Nemetschek (Daniela.Krebber@ecofog.gf)</p></li>
-<li><p>Natalia Restrepo-Coupe (nataliacoupe@gmail.com)</p></li>
-<li><p>Scott Saleska (saleska@arizona.edu)</p></li>
-<li><p>Giacomo Selan (giacomo.sellan@cirad.fr)</p></li>
-<li><p>Philippe Verley (philippe.verley@ird.fr)</p></li>
-<li><p>Gregoire Vincent (gregoire.vincent@ird.fr)</p></li>
-<li><p>Camille Ziegler (camille.ziegler9@gmail.com)</p></li>
-<li><p>Jérôme Chave (jerome.chave@univ-tlse3.fr)</p></li>
-<li><p>Isabelle Maréchaux (isabelle.marechaux@inrae.fr)</p></li>
+<li>Sylvain Schmitt</li>
+<li>Fabian J. Fischer</li>
+<li>James G. C. Ball</li>
+<li>Nicolas Barbier</li>
+<li>Marion Boisseaux</li>
+<li>Damien Bonal</li>
+<li>Benoit Burban</li>
+<li>Xiuzhi Chen</li>
+<li>Géraldine Derroire</li>
+<li>Jeremy W. Lichstein</li>
+<li>Daniela Nemetschek</li>
+<li>Natalia Restrepo-Coupe</li>
+<li>Scott Saleska</li>
+<li>Giacomo Sellan</li>
+<li>Philippe Verley</li>
+<li>Gregoire Vincent</li>
+<li>Camille Ziegler</li>
+<li>Jérôme Chave</li>
+<li>Isabelle Maréchaux</li>
 </ul>
 
 

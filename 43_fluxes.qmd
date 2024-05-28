@@ -176,7 +176,7 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 7.5) +
-  ggpubr::stat_cor()
+  ggpubr::stat_cor(aes(label = ..rr.label..))
 ggsave("figures/f03.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
@@ -430,7 +430,7 @@ g <- daily %>%
   mutate(type = "TROLL") %>% 
   bind_rows(read_tsv("data/fluxes/lai_age.tsv") %>% 
               filter(type == "time series") %>% 
-              mutate(type = "Yang et al. (2023) Renalaysis")) %>% 
+              mutate(type = "Yang et al. (2023) Reanalysis")) %>% 
   bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 2) %>% 
               rename(young = `Obs_LAIyoung (m^2 m^-2)`,
                      mature = `Obs_LAImature (m^2 m^-2)`,
@@ -451,7 +451,7 @@ g <- daily %>%
   #             select(site, week, type, young, mature, old) %>% 
   #             gather(age, m, -site, -week, -type)) %>% 
   mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016) PhenoCam",
-                                        "Yang et al. (2023) Renalaysis"))) %>% 
+                                        "Yang et al. (2023) Reanalysis"))) %>% 
   group_by(site, variable, age, type) %>% 
   # mutate(m = m / mean(m)) %>% 
   mutate(m = as.vector(scale(m))) %>% 
@@ -635,7 +635,7 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL")) +
   ylim(0, 5.5) +
-  ggpubr::stat_cor()
+  ggpubr::stat_cor(aes(label = ..rr.label..))
 ggsave("figures/f04.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```

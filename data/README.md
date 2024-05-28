@@ -1,6 +1,6 @@
 # Data for the evaluation
 Sylvain Schmitt -
-Mar 12, 2024
+May 28, 2024
 
 This folder will contains all data for the TROLL V4 evaluation used in
 both the snakemake workflow and the analyses in the quarto document.
@@ -33,6 +33,7 @@ fs::dir_tree()
     │   │   │   └── lba_km67_litter_archive.txt
     │   │   └── guide
     │   │       └── Online_Version_CD10_Litter_Tapajos.html
+    │   ├── Data_LAI_new.xlsx
     │   ├── GF-Guy_2004-2014_FLUXNET2015_Met.nc
     │   ├── README.md
     │   ├── README.qmd
@@ -76,15 +77,25 @@ fs::dir_tree()
     │   │   ├── YS-20220920-135633.tif
     │   │   ├── YS-20221110-133704.tif
     │   │   └── YS-20221130-131126.tif
+    │   ├── get_lai_age.R
     │   ├── get_sif.R
+    │   ├── lai_age.tsv
     │   ├── litterfall_2003_2022.csv
     │   ├── nph15726-sup-0002-notess4.xlsx
     │   ├── paddense_central.gpkg
     │   ├── prop_litterfall.csv
     │   └── rtsif.tsv
-    ├── guyafor
+    ├── inventories
     │   ├── README.md
     │   ├── README.qmd
+    │   ├── comp
+    │   │   ├── Forest_Inventory_Tapajos.pdf
+    │   │   └── forest_inventory_tapajos.kmz
+    │   ├── data
+    │   │   ├── Tapajos_inventory_data_2010.csv
+    │   │   └── forest_inventory_tapajos.zip
+    │   ├── guide
+    │   │   └── Online_Version_Forest_Inventory_Tapajos.html
     │   ├── guyafor.tsv
     │   └── understory_paracou_9ha_20231119.csv
     ├── soil
@@ -92,23 +103,12 @@ fs::dir_tree()
     │   ├── README.qmd
     │   ├── TROLLv4_soil_MIP_vG.txt
     │   └── TROLLv4_soil_MIP_vG_TNF.txt
-    ├── species
-    │   ├── README.md
-    │   ├── README.qmd
-    │   ├── guillemot.xlsx
-    │   ├── marechaux.xls
-    │   ├── tallo.csv
-    │   ├── tapajos_try.csv
-    │   ├── troll.tsv
-    │   └── vleminckx.xlsx
-    └── tapajos
+    └── species
         ├── README.md
         ├── README.qmd
-        ├── comp
-        │   ├── Forest_Inventory_Tapajos.pdf
-        │   └── forest_inventory_tapajos.kmz
-        ├── data
-        │   ├── Tapajos_inventory_data_2010.csv
-        │   └── forest_inventory_tapajos.zip
-        └── guide
-            └── Online_Version_Forest_Inventory_Tapajos.html
+        ├── guillemot.xlsx
+        ├── marechaux.xls
+        ├── tallo.csv
+        ├── tapajos_try.csv
+        ├── troll.tsv
+        └── vleminckx.xlsx

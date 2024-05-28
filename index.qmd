@@ -8,7 +8,7 @@ library(leaflet)
 
 # Introduction {.unnumbered}
 
-The aim of these analyses is to evaluate the TROLL version 4 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
+The aim of these analyses is to evaluate the TROLL 4.0 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
 
 ## Study sites
 
@@ -28,40 +28,22 @@ tibble(
 
 ## Poeple
 
--   Sylvain Schmitt (sylvain.schmitt\@cirad.fr)
-
--   Fabian J. Fischer (f.fischer\@bristol.ac.uk)
-
--   James Ball (jgcb3\@cam.ac.uk)
-
--   Nicolas Barbier (nicolas.barbier\@ird.fr)
-
--   Marion Boisseaux (marionboisseaux\@gmail.com)
-
--   Damien Bonal (damien.bonal\@inrae.fr)
-
--   Benoit Burban (benoit.burban\@inrae.fr)
-
--   Xiuzhi Chen (henxzh73\@mail.sysu.edu.cn)
-
-    Géraldine Derroire (geraldine.derroire\@cirad.fr)
-
--   Jeremy Lichstein (jlichstein\@ufl.edu)
-
--   Daniela Nemetschek (Daniela.Krebber\@ecofog.gf)
-
--   Natalia Restrepo-Coupe (nataliacoupe\@gmail.com)
-
--   Scott Saleska (saleska\@arizona.edu)
-
--   Giacomo Selan (giacomo.sellan\@cirad.fr)
-
--   Philippe Verley (philippe.verley\@ird.fr)
-
--   Gregoire Vincent (gregoire.vincent\@ird.fr)
-
--   Camille Ziegler (camille.ziegler9\@gmail.com)
-
--   Jérôme Chave (jerome.chave\@univ-tlse3.fr)
-
--   Isabelle Maréchaux (isabelle.marechaux\@inrae.fr)
+-   Sylvain Schmitt
+-   Fabian J. Fischer
+-   James G. C. Ball
+-   Nicolas Barbier
+-   Marion Boisseaux
+-   Damien Bonal
+-   Benoit Burban
+-   Xiuzhi Chen
+-   Géraldine Derroire
+-   Jeremy W. Lichstein
+-   Daniela Nemetschek
+-   Natalia Restrepo-Coupe
+-   Scott Saleska
+-   Giacomo Sellan
+-   Philippe Verley
+-   Gregoire Vincent
+-   Camille Ziegler
+-   Jérôme Chave
+-   Isabelle Maréchaux

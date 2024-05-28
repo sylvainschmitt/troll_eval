@@ -147,7 +147,7 @@ TROLL version 4 species data were gathered from:
 -   @nemetschek2024
 -   @schmitt2023a
 -   Boisseaux *et al.* submitted
--   Ziegler *et al.* (which?)
+-   @ziegler2019
 
 All databases together included 20 traits across 2,921 species but with numerous missing data. Traits distribution were similar across datasets. However, for the same species, allometric parameters inferred from `TALLO` were lower than those inside TROLL V4 and leaf area from Guillemot was higher than those from TROLL and Vleminckx. As all Paracou TROLL species are in Vleminckx dataset and 109 species from Tapajos we will use only the species from Vleminckx to limit missing data in predictive mean matching (PMM) data imputation.
 
@@ -395,7 +395,7 @@ data2 %>%
          s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
          s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
          s_tlp = TLP, s_leafaera = LA) %>% 
-  write_tsv("outputs/tapajos_species_troll.tsv")
+  write_tsv("outputs/Tapajos_species_troll.tsv")
 data2 %>% 
   filter(forest != "tapajos") %>% 
   select(-forest, -family, -genus) %>% 
@@ -405,7 +405,7 @@ data2 %>%
          s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
          s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
          s_tlp = TLP, s_leafaera = LA) %>% 
-  write_tsv("outputs/paracou_species_troll.tsv")
+  write_tsv("outputs/Paracou_species_troll.tsv")
 ```
 
 ## Functional composition
@@ -414,8 +414,8 @@ Forest functional composition was simply assessed using functional trait distrib
 
 ```{r dist}
 #| eval: false
-traits <- bind_rows(read_tsv("outputs/tapajos_species_troll.tsv"),
-          read_tsv("outputs/paracou_species_troll.tsv")) %>% 
+traits <- bind_rows(read_tsv("outputs/Tapajos_species_troll.tsv"),
+          read_tsv("outputs/Paracou_species_troll.tsv")) %>% 
   unique() %>% 
   rename_all(~ gsub("s_", "", .)) %>% 
   select(-seedmass, -regionalfreq) %>% 

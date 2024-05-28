@@ -538,7 +538,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <li><span class="citation" data-cites="nemetschek2024">Nemetschek et al. (<a href="99_references.html#ref-nemetschek2024" role="doc-biblioref">2024</a>)</span></li>
 <li><span class="citation" data-cites="schmitt2023a">Schmitt and Boisseaux (<a href="99_references.html#ref-schmitt2023a" role="doc-biblioref">2023</a>)</span></li>
 <li>Boisseaux <em>et al.</em> submitted</li>
-<li>Ziegler <em>et al.</em> (which?)</li>
+<li><span class="citation" data-cites="ziegler2019">Ziegler et al. (<a href="99_references.html#ref-ziegler2019" role="doc-biblioref">2019</a>)</span></li>
 </ul>
 <p>All databases together included 20 traits across 2,921 species but with numerous missing data. Traits distribution were similar across datasets. However, for the same species, allometric parameters inferred from <code>TALLO</code> were lower than those inside TROLL V4 and leaf area from Guillemot was higher than those from TROLL and Vleminckx. As all Paracou TROLL species are in Vleminckx dataset and 109 species from Tapajos we will use only the species from Vleminckx to limit missing data in predictive mean matching (PMM) data imputation.</p>
 <div class="cell">
@@ -972,7 +972,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_dbhmax =</span> dbhmax, <span class="at">s_hmax =</span> hmax, <span class="at">s_ah =</span> ah, </span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_seedmass =</span> seedmass, <span class="at">s_regionalfreq =</span> regionalfreq, </span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_tlp =</span> TLP, <span class="at">s_leafaera =</span> LA) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/tapajos_species_troll.tsv"</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/Tapajos_species_troll.tsv"</span>)</span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>data2 <span class="sc">%&gt;%</span> </span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(forest <span class="sc">!=</span> <span class="st">"tapajos"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>forest, <span class="sc">-</span>family, <span class="sc">-</span>genus) <span class="sc">%&gt;%</span> </span>
@@ -982,7 +982,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_dbhmax =</span> dbhmax, <span class="at">s_hmax =</span> hmax, <span class="at">s_ah =</span> ah, </span>
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_seedmass =</span> seedmass, <span class="at">s_regionalfreq =</span> regionalfreq, </span>
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">s_tlp =</span> TLP, <span class="at">s_leafaera =</span> LA) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/paracou_species_troll.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -992,8 +992,8 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>traits <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/tapajos_species_troll.tsv"</span>),</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">read_tsv</span>(<span class="st">"outputs/paracou_species_troll.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>traits <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/Tapajos_species_troll.tsv"</span>),</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">read_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
@@ -1097,6 +1097,9 @@ Schmitt, Sylvain, and Marion Boisseaux. 2023. <span>“Higher Local Intra- Than 
 </div>
 <div id="ref-vleminckx2021" class="csl-entry" role="listitem">
 Vleminckx, Jason, Claire Fortunel, Oscar Valverde-Barrantes, C. E. Timothy Paine, Julien Engel, Pascal Petronelli, Aurélie K. Dourdain, Juan Guevara, Solène Béroujon, and Christopher Baraloto. 2021. <span>“Resolving Whole<span>-</span>Plant Economics from Leaf, Stem and Root Traits of 1467 Amazonian Tree Species.”</span> <em>Oikos</em> 130 (7): 1193–1208. <a href="https://doi.org/10.1111/oik.08284">https://doi.org/10.1111/oik.08284</a>.
+</div>
+<div id="ref-ziegler2019" class="csl-entry" role="listitem">
+Ziegler, Camille, Sabrina Coste, Clément Stahl, Sylvain Delzon, Sébastien Levionnois, Jocelyn Cazal, Hervé Cochard, et al. 2019. <span>“Large Hydraulic Safety Margins Protect Neotropical Canopy Rainforest Tree Species Against Hydraulic Failure During Drought.”</span> <em>Annals of Forest Science</em> 76 (4). <a href="https://doi.org/10.1007/s13595-019-0905-0">https://doi.org/10.1007/s13595-019-0905-0</a>.
 </div>
 </div>
 </section>

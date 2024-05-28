@@ -304,11 +304,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>Inventory data from Paracou, including understorey trees, and Tapajos were used both as input to the TROLL assessment for the species list and as output to assess forest structure, neutral composition and species list.</p>
+<p>Inventory data from Paracou, including understory trees, and Tapajos were used both as input to the TROLL assessment for the species list and as output to assess forest structure, neutral composition and species list.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/tapajos/data/Tapajos_inventory_data_2010.csv"</span>, <span class="at">na =</span> <span class="st">"-9999"</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/inventories/data/Tapajos_inventory_data_2010.csv"</span>, <span class="at">na =</span> <span class="st">"-9999"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"PF"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(scientific_name, <span class="fu">c</span>(<span class="st">"genus"</span>, <span class="st">"species"</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">paste</span>(genus, species), <span class="at">wsg =</span> density_wood, <span class="at">h =</span> ht_total) <span class="sc">%&gt;%</span> </span>
@@ -316,7 +316,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, type, plot, tree, species, dbh, x, y) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot_size =</span> <span class="fl">0.25</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>paracou <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"data/guyafor/guyafor.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>paracou <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"data/inventories/guyafor.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Forest <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> <span class="fu">as.numeric</span>(Plot)) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(plot)) <span class="sc">%&gt;%</span> </span>
@@ -331,7 +331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(Species, <span class="st">"Species"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">paste</span>(Genus, Species), <span class="at">plot_size =</span> PlotArea) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, type, plot, tree, species, dbh, x, y, plot_size)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>paracou_understory <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/guyafor/understory_paracou_9ha_20231119.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>paracou_understory <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/inventories/understory_paracou_9ha_20231119.csv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> subplot) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh =</span> DBH, <span class="at">site =</span> <span class="st">"Paracou"</span>, <span class="at">type =</span> <span class="st">"understory"</span>, <span class="at">tree =</span> TreeID, <span class="at">x =</span> X, <span class="at">y =</span> Y) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&lt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
@@ -431,7 +431,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>This dataset provides tree inventory, tree height, diameter at breast height (DBH), and estimated crown measurements from 30 plots located in the Tapajos National Forest, Para, Brazil collected in September 2010. The plots were located in primary forest, primary forest subject to reduced-impact selective logging (PFL) between 1999 and 2003, and secondary forest (SF) with different age and disturbance histories. Plots were centered on GLAS (the Geoscience Laser Altimeter System) LiDAR instrument footprints selected along two sensor acquisition tracks spanning a wide range in vertical structure and aboveground biomass. <a href="https://daac.ornl.gov/VEGETATION/guides/Forest_Inventory_Tapajos.html" class="uri">https://daac.ornl.gov/VEGETATION/guides/Forest_Inventory_Tapajos.html</a></p>
 </blockquote>
-<p>PIs: ?</p>
 <p>Access: These data are available through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC).</p>
 <div class="cell">
 <details>
@@ -518,6 +517,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<blockquote class="blockquote">
+<p>We need to add height distribution from CHM using both ALS (F. Fischer) and GEDI</p>
+</blockquote>
 </section>
 <section id="composition" class="level2">
 <h2 class="anchored" data-anchor-id="composition">Composition</h2>

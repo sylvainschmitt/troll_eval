@@ -169,6 +169,7 @@ For data exploration purposes, we represented climate variations at multiple tim
 
 ```{r yearly}
 #| message: false
+#| warning: false
 #| fig-cap: "Yearly means of climate variables at Paracou and Tapajos across ten years."
 read_tsv("outputs/fluxnet_climate.tsv") %>% 
   gather(variable, value, -site, -time) %>% 
