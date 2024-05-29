@@ -27,6 +27,21 @@ troll_forest <- files %>%
   mutate(species = gsub("_", " ", s_name)) %>% 
   mutate(dbh = dbh*100)
 write_tsv(troll_forest, "outputs/evaluation_forest.tsv")
+
+files <- list.files("results/run3/", pattern = "CHM.txt", 
+                    recursive = T, full.names = T) 
+names(files) <- list.files("results/run3/", pattern = "CHM.txt", 
+                    recursive = T, full.names = F) 
+troll_height <- files %>% 
+  lapply(vroom::vroom) %>% 
+  bind_rows(.id = "file") %>% 
+  separate(file, "sim", "/") %>% 
+  separate(sim, c("site", "repetition")) %>%
+  mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
+  group_by(site, repetition, height) %>% 
+  summarise(n = n()) %>% 
+  mutate(pct = n/sum(n)*100)
+write_tsv(troll_height, "outputs/evaluation_height.tsv")
 ```
 
 ### Forest
@@ -243,6 +258,36 @@ g <- all_str %>%
   geom_text(data = labs, aes(label = label))
 ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
+```
+
+### Height
+
+```{r height}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of the hieght structure estimated by TROLL at the Paracou and Tapajos sites. Confidence intervals on inventory analysis at 95% are shown with shaded areas. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+read_tsv("outputs/evaluation_height.tsv") %>% 
+  group_by(site, height) %>% 
+  summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
+            m = quantile(pct, 0.5, na.rm = TRUE), 
+            h = quantile(pct, 0.975, na.rm = TRUE)) %>% 
+  mutate(type = "TROLL") %>% 
+  bind_rows(
+    read_tsv("outputs/hieght_chm.tsv") %>% 
+      group_by(site) %>% 
+      mutate(m = n/sum(n)*100) %>% 
+      mutate(type = "ALS")
+  ) %>% 
+  ggplot(aes(height, m, col = type)) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
+  geom_line() +
+  facet_wrap(~ site) +
+  theme_bw() +
+  coord_flip() +
+  ylab("[ % ]") + xlab("Height [ m ]")  +
+  scale_color_manual("", values =  as.vector(cols[c("obs", "sim")])) +
+  scale_fill_manual("", values =  as.vector(cols[c("obs", "sim")])) +
+  theme(legend.position = "bottom")
 ```
 
 ## Composition

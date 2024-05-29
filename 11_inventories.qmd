@@ -2,6 +2,7 @@
 #| include: false 
 rm(list = ls())
 library(tidyverse) 
+library(terra)
 ```
 
 # Inventories
@@ -130,6 +131,45 @@ read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>%
   coord_equal()
 ```
 
+## Airborne Lidar Scanning (ALS)
+
+Fabian Fischer personal communication to detail.
+
+```{r chm_data}
+#| eval: false
+paracou <- rast("data/inventories/chm/chm_lspikefree_paracou2015.tif") %>% 
+  as.data.frame(xy = TRUE) %>% 
+  mutate(site = "Paracou") %>% 
+  rename(height = spat_UnJH55x5kyQCEFH_27216) %>% 
+  filter(x >= 285011, x <= 287476, y >= 581176, y <= 583810)
+tapajos <- rast("data/inventories/chm/chm_lspikefree_tapajos2012.tif") %>% 
+  as.data.frame(xy = TRUE) %>% 
+  mutate(site = "Tapajos") %>% 
+  rename(height = spat_A96aTkDLpl6EakG_7172)
+g <- bind_rows(paracou, tapajos) %>% 
+  ggplot(aes(x, y, fill = height)) +
+  geom_raster() +
+  theme_bw() +
+  facet_wrap(~site, scales = "free") +
+  scale_fill_viridis_c() +
+  theme(axis.title = element_blank(), axis.text = element_blank())
+ggsave("outputs/chm_fig.png", g)
+bind_rows(paracou, tapajos) %>% 
+  group_by(site, height = floor(height)) %>% 
+  summarise(n = n()) %>% 
+  write_tsv("outputs/hieght_chm.tsv")
+```
+
+```{r chm_fig}
+#| message: false
+#| fig-cap: "Canpy Height Model (CHM) from Aerial Lidar Sensors (ALS) at Paracou an Tapajos."
+knitr::include_graphics("outputs/chm_fig.png")
+```
+
+## Global Ecosystem Dynamics Investigation (GEDI)
+
+To do.
+
 ## Structure
 
 Forest structure was simply assessed by DBH (m) classes using basal area (BA, m2/ha) and abundance for each plots (uncertainty bars in Paracou data).
@@ -176,7 +216,16 @@ read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>%
   theme(legend.position = "bottom")
 ```
 
-> We need to add height distribution from CHM using both ALS (F. Fischer) and GEDI
+```{r strheight}
+#| message: false
+#| fig-cap: "Height structure at the Paracou and Tapajos sites."
+read_tsv("outputs/hieght_chm.tsv") %>% 
+  ggplot(aes(height, n, col = site)) +
+  geom_line() +
+  theme_bw() +
+  coord_flip() +
+  xlab("") + ylab("Height [ m ]")
+```
 
 ## Composition
 

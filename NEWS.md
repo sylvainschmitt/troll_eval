@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9029: calibration str Tapajos v1
 -   troll_eval 0.1.0.9028: adding AGB to str calib
 -   troll_eval 0.1.0.9027: few figures update and small cleaning
 -   troll_eval 0.1.0.9026: adding workflow rules to summarise all the structure calib res
