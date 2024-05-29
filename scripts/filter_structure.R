@@ -23,9 +23,8 @@ library(tidyverse)
 
 # code
 crb = -0.39 + 0.57*cra + crberr
-# "echo -e 'site\ta\tb\tm\tdbh_cm' > test.{output} ; "
 read_tsv(filein) %>% 
-  mutate(site = site, a = cra, b = crb, m = m, dbh_cm = dbh*100) %>%
-  select(site, a, b, m, dbh_cm) %>% 
+  mutate(site = site, a = cra, b = crb, m = m, dbh_cm = dbh*100, agb = AGB) %>%
+  select(site, a, b, m, dbh_cm, agb) %>% 
   filter(dbh_cm >= 10) %>% 
   write_tsv(fileout, col_names = FALSE)

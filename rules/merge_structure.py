@@ -13,5 +13,5 @@ rule merge_structure:
         "results/benchmarks/merge_structure.benchmark.txt"
     threads: 1
     shell:
-        "echo -e 'site\ta\tb\tm\tdbh_cm' > {output} ; "
+        "echo -e 'site\ta\tb\tm\tdbh_cm\tagb' > {output} ; "
         "cat {input} >> {output}"
