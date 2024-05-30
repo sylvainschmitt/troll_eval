@@ -508,7 +508,7 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>obs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="fu">seq</span>(<span class="dv">15</span>, <span class="dv">175</span>, <span class="dv">5</span>)) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>obs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">200</span>, <span class="dv">5</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">ifelse</span>(dbh_class <span class="sc">&lt;</span> <span class="dv">40</span>, </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                            <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="fl">0.058</span><span class="sc">*</span>dbh_class<span class="fl">+2.912</span>), </span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                            <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="fl">0.016</span><span class="sc">*</span>dbh_class<span class="fl">+1.451</span>)))</span>
@@ -516,7 +516,8 @@ div.csl-indent {
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="fu">paste</span>(<span class="st">"Total:"</span>, <span class="fu">round</span>(<span class="fu">sum</span>(obs<span class="sc">$</span>abundance))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="31_structure_files/figure-html/rice_obs-1.png" class="img-fluid" width="672"></p>
@@ -529,13 +530,14 @@ div.csl-indent {
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>calib <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">cut</span>(dbh_cm, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">200</span>, <span class="at">by =</span> <span class="dv">10</span>), </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">190</span>, <span class="at">by =</span> <span class="dv">10</span>)<span class="sc">+</span><span class="dv">5</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(dbh_class))) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(a, b, m, dbh_class) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">9</span>, <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">9</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">write_tsv</span>(calib, <span class="st">"outputs/calib_structure.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">cut</span>(dbh_cm, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">205</span>, <span class="at">by =</span> <span class="dv">5</span>), </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">200</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(dbh_class))) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(a, b, m, dbh_class) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">9</span>, <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">9</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write_tsv</span>(calib, <span class="st">"outputs/calib_structure.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -557,7 +559,7 @@ div.csl-indent {
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(a[CR])) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 105978 Columns: 6
+<pre><code>Rows: 196887 Columns: 6
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 dbl (6): a, b, m, dbh_class, abundance, agb
@@ -576,7 +578,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">col =</span> a, <span class="at">group =</span> <span class="fu">paste</span>(a, b, m))) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(obs, dbh_class <span class="sc">&lt;</span> <span class="dv">180</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="fu">expression</span>(a[CR])) <span class="sc">+</span></span>
@@ -605,7 +607,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(b[CR])) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 105978 Columns: 6
+<pre><code>Rows: 196887 Columns: 6
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 dbl (6): a, b, m, dbh_class, abundance, agb
@@ -624,7 +626,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">col =</span> b, <span class="at">group =</span> <span class="fu">paste</span>(a, b, m))) <span class="sc">+</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(obs, dbh_class <span class="sc">&lt;</span> <span class="dv">180</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="fu">expression</span>(b[CR])) <span class="sc">+</span></span>
@@ -653,7 +655,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(m)) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 105978 Columns: 6
+<pre><code>Rows: 196887 Columns: 6
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: "\t"
 dbl (6): a, b, m, dbh_class, abundance, agb
@@ -672,7 +674,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">col =</span> m, <span class="at">group =</span> <span class="fu">paste</span>(a, b, m))) <span class="sc">+</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(obs, dbh_class <span class="sc">&lt;</span> <span class="dv">180</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>(<span class="fu">expression</span>(m)) <span class="sc">+</span></span>
@@ -685,29 +687,46 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 </section>
 <section id="best-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="best-parameters">Best parameters</h2>
+<p><span class="math display">\[
+D = \frac 12 \sum _{dbh = 10}^{dbh=170}|d_o(dbh)-d_s(dbh)|
+\]</span></p>
 <div class="cell">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>eval <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">simulated =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(simulated), <span class="dv">0</span>, simulated)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">err_dist =</span> <span class="fu">mean</span>((<span class="fu">log10</span>(observed) <span class="sc">-</span> <span class="fu">log10</span>(simulated))<span class="sc">^</span><span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">err_abund =</span> (<span class="dv">470</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>, </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">err_agb =</span> (<span class="fl">143.7</span> <span class="sc">-</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"err_dist"</span>, <span class="st">"err_abund"</span>, <span class="st">"err_agb"</span>), <span class="sc">~</span> <span class="fu">as.vector</span>(<span class="fu">scale</span>(., <span class="at">center =</span> <span class="cn">FALSE</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RMSEP_all =</span> <span class="fu">sqrt</span>(err_dist <span class="sc">+</span> err_abund <span class="sc">+</span> err_agb),</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP_agb =</span> <span class="fu">sqrt</span>(err_agb),</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP_abund =</span> <span class="fu">sqrt</span>(err_abund),</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP_dist =</span> <span class="fu">sqrt</span>(err_dist)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(<span class="st">"Tapajos_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>best <span class="ot">&lt;-</span> eval <span class="sc">%&gt;%</span> </span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(RMSEP_all, RMSEP_agb, RMSEP_abund, RMSEP_dist, a, b, m, sim) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(type, RMSEP, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m, <span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(type) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(RMSEP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">200</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"agb"</span>), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">d_s =</span> simulated<span class="sc">/</span><span class="fu">sum</span>(simulated),</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">d_o =</span> observed<span class="sc">/</span><span class="fu">sum</span>(observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">d_dist =</span> <span class="fl">0.5</span><span class="sc">*</span><span class="fu">sum</span>(<span class="fu">abs</span>(d_o <span class="sc">-</span> d_s)),</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_dist_norm =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_dist_log =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((<span class="fu">log10</span>(observed<span class="sc">+</span><span class="dv">1</span>) <span class="sc">-</span> <span class="fu">log10</span>(simulated<span class="sc">+</span><span class="dv">1</span>)<span class="sc">^</span><span class="dv">2</span>))),</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_agb =</span> <span class="fu">sqrt</span>((<span class="fl">143.7</span> <span class="sc">-</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_abund =</span> <span class="fu">sqrt</span>((<span class="dv">470</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_norm =</span> rmsep_dist_norm<span class="sc">/</span><span class="fu">mean</span>(obs<span class="sc">$</span>abundance) <span class="sc">+</span> </span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>           rmsep_agb<span class="sc">/</span><span class="fl">143.7</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">470</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_log =</span> rmsep_dist_log<span class="sc">/</span><span class="fu">mean</span>(<span class="fu">log10</span>(obs<span class="sc">$</span>abundance<span class="sc">+</span><span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>           rmsep_agb<span class="sc">/</span><span class="fl">143.7</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">470</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_d =</span> d_dist<span class="sc">/</span><span class="fu">mean</span>(obs<span class="sc">$</span>abundance<span class="sc">/</span><span class="fu">sum</span>(obs<span class="sc">$</span>abundance)) <span class="sc">+</span> </span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>           rmsep_agb<span class="sc">/</span><span class="fl">143.7</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">470</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(<span class="st">"Tapajos_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>best <span class="ot">&lt;-</span> eval <span class="sc">%&gt;%</span> </span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(d_dist, rmsep_dist_norm, rmsep_dist_log,</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>         rmsep_agb, rmsep_abund, </span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>         all_rmsep_norm, all_rmsep_log, all_d,</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>         a, b, m, sim) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(metric, value, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m, <span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(metric) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -716,8 +735,8 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(<span class="st">"Tapajos_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(type)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(type, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(metric)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(metric, a, b, m) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters at Tapajos according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -726,7 +745,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <caption>Best structure parameters at Tapajos according to calibration with inventory data.</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;">type</th>
+<th style="text-align: left;">metric</th>
 <th style="text-align: right;">a</th>
 <th style="text-align: right;">b</th>
 <th style="text-align: right;">m</th>
@@ -736,7 +755,39 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">RMSEP_abund</td>
+<td style="text-align: left;">all_d</td>
+<td style="text-align: right;">2.150</td>
+<td style="text-align: right;">0.71550</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">555.3333</td>
+<td style="text-align: right;">121.30661</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">all_rmsep_log</td>
+<td style="text-align: right;">2.250</td>
+<td style="text-align: right;">1.02250</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">342.2222</td>
+<td style="text-align: right;">134.02934</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">all_rmsep_norm</td>
+<td style="text-align: right;">2.300</td>
+<td style="text-align: right;">0.80100</td>
+<td style="text-align: right;">0.019</td>
+<td style="text-align: right;">489.7778</td>
+<td style="text-align: right;">143.69096</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d_dist</td>
+<td style="text-align: right;">2.025</td>
+<td style="text-align: right;">0.64425</td>
+<td style="text-align: right;">0.029</td>
+<td style="text-align: right;">577.7778</td>
+<td style="text-align: right;">102.46461</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rmsep_abund</td>
 <td style="text-align: right;">1.475</td>
 <td style="text-align: right;">0.58075</td>
 <td style="text-align: right;">0.025</td>
@@ -744,7 +795,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <td style="text-align: right;">43.67433</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">RMSEP_abund</td>
+<td style="text-align: left;">rmsep_abund</td>
 <td style="text-align: right;">1.800</td>
 <td style="text-align: right;">0.41600</td>
 <td style="text-align: right;">0.025</td>
@@ -752,7 +803,7 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <td style="text-align: right;">123.74359</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">RMSEP_agb</td>
+<td style="text-align: left;">rmsep_agb</td>
 <td style="text-align: right;">1.925</td>
 <td style="text-align: right;">0.53725</td>
 <td style="text-align: right;">0.022</td>
@@ -760,20 +811,20 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <td style="text-align: right;">143.69622</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">RMSEP_all</td>
-<td style="text-align: right;">2.250</td>
-<td style="text-align: right;">1.12250</td>
-<td style="text-align: right;">0.010</td>
-<td style="text-align: right;">211.6667</td>
-<td style="text-align: right;">137.13696</td>
+<td style="text-align: left;">rmsep_dist_log</td>
+<td style="text-align: right;">2.375</td>
+<td style="text-align: right;">0.64375</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">256.4444</td>
+<td style="text-align: right;">122.03646</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">RMSEP_dist</td>
-<td style="text-align: right;">1.525</td>
-<td style="text-align: right;">0.75925</td>
-<td style="text-align: right;">0.013</td>
-<td style="text-align: right;">126.2222</td>
-<td style="text-align: right;">27.37784</td>
+<td style="text-align: left;">rmsep_dist_norm</td>
+<td style="text-align: right;">2.225</td>
+<td style="text-align: right;">0.70825</td>
+<td style="text-align: right;">0.030</td>
+<td style="text-align: right;">470.2222</td>
+<td style="text-align: right;">88.93162</td>
 </tr>
 </tbody>
 </table>
@@ -785,8 +836,8 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(<span class="st">"Tapajos_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(type)) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance, <span class="at">col =</span> type)) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(metric)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance, <span class="at">col =</span> metric)) <span class="sc">+</span></span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
@@ -795,6 +846,23 @@ dbl (6): a, b, m, dbh_class, abundance, agb
 </details>
 <div class="cell-output-display">
 <p><img src="31_structure_files/figure-html/bestfig-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(<span class="st">"Tapajos_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(metric)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance, <span class="at">col =</span> metric)) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="31_structure_files/figure-html/bestfig2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 

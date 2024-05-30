@@ -133,7 +133,7 @@ According to @rice2004 :
 -   Stem density -0.016 (±0.001) dbh_cm + 1.451 (±0.04) for dbh \> 40
 
 ```{r rice_obs}
-obs <- data.frame(dbh_class = seq(15, 175, 5)) %>% 
+obs <- data.frame(dbh_class = seq(10, 200, 5)) %>% 
   mutate(abundance = ifelse(dbh_class < 40, 
                             10^(-0.058*dbh_class+2.912), 
                             10^(-0.016*dbh_class+1.451)))
@@ -141,7 +141,8 @@ ggplot(obs, (aes(dbh_class, abundance))) +
   geom_line() +
   theme_bw() +
   scale_y_log10(labels = scales::comma) +
-  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]"))
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  ggtitle(paste("Total:", round(sum(obs$abundance))))
 ```
 
 ## Parameters effect
@@ -149,8 +150,9 @@ ggplot(obs, (aes(dbh_class, abundance))) +
 ```{r calib}
 #| eval: false
 calib <- read_tsv("results/calib_structure.tsv") %>% 
-  mutate(dbh_class = cut(dbh_cm, breaks = seq(10, 200, by = 10), 
-                         labels = seq(10, 190, by = 10)+5,
+  mutate(dbh_class = cut(dbh_cm, 
+                         breaks = seq(10, 205, by = 5), 
+                         labels = seq(10, 200, by = 5),
                          include.lowest = TRUE)) %>% 
   mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
   group_by(a, b, m, dbh_class) %>% 
@@ -181,7 +183,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = a, group = paste(a, b, m))) +
-  geom_point(data = obs, col = "red") +
+  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(a[CR])) +
@@ -211,7 +213,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = b, group = paste(a, b, m))) +
-  geom_point(data = obs, col = "red") +
+  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(b[CR])) +
@@ -241,7 +243,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = m, group = paste(a, b, m))) +
-  geom_point(data = obs, col = "red") +
+  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(m)) +
@@ -250,29 +252,47 @@ read_tsv("outputs/calib_structure.tsv") %>%
 
 ## Best parameters
 
+$$
+D = \frac 12 \sum _{dbh = 10}^{dbh=170}|d_o(dbh)-d_s(dbh)|
+$$
+
 ```{r best}
 #| message: false
 #| warning: false
 eval <- read_tsv("outputs/calib_structure.tsv") %>% 
+  select(a, b, m) %>% 
+  unique() %>% 
+  mutate(dbh_class = list(seq(10, 200, by = 5))) %>% 
+  unnest(dbh_class) %>% 
+  left_join(read_tsv("outputs/calib_structure.tsv")) %>% 
+  mutate_at(c("abundance", "agb"), ~ifelse(is.na(.), 0, .)) %>% 
   rename(simulated = abundance) %>% 
   left_join(rename(obs, observed = abundance)) %>% 
-  mutate(simulated = ifelse(is.na(simulated), 0, simulated)) %>% 
   group_by(a, b, m) %>% 
-  summarise(err_dist = mean((log10(observed) - log10(simulated))^2, na.rm = TRUE), 
-            err_abund = (470 - sum(simulated))^2, 
-            err_agb = (143.7 - sum(agb)/10^3/2)^2) %>% 
-  mutate_at(c("err_dist", "err_abund", "err_agb"), ~ as.vector(scale(., center = FALSE))) %>%
-  mutate(RMSEP_all = sqrt(err_dist + err_abund + err_agb),
-         RMSEP_agb = sqrt(err_agb),
-         RMSEP_abund = sqrt(err_abund),
-         RMSEP_dist = sqrt(err_dist)) %>% 
+  mutate(d_s = simulated/sum(simulated),
+         d_o = observed/sum(observed)) %>% 
+  summarise(d_dist = 0.5*sum(abs(d_o - d_s)),
+            rmsep_dist_norm = sqrt(mean((observed - simulated)^2)),
+            rmsep_dist_log = sqrt(mean((log10(observed+1) - log10(simulated+1)^2))),
+            rmsep_agb = sqrt((143.7 - sum(agb)/10^3/2)^2),
+            rmsep_abund = sqrt((470 - sum(simulated))^2)
+            ) %>% 
   ungroup() %>% 
+  mutate(all_rmsep_norm = rmsep_dist_norm/mean(obs$abundance) + 
+           rmsep_agb/143.7 + rmsep_abund/470) %>% 
+  mutate(all_rmsep_log = rmsep_dist_log/mean(log10(obs$abundance+1)) + 
+           rmsep_agb/143.7 + rmsep_abund/470) %>% 
+  mutate(all_d = d_dist/mean(obs$abundance/sum(obs$abundance)) + 
+           rmsep_agb/143.7 + rmsep_abund/470) %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m))
 best <- eval %>% 
-  select(RMSEP_all, RMSEP_agb, RMSEP_abund, RMSEP_dist, a, b, m, sim) %>% 
-  gather(type, RMSEP, -a, -b, -m, -sim) %>% 
-  group_by(type) %>% 
-  slice_min(RMSEP)
+  select(d_dist, rmsep_dist_norm, rmsep_dist_log,
+         rmsep_agb, rmsep_abund, 
+         all_rmsep_norm, all_rmsep_log, all_d,
+         a, b, m, sim) %>% 
+  gather(metric, value, -a, -b, -m, -sim) %>% 
+  group_by(metric) %>% 
+  slice_min(value)
 ```
 
 ```{r besttab}
@@ -281,8 +301,8 @@ best <- eval %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
   left_join(best) %>% 
-  filter(!is.na(type)) %>% 
-  group_by(type, a, b, m) %>% 
+  filter(!is.na(metric)) %>% 
+  group_by(metric, a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
   knitr::kable(caption = "Best structure parameters at Tapajos according to calibration with inventory data.")
 ```
@@ -293,11 +313,25 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
   left_join(best) %>% 
-  filter(!is.na(type)) %>% 
-  ggplot(aes(dbh_class, abundance, col = type)) +
+  filter(!is.na(metric)) %>% 
+  ggplot(aes(dbh_class, abundance, col = metric)) +
   geom_line(aes(group = sim)) +
   geom_point(data = obs, col = "red") +
   scale_y_log10(labels = scales::comma) +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  theme_bw()
+```
+
+```{r bestfig2}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_structure.tsv") %>% 
+  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
+  left_join(best) %>% 
+  filter(!is.na(metric)) %>% 
+  ggplot(aes(dbh_class, abundance, col = metric)) +
+  geom_line(aes(group = sim)) +
+  geom_point(data = obs, col = "red") +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   theme_bw()
 ```
