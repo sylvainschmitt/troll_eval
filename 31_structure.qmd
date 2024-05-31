@@ -161,6 +161,8 @@ write_tsv(calib, "outputs/calib_structure.tsv")
 ```
 
 ```{r aCR}
+#| message: false
+#| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
@@ -191,6 +193,8 @@ read_tsv("outputs/calib_structure.tsv") %>%
 ```
 
 ```{r bCR}
+#| message: false
+#| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
@@ -221,6 +225,8 @@ read_tsv("outputs/calib_structure.tsv") %>%
 ```
 
 ```{r m}
+#| message: false
+#| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
@@ -252,10 +258,6 @@ read_tsv("outputs/calib_structure.tsv") %>%
 
 ## Best parameters
 
-$$
-D = \frac 12 \sum _{dbh = 10}^{dbh=170}|d_o(dbh)-d_s(dbh)|
-$$
-
 ```{r best}
 #| message: false
 #| warning: false
@@ -286,13 +288,14 @@ eval <- read_tsv("outputs/calib_structure.tsv") %>%
            rmsep_agb/143.7 + rmsep_abund/470) %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m))
 best <- eval %>% 
-  select(d_dist, rmsep_dist_norm, rmsep_dist_log,
-         rmsep_agb, rmsep_abund, 
-         all_rmsep_norm, all_rmsep_log, all_d,
+  select(all_rmsep_norm,
+         # d_dist, rmsep_dist_norm, rmsep_dist_log,
+         # rmsep_agb, rmsep_abund, 
+         # all_rmsep_norm, all_rmsep_log, all_d,
          a, b, m, sim) %>% 
   gather(metric, value, -a, -b, -m, -sim) %>% 
   group_by(metric) %>% 
-  slice_min(value)
+  slice_min(value, n = 5)
 ```
 
 ```{r besttab}
@@ -302,8 +305,11 @@ read_tsv("outputs/calib_structure.tsv") %>%
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
   left_join(best) %>% 
   filter(!is.na(metric)) %>% 
-  group_by(metric, a, b, m) %>% 
+  group_by(a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
+  gather(variable, value) %>% 
+  group_by(variable) %>% 
+  summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
   knitr::kable(caption = "Best structure parameters at Tapajos according to calibration with inventory data.")
 ```
 
@@ -312,9 +318,9 @@ read_tsv("outputs/calib_structure.tsv") %>%
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
-  left_join(best) %>% 
+  left_join(best %>% slice_min(value)) %>% 
   filter(!is.na(metric)) %>% 
-  ggplot(aes(dbh_class, abundance, col = metric)) +
+  ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(group = sim)) +
   geom_point(data = obs, col = "red") +
   scale_y_log10(labels = scales::comma) +
@@ -327,9 +333,9 @@ read_tsv("outputs/calib_structure.tsv") %>%
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
-  left_join(best) %>% 
+  left_join(best %>% slice_min(value)) %>% 
   filter(!is.na(metric)) %>% 
-  ggplot(aes(dbh_class, abundance, col = metric)) +
+  ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(group = sim)) +
   geom_point(data = obs, col = "red") +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
