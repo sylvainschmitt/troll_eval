@@ -1,0 +1,18 @@
+---
+title: "Guyafor data"
+author: Sylvain Schmitt -
+date: today
+date-format: medium
+format: 
+  gfm:
+    toc: true
+    toc-depth: 2
+---
+
+This folder contains [guyafor data](https://paracou.cirad.fr/website/experimental-design/guyafor-network) (G. Derroire pers. com. but publicly available doi are present on CIRAD dataverse for Paracou), understory data from Paracou 9-ha plot from 19/11/23 (J. Chave pers. com.), and [Tapajos inventories](https://daac.ornl.gov/VEGETATION/guides/Forest_Inventory_Tapajos.html) available online through the Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC).
+
+This folder also contains height data with Canopy Height Models (CHM) from Airborne Lidar Sensors (ALS) from Fabian Fischer personal communication, and GEDI data retrieved using the rGEDI package and the get_gedi.R script.
+
+```{r, comment=""}
+fs::dir_tree()
+```

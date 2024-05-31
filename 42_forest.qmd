@@ -115,24 +115,21 @@ filter(structure, variable %in% c("ba", "log_abundance")) %>%
 ```{r dbhstreval}
 #| message: false
 #| warning: false
-#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-structure %>% 
-  filter(variable != "abundance") %>% 
-  gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
-  mutate(type = str_sub(type, 1, 3)) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value) %>% 
-  ggplot(aes(m_obs, m_sim, col = dbh_class)) +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
-  geom_point() +
-  facet_wrap(~ site ~ varlong, scales = "free", labeller = label_parsed) +
-  theme_bw() +
-  geom_abline() +
-  ylab("Simulated") + xlab("Observed") +
-  scale_color_viridis_c(guide = "none") +
-  ggpubr::stat_cor() 
+filter(structure, variable %in% c("ba", "abundance")) %>% 
+  select(site, dbh_class, variable, m, type) %>% 
+   pivot_wider(names_from = type, values_from = m) %>% 
+  ungroup() %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  mutate(simulated = ifelse(is.na(simulated), 0, simulated)) %>% 
+  nest_by(site, variable) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation of abundance and basal area distribution at Paracou and Tapajos.")
 ```
 
 ### Understory
@@ -198,26 +195,22 @@ filter(understory, variable %in% c("ba", "log_abundance")) %>%
 ```{r understoryeval}
 #| message: false
 #| warning: false
-#| fig-cap: "Quantiles comparisons of the size structure estimated by TROLL at the Paracou with understory trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-understory %>% 
-  filter(site == "Paracou") %>% 
-  filter(variable != "abundance") %>% 
-  gather(quantile, value, -site, -dbh_class, -variable, -varlong, -type) %>% 
-  mutate(type = str_sub(type, 1, 3)) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value) %>% 
-  ggplot(aes(m_obs, m_sim, col = dbh_class)) +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
-  geom_point() +
-  facet_wrap(~ varlong, scales = "free", labeller = label_parsed) +
-  theme_bw() +
-  geom_abline() +
-  ylab("Simulated") + xlab("Observed") +
-  scale_color_viridis_c(guide = "none") +
-  ggpubr::stat_cor() +
-  ggtitle("Paracou")
+filter(understory, variable %in% c("ba", "abundance")) %>% 
+  select(site, dbh_class, variable, m, type) %>% 
+   pivot_wider(names_from = type, values_from = m) %>% 
+  ungroup() %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  mutate(simulated = ifelse(is.na(simulated), 0, simulated)) %>% 
+  nest_by(site, variable) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  na.omit() %>% 
+  knitr::kable(caption = "Evaluation of abundance and basal area distribution at Paracou for the understory.")
 ```
 
 ### All
@@ -265,7 +258,7 @@ g
 ```{r height}
 #| message: false
 #| warning: false
-#| fig-cap: "Evaluation of the hieght structure estimated by TROLL at the Paracou and Tapajos sites. Confidence intervals on inventory analysis at 95% are shown with shaded areas. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+#| fig-cap: "Evaluation of the height structure estimated by TROLL at the Paracou and Tapajos sites. Confidence intervals on inventory analysis at 95% are shown with shaded areas. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 read_tsv("outputs/evaluation_height.tsv") %>% 
   group_by(site, height) %>% 
   summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
@@ -274,20 +267,50 @@ read_tsv("outputs/evaluation_height.tsv") %>%
   mutate(type = "TROLL") %>% 
   bind_rows(
     read_tsv("outputs/hieght_chm.tsv") %>% 
-      group_by(site) %>% 
-      mutate(m = n/sum(n)*100) %>% 
-      mutate(type = "ALS")
+      rename(m = pct)
   ) %>% 
+  filter(height > 5) %>% 
   ggplot(aes(height, m, col = type)) +
   geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
   geom_line() +
   facet_wrap(~ site) +
   theme_bw() +
   coord_flip() +
-  ylab("[ % ]") + xlab("Height [ m ]")  +
-  scale_color_manual("", values =  as.vector(cols[c("obs", "sim")])) +
-  scale_fill_manual("", values =  as.vector(cols[c("obs", "sim")])) +
+  ylab("[ % ]") + xlab("Height [ m ]") +
+  scale_color_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
+  scale_fill_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
   theme(legend.position = "bottom")
+```
+
+```{r heightevaltab}
+#| message: false
+#| warning: false
+read_tsv("outputs/evaluation_height.tsv") %>% 
+  group_by(site, height) %>% 
+  summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
+            m = quantile(pct, 0.5, na.rm = TRUE), 
+            h = quantile(pct, 0.975, na.rm = TRUE)) %>% 
+  mutate(type = "TROLL") %>% 
+  bind_rows(
+    read_tsv("outputs/hieght_chm.tsv") %>% 
+      rename(m = pct)
+  ) %>% 
+  filter(height > 5) %>% 
+  select(site, height, m, type) %>% 
+  pivot_wider(names_from = type, values_from = m) %>% 
+  rename(simulated = TROLL) %>% 
+  gather(type, observed, -site, -height, -simulated) %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  ungroup() %>% 
+  nest_by(site, type) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation of height distribution at Paracou and Tapajos.")
 ```
 
 ## Composition
@@ -341,29 +364,23 @@ ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
-```{r compoquant}
+```{r compoeval}
 #| message: false
 #| warning: false
-#| fig-cap: "Quantiles comparisons of the species composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of species rank-abundance curve. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 compositon %>% 
+  select(site, rank, m, type) %>% 
+   pivot_wider(names_from = type, values_from = m) %>% 
   ungroup() %>% 
-  gather(quantile, value, -site, -rank, -variable, -type) %>% 
-  mutate(type = str_sub(type, 1, 3)) %>% 
-  mutate(quantile = paste0(quantile, "_", type)) %>% 
-  select(-type) %>% 
-  pivot_wider(names_from = quantile, values_from = value) %>% 
-  ggplot(aes(m_obs, m_sim, col = rank)) +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim)) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs)) +
-  geom_point() +
-  facet_wrap(~ site, scales = "free") +
-  theme_bw() +
-  geom_abline() +
-  ylab(expression("Simulated abundance ["~ha^{-~1}~"]")) +
-  xlab(expression("Observed abundance ["~ha^{-~1}~"]")) +
-  scale_y_log10() + scale_x_log10() +
-  scale_color_viridis_c(guide = "none") +
-  ggpubr::stat_cor()
+  na.omit() %>% 
+  nest_by(site) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation of rank-abundance distribution at Paracou and Tapajos.")
 ```
 
 ### Functional
@@ -425,25 +442,6 @@ read_tsv("outputs/functional_composition.tsv") %>%
                      labels = c("Field", "TROLL"))
 ```
 
-```{r ftparquant}
-#| message: false
-#| warning: false
-#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
-all_traits_q %>% 
-  filter(site == "Paracou") %>% 
-  ggplot(aes(m_obs, m_sim)) +
-  geom_abline(col = "blue") +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim), alpha = .5) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs), alpha = .5) +
-  geom_point() +
-  theme_bw() +
-  facet_wrap(~ trait, scales = "free") +
-  ggtitle("Paracou", "546,498 inds represented on 577,761 (94.59%)") +
-  xlab("Observed trait quantiles") +
-  ylab("Simulated trait quantiles") +
-  ggpubr::stat_cor()
-```
-
 ```{r fttapfig}
 #| message: false
 #| warning: false
@@ -459,27 +457,6 @@ read_tsv("outputs/functional_composition.tsv") %>%
   ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
   theme(axis.title = element_blank(), legend.position = "bottom") +
   scale_color_discrete("") +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL"))
-```
-
-```{r ftaptquant}
-#| message: false
-#| warning: false
-#| fig-cap: "Quantiles comparisons of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
-all_traits_q %>% 
-  filter(site == "Tapajos") %>% 
-  ggplot(aes(m_obs, m_sim)) +
-  geom_abline(col = "blue") +
-  geom_linerange(aes(ymin = l_sim, ymax = h_sim), alpha = .5) +
-  geom_linerange(aes(xmin = l_obs, xmax = h_obs), alpha = .5) +
-  geom_point() +
-  theme_bw() +
-  facet_wrap(~ trait, scales = "free") +
-  ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
-  xlab("Observed trait quantiles") +
-  ylab("Simulated trait quantiles") +
-  ggpubr::stat_cor() + 
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
 ```
@@ -514,4 +491,21 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
                      labels = c("Field", "TROLL"))
 ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
+```
+
+```{r fteval}
+#| message: false
+#| warning: false
+all_traits_q %>% 
+  rename(simulated = m_sim, observed = m_obs) %>% 
+  select(site, trait, quantile_id, observed, simulated) %>% 
+  nest_by(site, trait) %>% 
+  mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,
+         CC = cor(data$simulated, data$observed),
+         RMSEP = sqrt(mean((data$simulated-data$observed)^2)),
+         RRMSEP = sqrt(mean((data$simulated-data$observed)^2))/mean(data$observed),
+         SD =sd(data$simulated-data$observed),
+         RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
+  select(-data) %>% 
+  knitr::kable(caption = "Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos.")
 ```

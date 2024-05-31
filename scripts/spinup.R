@@ -54,10 +54,18 @@ n <- as.numeric(nrow(clim))
 if(test)
   n <- round(test_years*365)
 
+if(site == "Paracou")
+  parameters <- generate_parameters(nbiter = n)
+if(site == "Tapajos")
+  parameters <- generate_parameters(nbiter = n,
+                                    CR_a = 2.33,
+                                    CR_b = 0.82,
+                                    m = 0.018)
+
 sim <- troll(
   name = name,
   path = path,
-  global = generate_parameters(nbiter = n),
+  global = parameters,
   species = species,
   climate = clim,
   daily = day,
