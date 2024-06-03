@@ -510,22 +510,22 @@ div.csl-indent {
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">abundance</td>
-<td style="text-align: right;">0.9993257</td>
-<td style="text-align: right;">0.9996378</td>
-<td style="text-align: right;">45.2046362</td>
-<td style="text-align: right;">1.6233709</td>
-<td style="text-align: right;">43.0984659</td>
-<td style="text-align: right;">1.5477350</td>
+<td style="text-align: right;">0.9940971</td>
+<td style="text-align: right;">0.9966172</td>
+<td style="text-align: right;">40.7483768</td>
+<td style="text-align: right;">1.6884687</td>
+<td style="text-align: right;">39.3683101</td>
+<td style="text-align: right;">1.6312836</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">ba</td>
-<td style="text-align: right;">0.8098921</td>
-<td style="text-align: right;">0.7527917</td>
-<td style="text-align: right;">1.4717444</td>
-<td style="text-align: right;">0.7886955</td>
-<td style="text-align: right;">1.4595405</td>
-<td style="text-align: right;">0.7821555</td>
+<td style="text-align: right;">0.8495272</td>
+<td style="text-align: right;">0.7486662</td>
+<td style="text-align: right;">1.3921459</td>
+<td style="text-align: right;">0.8608146</td>
+<td style="text-align: right;">1.1297947</td>
+<td style="text-align: right;">0.6985932</td>
 </tr>
 </tbody>
 </table>
@@ -723,7 +723,7 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_height.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_height.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, height) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">l =</span> <span class="fu">quantile</span>(pct, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="fu">quantile</span>(pct, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
@@ -743,7 +743,9 @@ div.csl-indent {
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"[ % ]"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Height [ m ]"</span>) <span class="sc">+</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
 <span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f10.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -773,16 +775,17 @@ div.csl-indent {
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> TROLL) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(type, observed, <span class="sc">-</span>site, <span class="sc">-</span>height, <span class="sc">-</span>simulated) <span class="sc">%&gt;%</span> </span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, type) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of height distribution at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">simulated =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(simulated), <span class="dv">0</span>, simulated)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, type) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of height distribution at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -813,42 +816,42 @@ div.csl-indent {
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">ALS</td>
-<td style="text-align: right;">0.8990490</td>
-<td style="text-align: right;">0.9295997</td>
-<td style="text-align: right;">0.9856601</td>
-<td style="text-align: right;">0.4678877</td>
-<td style="text-align: right;">0.9963009</td>
-<td style="text-align: right;">0.4729388</td>
+<td style="text-align: right;">0.8786623</td>
+<td style="text-align: right;">0.9148812</td>
+<td style="text-align: right;">1.0254027</td>
+<td style="text-align: right;">0.5400982</td>
+<td style="text-align: right;">1.0349020</td>
+<td style="text-align: right;">0.5451017</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">GEDI</td>
 <td style="text-align: right;">0.8944389</td>
-<td style="text-align: right;">0.9002331</td>
-<td style="text-align: right;">0.8763353</td>
-<td style="text-align: right;">0.4403585</td>
-<td style="text-align: right;">0.8786628</td>
-<td style="text-align: right;">0.4415280</td>
+<td style="text-align: right;">0.9037386</td>
+<td style="text-align: right;">0.8412676</td>
+<td style="text-align: right;">0.4587146</td>
+<td style="text-align: right;">0.8433234</td>
+<td style="text-align: right;">0.4598355</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">ALS</td>
-<td style="text-align: right;">0.9074957</td>
-<td style="text-align: right;">0.8683797</td>
-<td style="text-align: right;">0.7245980</td>
-<td style="text-align: right;">0.3885157</td>
-<td style="text-align: right;">0.7312812</td>
-<td style="text-align: right;">0.3920991</td>
+<td style="text-align: right;">0.9115590</td>
+<td style="text-align: right;">0.9047585</td>
+<td style="text-align: right;">0.7002294</td>
+<td style="text-align: right;">0.4151343</td>
+<td style="text-align: right;">0.7062440</td>
+<td style="text-align: right;">0.4187001</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">GEDI</td>
-<td style="text-align: right;">0.9565942</td>
-<td style="text-align: right;">0.9539381</td>
-<td style="text-align: right;">0.5420067</td>
-<td style="text-align: right;">0.3504189</td>
-<td style="text-align: right;">0.4247160</td>
-<td style="text-align: right;">0.2745880</td>
+<td style="text-align: right;">0.8282438</td>
+<td style="text-align: right;">0.8134590</td>
+<td style="text-align: right;">0.9704867</td>
+<td style="text-align: right;">0.6998375</td>
+<td style="text-align: right;">0.9270385</td>
+<td style="text-align: right;">0.6685061</td>
 </tr>
 </tbody>
 </table>
@@ -966,12 +969,12 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
-<td style="text-align: right;">0.6655204</td>
-<td style="text-align: right;">0.9127528</td>
-<td style="text-align: right;">4.144904</td>
-<td style="text-align: right;">1.1564511</td>
-<td style="text-align: right;">3.53241</td>
-<td style="text-align: right;">0.9855619</td>
+<td style="text-align: right;">0.5999569</td>
+<td style="text-align: right;">0.8936298</td>
+<td style="text-align: right;">4.501805</td>
+<td style="text-align: right;">1.2560283</td>
+<td style="text-align: right;">4.03769</td>
+<td style="text-align: right;">1.1265378</td>
 </tr>
 </tbody>
 </table>
@@ -1243,92 +1246,92 @@ div.csl-indent {
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">LMA</td>
-<td style="text-align: right;">0.9877779</td>
-<td style="text-align: right;">0.9591651</td>
-<td style="text-align: right;">16.0849154</td>
-<td style="text-align: right;">0.1783169</td>
-<td style="text-align: right;">7.2953385</td>
-<td style="text-align: right;">0.0808759</td>
+<td style="text-align: right;">0.9895310</td>
+<td style="text-align: right;">0.9684560</td>
+<td style="text-align: right;">14.7876943</td>
+<td style="text-align: right;">0.1639359</td>
+<td style="text-align: right;">6.6847398</td>
+<td style="text-align: right;">0.0741068</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">Nmass</td>
-<td style="text-align: right;">0.9960163</td>
-<td style="text-align: right;">0.9876949</td>
-<td style="text-align: right;">0.0027300</td>
-<td style="text-align: right;">0.1254456</td>
-<td style="text-align: right;">0.0019224</td>
-<td style="text-align: right;">0.0883372</td>
+<td style="text-align: right;">0.9961801</td>
+<td style="text-align: right;">0.9881008</td>
+<td style="text-align: right;">0.0026139</td>
+<td style="text-align: right;">0.1201115</td>
+<td style="text-align: right;">0.0018633</td>
+<td style="text-align: right;">0.0856191</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">Pmass</td>
-<td style="text-align: right;">0.9822350</td>
-<td style="text-align: right;">0.9701743</td>
-<td style="text-align: right;">0.0002456</td>
-<td style="text-align: right;">0.3147728</td>
-<td style="text-align: right;">0.0001820</td>
-<td style="text-align: right;">0.2333093</td>
+<td style="text-align: right;">0.9875910</td>
+<td style="text-align: right;">0.9794141</td>
+<td style="text-align: right;">0.0002179</td>
+<td style="text-align: right;">0.2793188</td>
+<td style="text-align: right;">0.0001552</td>
+<td style="text-align: right;">0.1988837</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">ah</td>
-<td style="text-align: right;">0.9965882</td>
-<td style="text-align: right;">0.9479418</td>
-<td style="text-align: right;">0.0174417</td>
-<td style="text-align: right;">0.0594498</td>
-<td style="text-align: right;">0.0168221</td>
-<td style="text-align: right;">0.0573379</td>
+<td style="text-align: right;">0.9964007</td>
+<td style="text-align: right;">0.9520597</td>
+<td style="text-align: right;">0.0176742</td>
+<td style="text-align: right;">0.0602422</td>
+<td style="text-align: right;">0.0175136</td>
+<td style="text-align: right;">0.0596949</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">dbhmax</td>
-<td style="text-align: right;">0.9921828</td>
-<td style="text-align: right;">0.9862742</td>
-<td style="text-align: right;">0.0505886</td>
-<td style="text-align: right;">0.1033979</td>
-<td style="text-align: right;">0.0508021</td>
-<td style="text-align: right;">0.1038343</td>
+<td style="text-align: right;">0.9909816</td>
+<td style="text-align: right;">0.9869078</td>
+<td style="text-align: right;">0.0538599</td>
+<td style="text-align: right;">0.1100841</td>
+<td style="text-align: right;">0.0532707</td>
+<td style="text-align: right;">0.1088799</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">hmax</td>
-<td style="text-align: right;">0.9956210</td>
-<td style="text-align: right;">0.9227663</td>
-<td style="text-align: right;">3.1603697</td>
-<td style="text-align: right;">0.0664447</td>
-<td style="text-align: right;">3.1254581</td>
-<td style="text-align: right;">0.0657107</td>
+<td style="text-align: right;">0.9950494</td>
+<td style="text-align: right;">0.9300672</td>
+<td style="text-align: right;">3.3607882</td>
+<td style="text-align: right;">0.0706584</td>
+<td style="text-align: right;">3.3186734</td>
+<td style="text-align: right;">0.0697729</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">leafaera</td>
-<td style="text-align: right;">0.9113384</td>
-<td style="text-align: right;">0.9061062</td>
-<td style="text-align: right;">39.3924410</td>
-<td style="text-align: right;">0.4710126</td>
-<td style="text-align: right;">34.8908381</td>
-<td style="text-align: right;">0.4171872</td>
+<td style="text-align: right;">0.9007198</td>
+<td style="text-align: right;">0.9023457</td>
+<td style="text-align: right;">37.9945444</td>
+<td style="text-align: right;">0.4542980</td>
+<td style="text-align: right;">34.4698818</td>
+<td style="text-align: right;">0.4121539</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">tlp</td>
-<td style="text-align: right;">0.9968592</td>
-<td style="text-align: right;">0.9740826</td>
-<td style="text-align: right;">0.1153093</td>
-<td style="text-align: right;">-0.0599828</td>
-<td style="text-align: right;">0.1023389</td>
-<td style="text-align: right;">-0.0532357</td>
+<td style="text-align: right;">0.9971493</td>
+<td style="text-align: right;">0.9731435</td>
+<td style="text-align: right;">0.1113966</td>
+<td style="text-align: right;">-0.0579474</td>
+<td style="text-align: right;">0.0972079</td>
+<td style="text-align: right;">-0.0505666</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">wsg</td>
-<td style="text-align: right;">0.9954972</td>
-<td style="text-align: right;">0.9700305</td>
-<td style="text-align: right;">0.0440757</td>
-<td style="text-align: right;">0.0693426</td>
-<td style="text-align: right;">0.0413982</td>
-<td style="text-align: right;">0.0651302</td>
+<td style="text-align: right;">0.9964822</td>
+<td style="text-align: right;">0.9715584</td>
+<td style="text-align: right;">0.0421660</td>
+<td style="text-align: right;">0.0663382</td>
+<td style="text-align: right;">0.0353295</td>
+<td style="text-align: right;">0.0555826</td>
 </tr>
 </tbody>
 </table>

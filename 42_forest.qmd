@@ -259,7 +259,7 @@ g
 #| message: false
 #| warning: false
 #| fig-cap: "Evaluation of the height structure estimated by TROLL at the Paracou and Tapajos sites. Confidence intervals on inventory analysis at 95% are shown with shaded areas. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-read_tsv("outputs/evaluation_height.tsv") %>% 
+g <- read_tsv("outputs/evaluation_height.tsv") %>% 
   group_by(site, height) %>% 
   summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
             m = quantile(pct, 0.5, na.rm = TRUE), 
@@ -280,6 +280,8 @@ read_tsv("outputs/evaluation_height.tsv") %>%
   scale_color_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
   scale_fill_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
   theme(legend.position = "bottom")
+ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r heightevaltab}
@@ -301,6 +303,7 @@ read_tsv("outputs/evaluation_height.tsv") %>%
   rename(simulated = TROLL) %>% 
   gather(type, observed, -site, -height, -simulated) %>% 
   mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  mutate(simulated = ifelse(is.na(simulated), 0, simulated)) %>% 
   ungroup() %>% 
   nest_by(site, type) %>% 
   mutate(R2 = summary(lm(observed ~ 0 + simulated, data = data))$r.squared,

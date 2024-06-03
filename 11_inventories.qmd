@@ -138,12 +138,12 @@ Fabian Fischer personal communication to detail. GEDI to describe
 ```{r chm_data}
 #| eval: false
 paracou <- rast("data/inventories/chm/chm_lspikefree_paracou2015.tif") %>% 
-  crop(ext(285000,286000,581500,582500)) %>% 
+  # crop(ext(285000,286000,581500,582500)) %>% 
   as.data.frame(xy = TRUE) %>% 
   mutate(site = "Paracou") %>% 
   rename(height = spat_UnJH55x5kyQCEFH_27216)
 tapajos <- rast("data/inventories/chm/chm_lspikefree_tapajos2012.tif") %>% 
-  crop(ext(727000,728000,9683000,9684000)) %>% 
+  # crop(ext(727000,728000,9683000,9684000)) %>% 
   as.data.frame(xy = TRUE) %>% 
   mutate(site = "Tapajos") %>% 
   rename(height = spat_A96aTkDLpl6EakG_7172)
