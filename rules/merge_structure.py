@@ -1,7 +1,7 @@
 rule merge_structure:    
     input:
         expand("results/calib_str/{site}_{cra}_{crberr}_{m}.tsv",
-                site="Tapajos",
+                site=config["sites"],
                 cra=config["cra"],
                 crberr=config["crberr"],
                 m=config["m"]),

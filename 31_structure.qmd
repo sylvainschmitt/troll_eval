@@ -9,9 +9,9 @@ library(sf)
 
 Calibration of forest structure parameters (crown radius allometry and mortality):
 
--   $m$ : minimal death rate in death per year calibrated to 0.025 at Paracou
--   $a_{CR}$ : crown radius intercept calibrated to 2.13 at Paracou
--   $b_{CR}$ : crown radius slope calibrated to 0.36 at Paracou
+-   $m$ : minimal death rate in death per year calibrated to 0.025 at Nouragues
+-   $a_{CR}$ : crown radius intercept calibrated to 2.13 at Nouragues
+-   $b_{CR}$ : crown radius slope calibrated to 0.36 at Nouragues
 
 ## Crown radius parameters variation
 
@@ -52,16 +52,15 @@ params <- read_csv("data/species/tallo.csv") %>%
 ```{r tapajostalloparamsfig}
 #| message: false
 ggplot(params, aes(a, b)) +
-  geom_vline(xintercept = 2.13, linetype = "dashed") +
-  geom_hline(yintercept = 0.63, linetype = "dashed") +
+  geom_vline(xintercept = 2.13, linetype = "dashed", col = "green") +
+  geom_hline(yintercept = 0.63, linetype = "dashed", col = "green") +
   geom_point() +
   geom_density2d() +
   theme_bw() +
   xlab(expression(a[CR])) +
   ylab(expression(b[CR])) +
   ggpubr::stat_cor() +
-  geom_smooth(col = "red", method = "lm") +
-  ggpubr::stat_regline_equation(label.y.npc = 0.8)
+  geom_smooth(col = "blue", method = "lm")
 ```
 
 ## Parameters space
@@ -70,9 +69,9 @@ We prepared the parameter space for calibration defining low limit, high limit, 
 
 ```{r prepparamspace}
 pars <- data.frame(parameter = c("a", "error_b", "m"),
-                   low = c(1.4, -4*0.08, 0.01),
-                   high = c(2.4, 4*0.08, 0.03),
-                   by = c(0.025, 0.05, 0.001))
+                   low = c(1.8, -4*0.08, 0.01),
+                   high = c(2.5, 4*0.08, 0.03),
+                   by = c(0.05, 0.05, 0.002))
 grid <- data.frame(a = seq(pars$low[1], pars$high[1], by = pars$by[1])) %>% 
   mutate(error_b = list(seq(pars$low[2], pars$high[2], by = pars$by[2]))) %>% 
   unnest(error_b) %>% 

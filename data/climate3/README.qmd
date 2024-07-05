@@ -1,0 +1,20 @@
+---
+title: "Climate 3"
+author: Sylvain Schmitt -
+date: today
+date-format: medium
+format: 
+  gfm:
+    toc: true
+    toc-depth: 2
+---
+
+This folder contains code to retrieve climate data for TROLL 3.1 using rcontroll for structure calibration:
+
+-   get_climate.R: the code to retrieve climate data from CDS.
+-   \*.nc: the ERA5-Land climate data from CDS for Paracou and Tapajos.
+-   \*.tsv: the ERA5-Land climate data prepared for TROLL 3.1 for Paracou and Tapajos.
+
+```{r, comment=""}
+fs::dir_tree()
+```

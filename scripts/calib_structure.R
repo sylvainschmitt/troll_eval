@@ -4,6 +4,9 @@ sink(log_file, append = TRUE, type = "message")
 sink(log_file, append = TRUE)
 
 # snakemake vars
+climatedaytime12_in <- snakemake@input[[1]]
+daytimevar_in <- snakemake@input[[2]]
+species_in <- snakemake@input[[3]]
 fileout <- snakemake@output[[1]]
 site <- as.character(snakemake@params$site)
 cra <- as.numeric(snakemake@params$cra)
@@ -40,9 +43,9 @@ pars <- generate_parameters(nbiter = n,
 sim <- troll(
   name = name,
   global = pars,
-  species = TROLLv3_species,
-  climate = TROLLv3_climatedaytime12,
-  daily = TROLLv3_daytimevar,
+  species = read_tsv(species_in),
+  climate = read_tsv(climatedaytime12_in),
+  daily = read_tsv(daytimevar_in),
   load = TRUE,
   verbose = verbose,
   overwrite = TRUE

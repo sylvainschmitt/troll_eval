@@ -1,4 +1,8 @@
 rule calib_structure:
+    input:
+        "data/climate3/{site}_climatedaytime12.tsv",
+        "data/climate3/{site}_daytimevar.tsv",
+        "outputs/{site}_species_troll.tsv"
     output:
         "results/calib_structure/{site}_{cra}_{crberr}_{m}.tsv"
     log:
