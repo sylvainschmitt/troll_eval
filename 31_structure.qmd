@@ -124,19 +124,49 @@ grid %>%
 
 ## Observations
 
-According to @rice2004 :
+For Tapajos and according to @rice2004 :
 
 -   470 live trees per hectare with diameter at breast height (dbh) ≥10
 -   Aboveground live biomass was 143.7 ± 5.4 Mg C/ha
 -   Stem density -0.058 (±0.003) dbh_cm + 2.912 (±0.076) for dbh \< 40
 -   Stem density -0.016 (±0.001) dbh_cm + 1.451 (±0.04) for dbh \> 40
 
+For Paracou:
+
+-   612 ± 37 live trees per hectare with diameter at breast height (dbh) ≥10 (from inventory)
+-   Aboveground live biomass was 197.5-221.5 Mg C/ha in 2007 -\> 209.5 ± 17.0 Mg C/ha [@rutishauser2010]
+-   Stem density is shown below
+
 ```{r rice_obs}
-obs <- data.frame(dbh_class = seq(10, 200, 5)) %>% 
+#| message: false
+abd_par <- read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
+  filter(site == "Paracou", type == "default") %>% 
+  filter(dbh > 10) %>% 
+  group_by(plot) %>% 
+  summarise(abundance = n()/unique(plot_size)) %>% 
+  ungroup()
+# paste(round(median(abd_par$abundance)), "±", round(sd(abd_par$abundance)))
+obs_tap <- data.frame(dbh_class = seq(10, 150, 5)) %>% 
   mutate(abundance = ifelse(dbh_class < 40, 
                             10^(-0.058*dbh_class+2.912), 
-                            10^(-0.016*dbh_class+1.451)))
-ggplot(obs, (aes(dbh_class, abundance))) +
+                            10^(-0.016*dbh_class+1.451))) %>% 
+  mutate(site = "Tapajos")
+
+obs_par <- read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
+  filter(site == "Paracou", type == "default") %>% 
+  filter(dbh > 10) %>% 
+  mutate(dbh_class = cut(dbh, 
+                         breaks = c(seq(10, 155, by = 5)), 
+                         labels = c(seq(10, 150, by = 5)))) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+    group_by(plot, dbh_class) %>% 
+  summarise(abundance = n()/unique(plot_size)) %>% 
+  group_by(dbh_class) %>% 
+  summarise(abundance = median(abundance)) %>% 
+  mutate(site = "Paracou")
+# obs <- bind_rows(obs_tap, obs_par)
+obs <- bind_rows(obs_tap, obs_par)
+ggplot(obs, (aes(dbh_class, abundance, col = site))) +
   geom_line() +
   theme_bw() +
   scale_y_log10(labels = scales::comma) +
@@ -154,7 +184,7 @@ calib <- read_tsv("results/calib_structure.tsv") %>%
                          labels = seq(10, 200, by = 5),
                          include.lowest = TRUE)) %>% 
   mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
-  group_by(a, b, m, dbh_class) %>% 
+  group_by(site, a, b, m, dbh_class) %>% 
   summarise(abundance = n()/9, agb = sum(agb)/9)
 write_tsv(calib, "outputs/calib_structure.tsv")
 ```
@@ -163,16 +193,19 @@ write_tsv(calib, "outputs/calib_structure.tsv")
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  group_by(a, b, m) %>% 
+  group_by(site, a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m) %>% 
+  gather(variable, value, -a, -b, -m, -site) %>% 
   ggplot(aes(a, value, col = b)) +
   geom_point() +
-  facet_wrap(~ variable, scales = "free_y") +
+  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
   geom_hline(aes(yintercept = value),
-             data = data.frame(value = c(470, 143.7), 
-                               variable = c("abundance", "agb")),
+             data = data.frame(site = c("Tapajos", "Tapajos", 
+                                        "Paracou", "Paracou"),
+                               value = c(470, 143.7, 612, 209.5), 
+                               variable = c("abundance", "agb",
+                                            "abundance", "agb")),
              col = "red") +
   scale_color_viridis_c(expression(b[CR])) +
   xlab(expression(a[CR])) + ylab("")
@@ -184,27 +217,31 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = a, group = paste(a, b, m))) +
-  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
+  geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(a[CR])) +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~ site, nrow = 2)
 ```
 
 ```{r bCR}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  group_by(a, b, m) %>% 
+  group_by(site, a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m) %>% 
+  gather(variable, value, -a, -b, -m, -site) %>% 
   ggplot(aes(b, value, col = a)) +
   geom_point() +
-  facet_wrap(~ variable, scales = "free_y") +
+  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
   geom_hline(aes(yintercept = value),
-             data = data.frame(value = c(470, 143.7), 
-                               variable = c("abundance", "agb")),
+             data = data.frame(site = c("Tapajos", "Tapajos", 
+                                        "Paracou", "Paracou"),
+                               value = c(470, 143.7, 612, 209.5), 
+                               variable = c("abundance", "agb",
+                                            "abundance", "agb")),
              col = "red") +
   scale_color_viridis_c(expression(a[CR])) +
   xlab(expression(b[CR])) + ylab("")
@@ -216,27 +253,31 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = b, group = paste(a, b, m))) +
-  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
+  geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(b[CR])) +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~ site, nrow = 2)
 ```
 
 ```{r m}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  group_by(a, b, m) %>% 
+  group_by(site, a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m) %>% 
+  gather(variable, value, -a, -b, -m, -site) %>% 
   ggplot(aes(m, value, col = a)) +
   geom_point() +
-  facet_wrap(~ variable, scales = "free_y") +
+  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
   geom_hline(aes(yintercept = value),
-             data = data.frame(value = c(470, 143.7), 
-                               variable = c("abundance", "agb")),
+             data = data.frame(site = c("Tapajos", "Tapajos", 
+                                        "Paracou", "Paracou"),
+                               value = c(470, 143.7, 612, 209.5), 
+                               variable = c("abundance", "agb",
+                                            "abundance", "agb")),
              col = "red") +
   scale_color_viridis_c(expression(a[CR])) +
   xlab(expression(m)) + ylab("")
@@ -248,11 +289,12 @@ read_tsv("outputs/calib_structure.tsv") %>%
 read_tsv("outputs/calib_structure.tsv") %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = m, group = paste(a, b, m))) +
-  geom_point(data = filter(obs, dbh_class < 180), col = "red") +
+  geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(m)) +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~ site, nrow = 2)
 ```
 
 ## Best parameters
@@ -261,82 +303,78 @@ read_tsv("outputs/calib_structure.tsv") %>%
 #| message: false
 #| warning: false
 eval <- read_tsv("outputs/calib_structure.tsv") %>% 
-  select(a, b, m) %>% 
+  select(site, a, b, m) %>% 
   unique() %>% 
-  mutate(dbh_class = list(seq(10, 200, by = 5))) %>% 
+  mutate(dbh_class = list(seq(10, 150, by = 5))) %>% 
   unnest(dbh_class) %>% 
   left_join(read_tsv("outputs/calib_structure.tsv")) %>% 
   mutate_at(c("abundance", "agb"), ~ifelse(is.na(.), 0, .)) %>% 
   rename(simulated = abundance) %>% 
   left_join(rename(obs, observed = abundance)) %>% 
-  group_by(a, b, m) %>% 
-  mutate(d_s = simulated/sum(simulated),
-         d_o = observed/sum(observed)) %>% 
-  summarise(d_dist = 0.5*sum(abs(d_o - d_s)),
-            rmsep_dist_norm = sqrt(mean((observed - simulated)^2)),
-            rmsep_dist_log = sqrt(mean((log10(observed+1) - log10(simulated+1)^2))),
-            rmsep_agb = sqrt((143.7 - sum(agb)/10^3/2)^2),
-            rmsep_abund = sqrt((470 - sum(simulated))^2)
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  mutate(agb_obs = ifelse(site == "Tapajos", 143.7, 209.5)) %>% 
+  mutate(abund_obs = ifelse(site == "Tapajos", 470, 612)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(rmsep_dist = sqrt(mean((observed - simulated)^2)),
+            rmsep_agb = sqrt((unique(agb_obs) - sum(agb)/10^3/2)^2),
+            rmsep_abund = sqrt((unique(abund_obs) - sum(simulated))^2)
             ) %>% 
   ungroup() %>% 
-  mutate(all_rmsep_norm = rmsep_dist_norm/mean(obs$abundance) + 
-           rmsep_agb/143.7 + rmsep_abund/470) %>% 
-  mutate(all_rmsep_log = rmsep_dist_log/mean(log10(obs$abundance+1)) + 
-           rmsep_agb/143.7 + rmsep_abund/470) %>% 
-  mutate(all_d = d_dist/mean(obs$abundance/sum(obs$abundance)) + 
-           rmsep_agb/143.7 + rmsep_abund/470) %>% 
-  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m))
+  mutate(dist_mean_obs = ifelse(site == "Tapajos", 16.2, 30.5)) %>% 
+  mutate(agb_obs = ifelse(site == "Tapajos", 143.7, 209.5)) %>% 
+  mutate(abund_obs = ifelse(site == "Tapajos", 470, 612)) %>% 
+  mutate(rrmsep_dist =  rmsep_dist/dist_mean_obs,
+         rrmsep_agb = rmsep_agb/agb_obs,
+         rrmsep_abund = rmsep_abund/abund_obs) %>% 
+  mutate(all_rmsep_norm = rrmsep_dist + rrmsep_agb + rrmsep_abund) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m))
 best <- eval %>% 
-  select(all_rmsep_norm,
-         # d_dist, rmsep_dist_norm, rmsep_dist_log,
-         # rmsep_agb, rmsep_abund, 
-         # all_rmsep_norm, all_rmsep_log, all_d,
-         a, b, m, sim) %>% 
-  gather(metric, value, -a, -b, -m, -sim) %>% 
-  group_by(metric) %>% 
-  slice_min(value, n = 5)
+  group_by(site) %>% 
+  slice_min(all_rmsep_norm, n = 5)
 ```
 
 ```{r besttab}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
   left_join(best) %>% 
-  filter(!is.na(metric)) %>% 
-  group_by(a, b, m) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  group_by(site, a, b, m) %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value) %>% 
-  group_by(variable) %>% 
+  gather(variable, value, -site) %>% 
+  group_by(site, variable) %>% 
   summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
-  knitr::kable(caption = "Best structure parameters at Tapajos according to calibration with inventory data.")
+  knitr::kable(caption = "Best structure parameters according to calibration with inventory data.")
 ```
 
 ```{r bestfig}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
-  left_join(best %>% slice_min(value)) %>% 
-  filter(!is.na(metric)) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best %>% slice_min(all_rmsep_norm)) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(group = sim)) +
   geom_point(data = obs, col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~ site)
 ```
 
 ```{r bestfig2}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
-  mutate(sim = paste0("Tapajos_", a, "_", b, "_", m)) %>% 
-  left_join(best %>% slice_min(value)) %>% 
-  filter(!is.na(metric)) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best %>% slice_min(all_rmsep_norm)) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(group = sim)) +
   geom_point(data = obs, col = "red") +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~ site)
 ```

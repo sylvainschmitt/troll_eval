@@ -24,9 +24,10 @@ paracou <- read_tsv("data/inventories/guyafor.tsv") %>%
   mutate(plot = as.numeric(Plot)) %>% 
   filter(!is.na(plot)) %>% 
   filter(Plot != 16) %>% 
-  filter(Plot %in% 1:15) %>% 
+  filter(Plot %in% c(1, 6, 11, 13:15)) %>% 
   filter(BotaSource == "Bota") %>% 
   filter(!is.na(Xutm), !is.na(Yutm)) %>% 
+  filter(CodeAlive == 1) %>% 
   mutate(dbh = CircCorr/pi, site = "Paracou", type = "default", tree = idTree,
          x = Xfield, y = Yfield) %>% 
   filter(CensusYear == 2005) %>% 
