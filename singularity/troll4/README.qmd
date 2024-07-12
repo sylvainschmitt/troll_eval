@@ -34,7 +34,7 @@ sudo singularity build troll4.sif Singularity
 **usage**:
 
 ``` bash
-singularity shell -e -B "/home/sschmitt/Documents/data" troll4.sif 
+singularity shell -e troll4.sif 
 ```
 
-> `-e` to avoid conflict with local environment and `-B` to bind the data folder
+> `-e` to avoid conflict with local environment

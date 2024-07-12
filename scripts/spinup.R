@@ -55,12 +55,17 @@ if(test)
   n <- round(test_years*365)
 
 if(site == "Paracou")
-  parameters <- generate_parameters(nbiter = n)
+  parameters <- generate_parameters(nbiter = n,
+                                    CR_a = 1.95,
+                                    CR_b = 0.60,
+                                    m = 0.016,
+                                    m1 = 0.016)
 if(site == "Tapajos")
   parameters <- generate_parameters(nbiter = n,
-                                    CR_a = 2.33,
-                                    CR_b = 0.82,
-                                    m = 0.018)
+                                    CR_a = 2.20,
+                                    CR_b = 0.69,
+                                    m = 0.018,
+                                    m1 = 0.018)
 
 sim <- troll(
   name = name,

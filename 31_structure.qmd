@@ -11,7 +11,7 @@ Calibration of forest structure parameters (crown radius allometry and mortality
 
 -   $m$ : minimal death rate in death per year calibrated to 0.025 at Nouragues
 -   $a_{CR}$ : crown radius intercept calibrated to 2.13 at Nouragues
--   $b_{CR}$ : crown radius slope calibrated to 0.36 at Nouragues
+-   $b_{CR}$ : crown radius slope calibrated to 0.63 at Nouragues
 
 ## Crown radius parameters variation
 
@@ -69,9 +69,9 @@ We prepared the parameter space for calibration defining low limit, high limit, 
 
 ```{r prepparamspace}
 pars <- data.frame(parameter = c("a", "error_b", "m"),
-                   low = c(1.8, -4*0.08, 0.01),
-                   high = c(2.5, 4*0.08, 0.03),
-                   by = c(0.05, 0.05, 0.002))
+                   low = c(1.8, -4*0.08, 0.025),
+                   high = c(2.5, 4*0.08, 0.06),
+                   by = c(0.05, 0.05, 0.005))
 grid <- data.frame(a = seq(pars$low[1], pars$high[1], by = pars$by[1])) %>% 
   mutate(error_b = list(seq(pars$low[2], pars$high[2], by = pars$by[2]))) %>% 
   unnest(error_b) %>% 
@@ -189,110 +189,156 @@ calib <- read_tsv("results/calib_structure.tsv") %>%
 write_tsv(calib, "outputs/calib_structure.tsv")
 ```
 
+### $a_{CR}$ 
+
 ```{r aCR}
+#| message: false
+#| warning: false
+dat <-  read_tsv("outputs/calib_structure.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(agb = sum(agb)/10^3/2,
+            abundance = sum(abundance)) %>% 
+  filter(m == 0.024)
+cowplot::plot_grid(
+ dat %>% 
+  ggplot(aes(a, b, col = agb)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free_y") +
+  theme_bw() +
+  scale_color_viridis_c("AGB") +
+  xlab(expression(a[CR|m==0.024])) + ylab(expression(b[CR|m==0.024])),
+   dat %>% 
+  ggplot(aes(a, b, col = abundance)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free_y") +
+  theme_bw() +
+  scale_color_viridis_c("Abundance") +
+  xlab(expression(a[CR|m==0.024])) + ylab(expression(b[CR|m==0.024])), 
+ nrow = 2)
+```
+
+```{r aCR2}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(site, a, b, m) %>% 
-  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m, -site) %>% 
-  ggplot(aes(a, value, col = b)) +
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = a)) +
   geom_point() +
-  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
-  geom_hline(aes(yintercept = value),
-             data = data.frame(site = c("Tapajos", "Tapajos", 
-                                        "Paracou", "Paracou"),
-                               value = c(470, 143.7, 612, 209.5), 
-                               variable = c("abundance", "agb",
-                                            "abundance", "agb")),
-             col = "red") +
-  scale_color_viridis_c(expression(b[CR])) +
-  xlab(expression(a[CR])) + ylab("")
+  scale_color_viridis_c(expression(a[CR])) +
+  facet_wrap(~ site)
 ```
 
 ```{r aCRdist}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
+  filter(m == 0.024) %>% 
+  mutate(berr = -0.39 + 0.57*a - b) %>% 
+  filter(berr > 0, berr < 0.05) %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = a, group = paste(a, b, m))) +
   geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
-  scale_color_viridis_c(expression(a[CR])) +
+  scale_color_viridis_c(expression(a[CR|m==0.024|berr==0.02])) +
   theme_bw() +
   facet_wrap(~ site, nrow = 2)
 ```
+
+### $b_{CR}$ 
 
 ```{r bCR}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(site, a, b, m) %>% 
-  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m, -site) %>% 
-  ggplot(aes(b, value, col = a)) +
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = b)) +
   geom_point() +
-  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
-  geom_hline(aes(yintercept = value),
-             data = data.frame(site = c("Tapajos", "Tapajos", 
-                                        "Paracou", "Paracou"),
-                               value = c(470, 143.7, 612, 209.5), 
-                               variable = c("abundance", "agb",
-                                            "abundance", "agb")),
-             col = "red") +
-  scale_color_viridis_c(expression(a[CR])) +
-  xlab(expression(b[CR])) + ylab("")
+  scale_color_viridis_c(expression(b[CR])) +
+  facet_wrap(~ site)
 ```
 
 ```{r bCRdist}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
+  filter(m == 0.024) %>% 
+  mutate(berr = -0.39 + 0.57*a - b) %>% 
+  filter(berr > 0, berr < 0.05) %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = b, group = paste(a, b, m))) +
   geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(b[CR])) +
+  scale_color_viridis_c(expression(b[CR|m==0.024|a==2])) +
   theme_bw() +
   facet_wrap(~ site, nrow = 2)
 ```
 
+### $m$ 
+
 ```{r m}
+#| message: false
+#| warning: false
+dat <-  read_tsv("outputs/calib_structure.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(agb = sum(agb)/10^3/2,
+            abundance = sum(abundance)) %>% 
+  mutate(berr = -0.39 + 0.57*a - b) %>% 
+  filter(berr > 0, berr < 0.05)
+cowplot::plot_grid(
+ dat %>% 
+  ggplot(aes(a, m, col = agb)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free_y") +
+  theme_bw() +
+  scale_color_viridis_c("AGB") +
+  xlab(expression(a[CR|berr==0.02])) + ylab(expression(m[berr==0.02])),
+   dat %>% 
+  ggplot(aes(a, m, col = abundance)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free_y") +
+  theme_bw() +
+  scale_color_viridis_c("Abundance") +
+  xlab(expression(a[CR|berr==0.02])) + ylab(expression(m[berr==0.02])),
+ nrow = 2)
+```
+
+```{r m2}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
   group_by(site, a, b, m) %>% 
-  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
-  gather(variable, value, -a, -b, -m, -site) %>% 
-  ggplot(aes(m, value, col = a)) +
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = m)) +
   geom_point() +
-  facet_grid(variable ~ site, scales = "free_y") +
   theme_bw() +
-  geom_hline(aes(yintercept = value),
-             data = data.frame(site = c("Tapajos", "Tapajos", 
-                                        "Paracou", "Paracou"),
-                               value = c(470, 143.7, 612, 209.5), 
-                               variable = c("abundance", "agb",
-                                            "abundance", "agb")),
-             col = "red") +
-  scale_color_viridis_c(expression(a[CR])) +
-  xlab(expression(m)) + ylab("")
+  scale_color_viridis_c(expression(m)) +
+  facet_wrap(~ site)
 ```
 
 ```{r mdist}
 #| message: false
 #| warning: false
 read_tsv("outputs/calib_structure.tsv") %>% 
+  filter(a == 2) %>% 
+  mutate(berr = -0.39 + 0.57*a - b) %>% 
+  filter(berr > 0, berr < 0.05) %>% 
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(col = m, group = paste(a, b, m))) +
   geom_point(data = filter(obs, dbh_class < 150), col = "red") +
   scale_y_log10(labels = scales::comma) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   scale_color_viridis_c(expression(m)) +
+  scale_color_viridis_c(expression(m[a==2|berr==0.02])) +
   theme_bw() +
   facet_wrap(~ site, nrow = 2)
 ```
@@ -341,7 +387,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
   left_join(best) %>% 
   filter(!is.na(all_rmsep_norm)) %>% 
   group_by(site, a, b, m) %>% 
-  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
+  summarise(abundance = sum(abundance), agb = sum(agb)/10^3) %>% 
   gather(variable, value, -site) %>% 
   group_by(site, variable) %>% 
   summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
