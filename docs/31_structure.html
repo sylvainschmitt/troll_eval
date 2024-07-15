@@ -569,7 +569,7 @@ div.csl-indent {
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(dbh_class))) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m, dbh_class) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">9</span>, <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">9</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">4</span>, <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">4</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write_tsv</span>(calib, <span class="st">"outputs/calib_structure.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -799,7 +799,7 @@ div.csl-indent {
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
@@ -828,65 +828,65 @@ div.csl-indent {
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">abundance</td>
-<td style="text-align: right;">561.3333</td>
-<td style="text-align: right;">539.6667</td>
-<td style="text-align: right;">576.6667</td>
+<td style="text-align: right;">608.5000</td>
+<td style="text-align: right;">599.7500</td>
+<td style="text-align: right;">622.7500</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">agb</td>
-<td style="text-align: right;">310.2337</td>
-<td style="text-align: right;">274.9549</td>
-<td style="text-align: right;">311.8454</td>
+<td style="text-align: right;">210.6042</td>
+<td style="text-align: right;">204.8932</td>
+<td style="text-align: right;">216.6646</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">b</td>
-<td style="text-align: right;">0.6945</td>
-<td style="text-align: right;">0.6660</td>
-<td style="text-align: right;">0.7445</td>
+<td style="text-align: right;">0.4445</td>
+<td style="text-align: right;">0.4160</td>
+<td style="text-align: right;">0.4730</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">m</td>
-<td style="text-align: right;">0.0250</td>
-<td style="text-align: right;">0.0250</td>
-<td style="text-align: right;">0.0350</td>
+<td style="text-align: right;">0.0550</td>
+<td style="text-align: right;">0.0500</td>
+<td style="text-align: right;">0.0600</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">a</td>
-<td style="text-align: right;">1.9000</td>
-<td style="text-align: right;">1.8000</td>
-<td style="text-align: right;">1.9000</td>
+<td style="text-align: right;">2.5000</td>
+<td style="text-align: right;">2.4000</td>
+<td style="text-align: right;">2.5000</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">abundance</td>
-<td style="text-align: right;">472.1111</td>
-<td style="text-align: right;">459.5556</td>
-<td style="text-align: right;">483.8889</td>
+<td style="text-align: right;">467.2500</td>
+<td style="text-align: right;">453.7500</td>
+<td style="text-align: right;">485.5000</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">agb</td>
-<td style="text-align: right;">287.6434</td>
-<td style="text-align: right;">280.4222</td>
-<td style="text-align: right;">290.4473</td>
+<td style="text-align: right;">152.7362</td>
+<td style="text-align: right;">137.3486</td>
+<td style="text-align: right;">167.9250</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">b</td>
-<td style="text-align: right;">0.6730</td>
-<td style="text-align: right;">0.6160</td>
-<td style="text-align: right;">0.6730</td>
+<td style="text-align: right;">0.8150</td>
+<td style="text-align: right;">0.7080</td>
+<td style="text-align: right;">0.8150</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">m</td>
-<td style="text-align: right;">0.0350</td>
-<td style="text-align: right;">0.0250</td>
 <td style="text-align: right;">0.0550</td>
+<td style="text-align: right;">0.0400</td>
+<td style="text-align: right;">0.0600</td>
 </tr>
 </tbody>
 </table>

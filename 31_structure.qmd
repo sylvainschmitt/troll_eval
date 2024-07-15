@@ -185,7 +185,7 @@ calib <- read_tsv("results/calib_structure.tsv") %>%
                          include.lowest = TRUE)) %>% 
   mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
   group_by(site, a, b, m, dbh_class) %>% 
-  summarise(abundance = n()/9, agb = sum(agb)/9)
+  summarise(abundance = n()/4, agb = sum(agb)/4)
 write_tsv(calib, "outputs/calib_structure.tsv")
 ```
 
@@ -387,7 +387,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
   left_join(best) %>% 
   filter(!is.na(all_rmsep_norm)) %>% 
   group_by(site, a, b, m) %>% 
-  summarise(abundance = sum(abundance), agb = sum(agb)/10^3) %>% 
+  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
   gather(variable, value, -site) %>% 
   group_by(site, variable) %>% 
   summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
