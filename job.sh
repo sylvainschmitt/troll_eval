@@ -1,11 +1,12 @@
 #!/bin/bash
-#SBATCH --time=96:00:00
+#SBATCH --time=240:00:00
 #SBATCH -J troll_eval
 #SBATCH -o troll_eval.%N.%j.out
 #SBATCH -e troll_eval.%N.%j.err
 #SBATCH --mem=5G
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
+#SBATCH -p unlimitq
 
 # Environment
 module purge
