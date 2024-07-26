@@ -1,18 +1,33 @@
 rule calib_pheno:
     input:
-        expand("results/run2/{site}_{a0}_{b0}_{delta}",
-                site=config["sites"],
-                a0=config["a0"],
-                b0=config["b0"],
-                delta=config["delta"])
+        "results/data/{site}_climate.tsv",
+        expand("results/calib_str4_run/{site}_{cra}_{crberr}_{m}", 
+                cra=config["cra_f"],
+                crberr=config["crberr_f"],
+                m=config["m_f"], 
+                allow_missing=True)
     output:
-        directory("results/calib")
+        directory("results/calib_pheno_run/run1/{site}_{a0}_{b0}_{delta}"),
+        directory("results/calib_pheno_run/run2/{site}_{a0}_{b0}_{delta}")
     log:
-        "results/logs/calib.log"
+        "results/logs/calib_pheno_{site}_{a0}_{b0}_{delta}.log"
     benchmark:
-        "results/benchmarks/calib.benchmark.txt"
+        "results/benchmarks/calib_pheno_{site}_{a0}_{b0}_{delta}.benchmark.txt"
+    singularity:
+        config["troll4"]
+    threads: 1
     params:
-        files = lambda wildcards, input: [x + "/*_sumstats.txt" for x in input]
-    shell:
-        "mkdir {output} ; "
-        "cp {params.files} {output}"
+        site="{site}",
+        a0="{a0}",
+        b0="{b0}",
+        delta="{delta}",
+        cra=config["cra_f"],
+        crberr=config["crberr_f"],
+        m=config["m_f"], 
+        dstart=config["day_start"],
+        dend=config["day_end"],
+        verbose=config["verbose"],
+        test=config["test"],
+        test_years=config["test_years"]
+    script:
+        "../scripts/calib_pheno.R"

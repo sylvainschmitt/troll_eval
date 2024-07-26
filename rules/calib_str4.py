@@ -5,7 +5,7 @@ rule calib_str4:
         "results/data/{site}_soil.tsv"
     output:
         "results/calib_str4/{site}_{cra}_{crberr}_{m}.tsv",
-        directory("results/calib_str4_sim/{site}_{cra}_{crberr}_{m}")
+        directory("results/calib_str4_run/{site}_{cra}_{crberr}_{m}")
     log:
         "results/logs/calib_str4_{site}_{cra}_{crberr}_{m}.log"
     benchmark:
