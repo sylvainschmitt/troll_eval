@@ -168,6 +168,7 @@ understory <- read_tsv("outputs/evaluation_forest.tsv") %>%
 #| warning: false
 #| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 labs <- understory %>% 
+  filter(site == "Paracou") %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
   mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
   group_by(variable, varlong, type, site) %>% 
@@ -177,19 +178,22 @@ labs <- understory %>%
   mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
   mutate(dbh_class = 5) %>% 
   mutate(m = ifelse(variable == "log_abundance", 3, 0.6)) 
-filter(understory, variable %in% c("ba", "log_abundance")) %>% 
+g <- filter(understory, variable %in% c("ba", "log_abundance")) %>% 
+  filter(site == "Paracou") %>% 
   ggplot(aes(dbh_class, m)) +
   geom_linerange(aes(ymin = l, ymax = h, col = type)) +
   geom_point(aes(col = type)) +
   geom_line(aes(col = type)) +
   theme_bw() +
-  facet_grid(varlong ~ site, scales = "free_y", labeller = label_parsed) +
+  facet_wrap(site ~ varlong, scales = "free_y", labeller = label_parsed) +
   xlab("DBH [ cm ]") + ylab("") +
   scale_color_discrete("") +
   theme(legend.position = "bottom") +
   geom_text(data = labs, aes(label = label)) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
+ggsave("figures/f03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ```{r understoryeval}
@@ -236,7 +240,7 @@ labs <- all_str %>%
   mutate(m = c(0.2, 7, 5, 3, 2, 2))
 labs$label[1] <- "Field: 4\nTROLL: 4"
 labs$label[4] <- "Field: 3787\nTROLL: 2312"
-g <- all_str %>% 
+all_str %>% 
   ggplot(aes(dbh_class, m)) +
   geom_linerange(aes(ymin = l, ymax = h, col = type)) +
   geom_point(aes(col = type)) +
@@ -249,8 +253,6 @@ g <- all_str %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL")) +
   geom_text(data = labs, aes(label = label))
-ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
-g
 ```
 
 ### Height
@@ -280,7 +282,7 @@ g <- read_tsv("outputs/evaluation_height.tsv") %>%
   scale_color_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
   scale_fill_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
   theme(legend.position = "bottom")
-ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -363,7 +365,7 @@ g <- compositon %>%
   scale_y_log10()  +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f04.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -492,7 +494,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
   scale_color_discrete("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
-ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 

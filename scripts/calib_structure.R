@@ -59,6 +59,7 @@ pars <- generate_parameters(
 )
 sim <- troll(
   name = name,
+  path = name,
   global = pars,
   species = read_tsv(species_in),
   climate = read_tsv(climatedaytime12_in),

@@ -21,8 +21,9 @@ book:
         - 22_tools.qmd
     - part: 30_calibration.qmd
       chapters: 
-        - 31_structure.qmd
-        - 32_phenology.qmd
+        - 31_str3.qmd
+        - 32_str4.qmd
+        - 33_phenology.qmd
     - part: 40_evaluation.qmd
       chapters: 
         - 41_variation.qmd

@@ -127,7 +127,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./40_evaluation.html">Evaluation</a></li><li class="breadcrumb-item"><a href="./43_fluxes.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Fluxes</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./40_evaluation.html">Evaluation</a></li><li class="breadcrumb-item"><a href="./43_fluxes.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Fluxes</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -226,12 +226,17 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./31_structure.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Structure</span></a>
+  <a href="./31_str3.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Structure v3</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./32_phenology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Phenology</span></a>
+  <a href="./32_str4.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Structure v4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./33_phenology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Phenology</span></a>
   </div>
 </li>
       </ul>
@@ -470,7 +475,7 @@ div.csl-indent {
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f01.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")</span></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -507,7 +512,7 @@ div.csl-indent {
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">7.5</span>) <span class="sc">+</span></span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>(<span class="fu">aes</span>(<span class="at">label =</span> ..rr.label..))</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f11.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -594,45 +599,45 @@ div.csl-indent {
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">gpp</td>
 <td style="text-align: left;">observed</td>
-<td style="text-align: right;">0.9684973</td>
-<td style="text-align: right;">0.5903513</td>
-<td style="text-align: right;">0.9100597</td>
-<td style="text-align: right;">0.2542892</td>
-<td style="text-align: right;">0.7047956</td>
-<td style="text-align: right;">0.1969342</td>
+<td style="text-align: right;">0.9697788</td>
+<td style="text-align: right;">0.6035862</td>
+<td style="text-align: right;">0.7516227</td>
+<td style="text-align: right;">0.2100186</td>
+<td style="text-align: right;">0.6664904</td>
+<td style="text-align: right;">0.1862310</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">gpp</td>
 <td style="text-align: left;">satellite</td>
-<td style="text-align: right;">0.9534550</td>
-<td style="text-align: right;">0.2047164</td>
-<td style="text-align: right;">1.3848787</td>
-<td style="text-align: right;">0.4469346</td>
-<td style="text-align: right;">0.8307006</td>
-<td style="text-align: right;">0.2680877</td>
+<td style="text-align: right;">0.9533363</td>
+<td style="text-align: right;">0.1925081</td>
+<td style="text-align: right;">1.1842877</td>
+<td style="text-align: right;">0.3821990</td>
+<td style="text-align: right;">0.7969428</td>
+<td style="text-align: right;">0.2571932</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">gpp</td>
 <td style="text-align: left;">observed</td>
-<td style="text-align: right;">0.9673253</td>
-<td style="text-align: right;">0.4617635</td>
-<td style="text-align: right;">1.2785170</td>
-<td style="text-align: right;">0.3963407</td>
-<td style="text-align: right;">0.7007023</td>
-<td style="text-align: right;">0.2172180</td>
+<td style="text-align: right;">0.9674821</td>
+<td style="text-align: right;">0.4546221</td>
+<td style="text-align: right;">1.1245310</td>
+<td style="text-align: right;">0.3486050</td>
+<td style="text-align: right;">0.6763800</td>
+<td style="text-align: right;">0.2096780</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">gpp</td>
 <td style="text-align: left;">satellite</td>
-<td style="text-align: right;">0.9607134</td>
-<td style="text-align: right;">0.2285033</td>
-<td style="text-align: right;">1.7097866</td>
-<td style="text-align: right;">0.6452635</td>
-<td style="text-align: right;">0.7960343</td>
-<td style="text-align: right;">0.3004187</td>
+<td style="text-align: right;">0.9615592</td>
+<td style="text-align: right;">0.2199041</td>
+<td style="text-align: right;">1.5411157</td>
+<td style="text-align: right;">0.5816081</td>
+<td style="text-align: right;">0.7538847</td>
+<td style="text-align: right;">0.2845117</td>
 </tr>
 </tbody>
 </table>
@@ -722,7 +727,7 @@ div.csl-indent {
 <span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"J"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"A"</span>, <span class="st">"M"</span>, <span class="st">"J"</span>, <span class="st">"J"</span>, <span class="st">"A"</span>, <span class="st">"S"</span>, <span class="st">"O"</span>, <span class="st">"N"</span>, <span class="st">"D"</span>)) <span class="sc">+</span></span>
 <span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Leaf Area Index ["</span><span class="sc">~</span>m<span class="sc">^</span><span class="dv">2</span><span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">2</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">col =</span> <span class="fu">guide_legend</span>(<span class="at">nrow =</span> <span class="dv">2</span>), <span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">nrow =</span> <span class="dv">2</span>))</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f05.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f07.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -787,52 +792,52 @@ div.csl-indent {
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">LAI Modis</td>
-<td style="text-align: right;">0.9995262</td>
-<td style="text-align: right;">0.6853446</td>
-<td style="text-align: right;">0.2946246</td>
-<td style="text-align: right;">0.0489980</td>
-<td style="text-align: right;">0.1263844</td>
-<td style="text-align: right;">0.0210186</td>
+<td style="text-align: right;">0.9993571</td>
+<td style="text-align: right;">0.6435971</td>
+<td style="text-align: right;">0.2281536</td>
+<td style="text-align: right;">0.0379435</td>
+<td style="text-align: right;">0.1501480</td>
+<td style="text-align: right;">0.0249706</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">PAI (Barbier, Verley, Vincent, unpublished)</td>
-<td style="text-align: right;">0.9995707</td>
-<td style="text-align: right;">0.7477856</td>
-<td style="text-align: right;">0.1500587</td>
-<td style="text-align: right;">0.0266100</td>
-<td style="text-align: right;">0.1198533</td>
-<td style="text-align: right;">0.0212537</td>
+<td style="text-align: right;">0.9995712</td>
+<td style="text-align: right;">0.7586187</td>
+<td style="text-align: right;">0.2164848</td>
+<td style="text-align: right;">0.0383894</td>
+<td style="text-align: right;">0.1207502</td>
+<td style="text-align: right;">0.0214127</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">LAI (Smith et al., 2019)</td>
-<td style="text-align: right;">0.9989904</td>
-<td style="text-align: right;">0.2488275</td>
-<td style="text-align: right;">0.2692674</td>
-<td style="text-align: right;">0.0472933</td>
-<td style="text-align: right;">0.1910818</td>
-<td style="text-align: right;">0.0335610</td>
+<td style="text-align: right;">0.9990079</td>
+<td style="text-align: right;">0.2484052</td>
+<td style="text-align: right;">0.2014810</td>
+<td style="text-align: right;">0.0353875</td>
+<td style="text-align: right;">0.1859247</td>
+<td style="text-align: right;">0.0326553</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">LAI Modis</td>
-<td style="text-align: right;">0.9991975</td>
-<td style="text-align: right;">0.5390823</td>
-<td style="text-align: right;">0.3074205</td>
-<td style="text-align: right;">0.0500511</td>
-<td style="text-align: right;">0.1695084</td>
-<td style="text-align: right;">0.0275976</td>
+<td style="text-align: right;">0.9992162</td>
+<td style="text-align: right;">0.5613419</td>
+<td style="text-align: right;">0.3990495</td>
+<td style="text-align: right;">0.0649692</td>
+<td style="text-align: right;">0.1641144</td>
+<td style="text-align: right;">0.0267195</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">PhenoCam (Wu et al.&nbsp;2016)</td>
-<td style="text-align: right;">0.9998129</td>
-<td style="text-align: right;">0.9081538</td>
-<td style="text-align: right;">0.0835076</td>
-<td style="text-align: right;">0.0142644</td>
-<td style="text-align: right;">0.0838325</td>
-<td style="text-align: right;">0.0143199</td>
+<td style="text-align: right;">0.9998312</td>
+<td style="text-align: right;">0.9169373</td>
+<td style="text-align: right;">0.1124293</td>
+<td style="text-align: right;">0.0192047</td>
+<td style="text-align: right;">0.0790174</td>
+<td style="text-align: right;">0.0134974</td>
 </tr>
 </tbody>
 </table>
@@ -935,7 +940,7 @@ div.csl-indent {
 <span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols_laid[<span class="fu">c</span>(<span class="st">"mature"</span>, <span class="st">"old"</span>, <span class="st">"young"</span>)])) <span class="sc">+</span></span>
 <span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols_laid[<span class="fu">c</span>(<span class="st">"mature"</span>, <span class="st">"old"</span>, <span class="st">"young"</span>)])) <span class="sc">+</span></span>
 <span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs08.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1002,7 +1007,7 @@ div.csl-indent {
 <span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"J"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"A"</span>, <span class="st">"M"</span>, <span class="st">"J"</span>, <span class="st">"J"</span>, <span class="st">"A"</span>, <span class="st">"S"</span>, <span class="st">"O"</span>, <span class="st">"N"</span>, <span class="st">"D"</span>)) <span class="sc">+</span> </span>
 <span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Normalised Leaf Area Index"</span>)) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f06.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f08.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1151,7 +1156,7 @@ div.csl-indent {
 <span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Potential"</span>, <span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"sat"</span>, <span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Potential"</span>, <span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f02.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f10.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1188,7 +1193,7 @@ div.csl-indent {
 <span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
 <span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">5.5</span>) <span class="sc">+</span></span>
 <span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>(<span class="fu">aes</span>(<span class="at">label =</span> ..rr.label..))</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f04.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f12.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">6</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
@@ -1247,12 +1252,12 @@ div.csl-indent {
 <colgroup>
 <col style="width: 10%">
 <col style="width: 11%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1270,22 +1275,22 @@ div.csl-indent {
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">et</td>
-<td style="text-align: right;">0.9648307</td>
-<td style="text-align: right;">0.7018329</td>
-<td style="text-align: right;">0.5969942</td>
-<td style="text-align: right;">0.1946098</td>
-<td style="text-align: right;">0.5968866</td>
-<td style="text-align: right;">0.1945747</td>
+<td style="text-align: right;">0.964289</td>
+<td style="text-align: right;">0.6924622</td>
+<td style="text-align: right;">0.5989156</td>
+<td style="text-align: right;">0.1952362</td>
+<td style="text-align: right;">0.5959970</td>
+<td style="text-align: right;">0.1942847</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">et</td>
-<td style="text-align: right;">0.9536833</td>
-<td style="text-align: right;">0.6606153</td>
-<td style="text-align: right;">0.8644554</td>
-<td style="text-align: right;">0.3413990</td>
-<td style="text-align: right;">0.6587793</td>
-<td style="text-align: right;">0.2601714</td>
+<td style="text-align: right;">0.953637</td>
+<td style="text-align: right;">0.6545958</td>
+<td style="text-align: right;">0.7509561</td>
+<td style="text-align: right;">0.2965747</td>
+<td style="text-align: right;">0.6295722</td>
+<td style="text-align: right;">0.2486367</td>
 </tr>
 </tbody>
 </table>
@@ -1403,13 +1408,13 @@ div.csl-indent {
 <caption>Evaluation fo daily means of RSWC at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 10%">
-<col style="width: 12%">
+<col style="width: 11%">
 <col style="width: 13%">
 <col style="width: 13%">
 <col style="width: 13%">
-<col style="width: 12%">
 <col style="width: 13%">
-<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 13%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1427,12 +1432,12 @@ div.csl-indent {
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">rswc10</td>
-<td style="text-align: right;">0.9678223</td>
-<td style="text-align: right;">0.7751409</td>
-<td style="text-align: right;">0.2329841</td>
-<td style="text-align: right;">0.320585</td>
-<td style="text-align: right;">0.1268988</td>
-<td style="text-align: right;">0.174612</td>
+<td style="text-align: right;">0.9670209</td>
+<td style="text-align: right;">0.7714005</td>
+<td style="text-align: right;">0.2358212</td>
+<td style="text-align: right;">0.3244888</td>
+<td style="text-align: right;">0.128365</td>
+<td style="text-align: right;">0.1766295</td>
 </tr>
 </tbody>
 </table>

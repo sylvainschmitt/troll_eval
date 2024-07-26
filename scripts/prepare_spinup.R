@@ -25,7 +25,7 @@ set.seed(seed)
 # climate
 climate <- vroom(climate_file) %>% 
   arrange(time) %>% 
-  filter(paste0(month(time), "-", day(time)) != "02-29")
+  filter(paste0(month(time), "-", day(time)) != "2-29")
 
 # years
 years <- unique(year(climate$time))

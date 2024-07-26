@@ -147,7 +147,7 @@ g <- daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+# ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -177,7 +177,7 @@ g <- daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 7.5) +
   ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f03.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f11.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
@@ -293,7 +293,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2))
-ggsave("figures/f05.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -411,7 +411,7 @@ g <- daily %>%
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   theme(legend.position = "bottom")
-ggsave("figures/fs08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fs03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -471,7 +471,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Normalised Leaf Area Index")) + xlab("") +
   theme(legend.position = "bottom")
-ggsave("figures/f06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -606,7 +606,7 @@ g <- daily %>%
                      labels = c("Potential", "Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
                      labels = c("Potential", "Tower", "TROLL"))
-ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -636,7 +636,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   ylim(0, 5.5) +
   ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f04.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 

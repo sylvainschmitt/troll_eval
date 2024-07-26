@@ -5,7 +5,7 @@ library(knitr)
 library(sf)
 ```
 
-# Structure
+# Structure v3
 
 Calibration of forest structure parameters (crown radius allometry and mortality):
 
@@ -387,6 +387,7 @@ read_tsv("outputs/calib_structure.tsv") %>%
   left_join(best) %>% 
   filter(!is.na(all_rmsep_norm)) %>% 
   group_by(site, a, b, m) %>% 
+  filter(site == "Paracou") %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
   gather(variable, value, -site) %>% 
   group_by(site, variable) %>% 
@@ -413,14 +414,28 @@ read_tsv("outputs/calib_structure.tsv") %>%
 ```{r bestfig2}
 #| message: false
 #| warning: false
-read_tsv("outputs/calib_structure.tsv") %>% 
+g <- read_tsv("outputs/calib_structure.tsv") %>% 
   mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
   left_join(best %>% slice_min(all_rmsep_norm)) %>% 
   filter(!is.na(all_rmsep_norm)) %>% 
   ggplot(aes(dbh_class, abundance)) +
-  geom_line(aes(group = sim)) +
-  geom_point(data = obs, col = "red") +
+  geom_line(aes(group = sim, col = "TROLL")) +
+  geom_point(data = obs, aes(col = "field")) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   theme_bw() +
-  facet_wrap(~ site)
+  facet_wrap(~ site) +
+  scale_colour_manual("", values = c("#3f3f3f", "#0da1f8")) +
+  theme(legend.position = "bottom") +
+  geom_text(aes(col = "field", label = lab), 
+            data = data.frame(dbh_class = 80, abundance = 200,
+                              lab = c("470 tress/ha & 143.7 MgC/ha",
+                                      "612 tress/ha & 209.5 MgC/ha"),
+                              site = c("Tapajos", "Paracou"))) +
+  geom_text(aes(col = "TROLL", label = lab), 
+            data = data.frame(dbh_class = 80, abundance = 180,
+                              lab = c("467 tress/ha & 152.7 MgC/ha",
+                                      "608 tress/ha & 210.6 MgC/ha"),
+                              site = c("Tapajos", "Paracou")))
+ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
