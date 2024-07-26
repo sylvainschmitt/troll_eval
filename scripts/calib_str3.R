@@ -68,4 +68,8 @@ sim <- troll(
   verbose = verbose,
   overwrite = TRUE
 )
-write_tsv(sim@forest, fileout)
+sim@forest %>% 
+  mutate(site = sit, a = cra, b = crb, m = m, dbh_cm = dbh*100, agb = AGB) %>%
+  select(site, a, b, m, dbh_cm, agb) %>% 
+  filter(dbh_cm >= 10) %>% 
+  write_tsv(fileout, col_names = FALSE)

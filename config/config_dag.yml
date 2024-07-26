@@ -1,16 +1,25 @@
+output: "calibration structure 3"
+
 # data
-sites: ["Paracou", "Tapajos"]
+sites: ["Paracou"]
 
-# structure
+# calib structure
 # paste0("[", paste(seq(1.8, 2.2, 0.01), collapse = ", "), "]")
-cra: [2.13]
+cra: [1.85]
 crberr: [-0.4641]
-m: [0.025]
+m: [0.045]
 
-# pheno
+# selected structure
+cra_f: 1.85
+crb_f: 0.04445
+m_f: 0.045
+
+# calib pheno
 a0: [0.2]
-b0: [0.015]
+b0: [0.02]
 delta: [0.2]
+
+# selected pheno
 a0_f: 0.2
 b0_f: 0.015
 delta_f: 0.2
@@ -19,7 +28,7 @@ delta_f: 0.2
 spinup: 600
 verbose: yes
 seed: 42
-rep: 1
+rep: 10
 
 # singularity
 troll3: "singularity/troll3/troll3.sif"

@@ -1,14 +1,14 @@
-rule calib_structure:
+rule calib_str3:
     input:
         "data/climate3/{site}_climatedaytime12.tsv",
         "data/climate3/{site}_daytimevar.tsv",
         "outputs/{site}_species_troll.tsv"
     output:
-        "results/calib_structure/{site}_{cra}_{crberr}_{m}.tsv"
+        "results/calib_str3/{site}_{cra}_{crberr}_{m}.tsv"
     log:
-        "results/logs/calib_structure_{site}_{cra}_{crberr}_{m}.log"
+        "results/logs/calib_st3_{site}_{cra}_{crberr}_{m}.log"
     benchmark:
-        "results/benchmarks/calib_structure_{site}_{cra}_{crberr}_{m}.benchmark.txt"
+        "results/benchmarks/calib_str3_{site}_{cra}_{crberr}_{m}.benchmark.txt"
     singularity:
         config["troll3"]
     threads: 1
@@ -21,4 +21,4 @@ rule calib_structure:
         test=config["test"],
         test_years=config["test_years"]
     script:
-        "../scripts/calib_structure.R"
+        "../scripts/calib_str3.R"
