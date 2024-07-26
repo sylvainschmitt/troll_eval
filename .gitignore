@@ -8,3 +8,4 @@
 .snakemake
 /.quarto/
 results2
+.cache

@@ -12,9 +12,9 @@ TROLL simulations showed very little variations due to stochasticity in fluxes (
 #| message: false
 #| warning: false
 #| fig-cap: "Variability of monthly means of growth primary productivity for Paracou and Tapajos across 10 TROLL simulations."
-files <- list.files("results/run3/", pattern = "sumstats.txt", 
+files <- list.files("results/eval/", pattern = "sumstats.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "sumstats.txt", 
+names(files) <- list.files("results/eval/", pattern = "sumstats.txt", 
                     recursive = T, full.names = F) 
 period <- "month"
 files %>% 
@@ -49,9 +49,9 @@ files %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Variability of monthly means of leaf area index for Paracou and Tapajos across 10 TROLL simulations."
-files <- list.files("results/run3/", pattern = "LAIdynamics.txt", 
+files <- list.files("results/eval/", pattern = "LAIdynamics.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "LAIdynamics.txt", 
+names(files) <- list.files("results/eval/", pattern = "LAIdynamics.txt", 
                     recursive = T, full.names = F) 
 period <- "month"
 files %>% 
@@ -84,9 +84,9 @@ files %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Variability of monthly means of evapotranspiration for Paracou and Tapajos across 10 TROLL simulations."
-files <- list.files("results/run3/", pattern = "water_balance.txt", 
+files <- list.files("results/eval/", pattern = "water_balance.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "water_balance.txt", 
+names(files) <- list.files("results/eval/", pattern = "water_balance.txt", 
                     recursive = T, full.names = F) 
 period <- "month"
 files %>% 
@@ -121,9 +121,9 @@ files %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Variability of monthly means of soil water content for Paracou and Tapajos across 10 TROLL simulations."
-files <- list.files("results/run3/", pattern = "water_balance.txt", 
+files <- list.files("results/eval/", pattern = "water_balance.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "water_balance.txt", 
+names(files) <- list.files("results/eval/", pattern = "water_balance.txt", 
                     recursive = T, full.names = F) 
 period <- "month"
 files %>% 

@@ -502,6 +502,7 @@ g
 #| message: false
 #| warning: false
 all_traits_q %>% 
+  filter(trait != "LA", trait != "leafarea", trait != "leafaera") %>% 
   rename(simulated = m_sim, observed = m_obs) %>% 
   select(site, trait, quantile_id, observed, simulated) %>% 
   nest_by(site, trait) %>% 

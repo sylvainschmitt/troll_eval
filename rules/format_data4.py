@@ -1,4 +1,4 @@
-rule format:
+rule format_data4:
     input:
         "outputs/fluxnet_climate.tsv",
         "outputs/{site}_species_troll.tsv",
@@ -8,14 +8,14 @@ rule format:
         "results/data/{site}_species.tsv",
         "results/data/{site}_soil.tsv"
     log:
-        "results/logs/format_{site}.log"
+        "results/logs/format_data4_{site}.log"
     benchmark:
-        "results/benchmarks/format_{site}.benchmark.txt"
+        "results/benchmarks/format_data4_{site}.benchmark.txt"
     singularity:
         config["troll4"]
     threads: 1
     params:
         site="{site}"
     script:
-        "../scripts/format.R"
+        "../scripts/format_data4.R"
         

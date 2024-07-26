@@ -13,8 +13,8 @@ soil <- snakemake@output[[3]]
 sit <- as.character(snakemake@params$site)
 
 # test
-# clim_raw <- "data/climate_raw.tsv"
-# sit <- "Tapajos"
+clim_raw <- "outputs/fluxnet_climate.tsv"
+sit <- "Paracou"
 
 # libraries
 library(tidyverse)
@@ -22,8 +22,8 @@ library(vroom)
 
 vroom(clim_raw) %>% 
   filter(site == sit) %>% 
-  filter(variable %in% c("rainfall", "snet", "temperature", "vpd", "ws")) %>% 
-  pivot_wider(names_from = variable, values_from = observed) %>% 
+  # filter(variable %in% c("rainfall", "snet", "temperature", "vpd", "ws")) %>% 
+  # pivot_wider(names_from = variable, values_from = observed) %>% 
   select(time, rainfall, snet, temperature, vpd, ws) %>% 
   vroom_write(climate)
 

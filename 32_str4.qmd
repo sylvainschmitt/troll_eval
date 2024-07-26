@@ -6,3 +6,154 @@ library(knitr)
 
 # Structure v4
 
+Calibration of forest structure parameters (crown radius allometry and mortality) in TROLL 4.0.1 (as mortality differs between TROLL 3.1.8 and 4.0.1):
+
+-   $m$ : minimal death rate in death per year calibrated with TROLL 3.1.8 to 0.055 both at Paracou and Tapajos
+-   $a_{CR}$ : crown radius intercept calibrated with TROLL 3.1.8 to 1.85 at Paracou and to 2.50 at Tapajos
+-   $b_{CR}$ : crown radius slope calibrated with TROLL 3.1.8 to 0.4445 at Paracou and to 0.8150 at Tapajos
+
+## Parameters spaces
+
+We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b for Paracou and Tapajos independently using calibration of forest crown radius allometry from TROLL 3.1.8 as prior and tests with TROLL 4.0.1 for the mortality prior. We obtained a calibration grid of **972 simulations**. Dashed lines shows prior values. The last figure shows the corresponding projected allometries of crown radius.
+
+```{r prepparamspace}
+pars_par <- data.frame(site = "Paracou",
+                       parameter = c("a", "error_b", "m"),
+                       low = c(1.6, -6*0.05, 0.03),
+                       high = c(2.0, -2*0.05, 0.05),
+                       by = c(0.05, 0.05, 0.0025))
+pars_tap <- data.frame(site = "Tapajos",
+                       parameter = c("a", "error_b", "m"),
+                       low = c(2.3, -6*0.05, 0.03),
+                       high = c(2.7, -2*0.05, 0.05),
+                       by = c(0.05, 0.05, 0.0025))
+pars <- bind_rows(pars_par, pars_tap)
+grid_par <- data.frame(a = seq(pars_par$low[1], pars_par$high[1], by = pars_par$by[1])) %>% 
+  mutate(error_b = list(seq(pars_par$low[2], pars_par$high[2], by = pars_par$by[2]))) %>% 
+  unnest(error_b) %>% 
+  mutate(b = -0.39 + 0.57*a + error_b) %>% 
+  mutate(m = list(seq(pars_par$low[3], pars_par$high[3], by = pars_par$by[3]))) %>% 
+  unnest(m) %>% 
+  mutate(site = "Paracou")
+grid_tap <- data.frame(a = seq(pars_tap$low[1], pars_tap$high[1], by = pars_tap$by[1])) %>% 
+  mutate(error_b = list(seq(pars_tap$low[2], pars_tap$high[2], by = pars_tap$by[2]))) %>% 
+  unnest(error_b) %>% 
+  mutate(b = -0.39 + 0.57*a + error_b) %>% 
+  mutate(m = list(seq(pars_tap$low[3], pars_tap$high[3], by = pars_tap$by[3]))) %>% 
+  unnest(m) %>% 
+  mutate(site = "Tapajos")
+grid <- bind_rows(grid_par, grid_tap)
+```
+
+```{r parstab}
+kable(pars)
+```
+
+```{r abplot}
+grid %>% 
+  ggplot(aes(a, b, col = site)) +
+  geom_point() +
+  geom_vline(aes(xintercept = a, col = site), linetype = "dashed", 
+             data = data.frame(a = c(1.85, 2.50), site = c("Paracou", "Tapajos"))) +
+  geom_hline(aes(yintercept = b, col = site), linetype = "dashed", 
+             data = data.frame(b = c(0.4445, 0.8150), site = c("Paracou", "Tapajos"))) +
+  geom_abline(intercept = -0.37, slope = 0.57, col = "black") +
+  theme_bw() +
+  xlab(expression(a[CR])) +
+  ylab(expression(b[CR]))
+```
+
+```{r amplot}
+grid %>% 
+  ggplot(aes(a, m, col = site)) +
+  geom_point() +
+  geom_vline(aes(xintercept = a, col = site), linetype = "dashed", 
+             data = data.frame(a = c(1.85, 2.50), site = c("Paracou", "Tapajos"))) +
+  geom_hline(yintercept = 0.040, linetype = "dashed") +
+  theme_bw() +
+  xlab(expression(a[CR])) +
+  ylab(expression(m))
+```
+
+```{r crallomplot}
+grid %>% 
+  mutate(dbh = list(seq(1, 150, 1)/100)) %>% 
+  unnest(dbh) %>% 
+  mutate(cr = exp(a+b*log(dbh))) %>% 
+  ggplot(aes(dbh, cr)) +
+  geom_line(aes(col = a, group = paste(a, b))) +
+  theme_bw() +
+  scale_colour_viridis_c(expression(a[CR])) +
+  xlab("Diameter (m)") + ylab("Crown radius (m)") +
+  geom_line(col = "black", linetype = "dashed",
+            data = bind_rows(
+              data.frame(site = "Paracou", 
+                         dbh = seq(1, 150, 1)/100) %>% 
+              mutate(cr = exp(1.85+0.4445*log(dbh))),
+              data.frame(site = "Tapajos", 
+                         dbh = seq(1, 150, 1)/100) %>% 
+              mutate(cr = exp(2.50+0.8150*log(dbh)))
+            )
+              
+            ) +
+  facet_wrap(~ site)
+```
+
+## Observations
+
+We used different evaluation metrics per site to rely on a single data source and minimise discrepancies.
+
+For Tapajos and according to @rice2004 :
+
+-   470 live trees per hectare with diameter at breast height (dbh) ≥10
+-   Aboveground live biomass was 143.7 ± 5.4 Mg C/ha
+-   Stem density -0.058 (±0.003) dbh_cm + 2.912 (±0.076) for dbh \< 40
+-   Stem density -0.016 (±0.001) dbh_cm + 1.451 (±0.04) for dbh \> 40
+-   Stem density is shown below
+
+For Paracou according to the inventories:
+
+-   612 ± 37 live trees per hectare with diameter at breast height (dbh) ≥10 (from inventory)
+-   Basal area was 30.8 ± 0.836 m2/ha
+-   Stem density is shown below
+
+```{r obs}
+#| message: false
+abd_par <- read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
+  filter(site == "Paracou", type == "default") %>% 
+  filter(dbh > 10) %>% 
+  group_by(plot) %>% 
+  summarise(abundance = n()/unique(plot_size)) %>% 
+  ungroup()
+# paste(round(median(abd_par$abundance)), "±", round(sd(abd_par$abundance)))
+# read_tsv("outputs/inventories.tsv") %>% 
+#   filter(site == "Paracou", type == "default", dbh >= 10) %>% 
+#   group_by(plot) %>% 
+#   summarise(ba = sum((dbh/2)^2*pi)/10^4/unique(plot_size)) %>% 
+#   summarise(ba_mean = median(ba), ba_sd = sd(ba))
+obs_tap <- data.frame(dbh_class = seq(10, 150, 5)) %>% 
+  mutate(abundance = ifelse(dbh_class < 40, 
+                            10^(-0.058*dbh_class+2.912), 
+                            10^(-0.016*dbh_class+1.451))) %>% 
+  mutate(site = "Tapajos")
+
+obs_par <- read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>% 
+  filter(site == "Paracou", type == "default") %>% 
+  filter(dbh > 10) %>% 
+  mutate(dbh_class = cut(dbh, 
+                         breaks = c(seq(10, 155, by = 5)), 
+                         labels = c(seq(10, 150, by = 5)))) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+    group_by(plot, dbh_class) %>% 
+  summarise(abundance = n()/unique(plot_size)) %>% 
+  group_by(dbh_class) %>% 
+  summarise(abundance = median(abundance)) %>% 
+  mutate(site = "Paracou")
+# obs <- bind_rows(obs_tap, obs_par)
+obs <- bind_rows(obs_tap, obs_par)
+ggplot(obs, (aes(dbh_class, abundance, col = site))) +
+  geom_line() +
+  theme_bw() +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  ggtitle(paste("Total:", round(sum(obs$abundance))))
+```

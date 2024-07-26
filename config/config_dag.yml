@@ -1,7 +1,9 @@
-output: "calibration structure 3"
+output: "calibration structure 4"
 
 # data
-sites: ["Paracou"]
+sites: ["Tapajos"]
+day_start: 7
+day_end: 19
 
 # calib structure
 # paste0("[", paste(seq(1.8, 2.2, 0.01), collapse = ", "), "]")
@@ -16,7 +18,7 @@ m_f: 0.045
 
 # calib pheno
 a0: [0.2]
-b0: [0.02]
+b0: [0.015]
 delta: [0.2]
 
 # selected pheno

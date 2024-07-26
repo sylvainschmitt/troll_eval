@@ -15,7 +15,7 @@ module load containers/singularity/3.9.9 # to adapt to your cluster
 # Variables
 CONFIG=config/ressources.yaml
 COMMAND="sbatch --cpus-per-task={cluster.cpus} --time={cluster.time} --mem={cluster.mem} -J {cluster.jobname} -o snake_subjob_log/{cluster.jobname}.%N.%j.out -e snake_subjob_log/{cluster.jobname}.%N.%j.err"
-CORES=100
+CORES=200
 mkdir -p snake_subjob_log
 
 # Workflow

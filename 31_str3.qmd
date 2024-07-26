@@ -7,7 +7,7 @@ library(sf)
 
 # Structure v3
 
-Calibration of forest structure parameters (crown radius allometry and mortality):
+Calibration of forest structure parameters (crown radius allometry and mortality) in TROLL 3.1.8:
 
 -   $m$ : minimal death rate in death per year calibrated to 0.025 at Nouragues
 -   $a_{CR}$ : crown radius intercept calibrated to 2.13 at Nouragues
@@ -178,7 +178,7 @@ ggplot(obs, (aes(dbh_class, abundance, col = site))) +
 
 ```{r calib}
 #| eval: false
-calib <- read_tsv("results/calib_structure.tsv") %>% 
+calib <- read_tsv("results/calib_str3.tsv") %>% 
   mutate(dbh_class = cut(dbh_cm, 
                          breaks = seq(10, 205, by = 5), 
                          labels = seq(10, 200, by = 5),
@@ -387,7 +387,6 @@ read_tsv("outputs/calib_structure.tsv") %>%
   left_join(best) %>% 
   filter(!is.na(all_rmsep_norm)) %>% 
   group_by(site, a, b, m) %>% 
-  filter(site == "Paracou") %>% 
   summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
   gather(variable, value, -site) %>% 
   group_by(site, variable) %>% 

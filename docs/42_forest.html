@@ -1122,30 +1122,31 @@ div.csl-indent {
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>all_traits_q <span class="sc">%&gt;%</span> </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> m_sim, <span class="at">observed =</span> m_obs) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, trait, quantile_id, observed, simulated) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trait <span class="sc">!=</span> <span class="st">"LA"</span>, trait <span class="sc">!=</span> <span class="st">"leafarea"</span>, trait <span class="sc">!=</span> <span class="st">"leafaera"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> m_sim, <span class="at">observed =</span> m_obs) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, trait, quantile_id, observed, simulated) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <caption>Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos.</caption>
 <colgroup>
-<col style="width: 9%">
-<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 8%">
 <col style="width: 12%">
 <col style="width: 12%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 12%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1222,16 +1223,6 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">leafaera</td>
-<td style="text-align: right;">0.7815434</td>
-<td style="text-align: right;">0.7902739</td>
-<td style="text-align: right;">78.5364264</td>
-<td style="text-align: right;">0.8631095</td>
-<td style="text-align: right;">72.8556791</td>
-<td style="text-align: right;">0.8006785</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">tlp</td>
 <td style="text-align: right;">0.9994627</td>
 <td style="text-align: right;">0.9852830</td>
@@ -1240,7 +1231,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0463786</td>
 <td style="text-align: right;">-0.0251202</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Paracou</td>
 <td style="text-align: left;">wsg</td>
 <td style="text-align: right;">0.9970390</td>
@@ -1250,7 +1241,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0381994</td>
 <td style="text-align: right;">0.0616878</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">LMA</td>
 <td style="text-align: right;">0.9893949</td>
@@ -1260,7 +1251,7 @@ div.csl-indent {
 <td style="text-align: right;">6.8309362</td>
 <td style="text-align: right;">0.0757276</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">Nmass</td>
 <td style="text-align: right;">0.9954951</td>
@@ -1270,7 +1261,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0019660</td>
 <td style="text-align: right;">0.0903402</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">Pmass</td>
 <td style="text-align: right;">0.9789817</td>
@@ -1280,7 +1271,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0001944</td>
 <td style="text-align: right;">0.2492055</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">ah</td>
 <td style="text-align: right;">0.9964029</td>
@@ -1290,7 +1281,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0178011</td>
 <td style="text-align: right;">0.0606748</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">dbhmax</td>
 <td style="text-align: right;">0.9924070</td>
@@ -1300,7 +1291,7 @@ div.csl-indent {
 <td style="text-align: right;">0.0474962</td>
 <td style="text-align: right;">0.0970774</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">hmax</td>
 <td style="text-align: right;">0.9927981</td>
@@ -1309,16 +1300,6 @@ div.csl-indent {
 <td style="text-align: right;">0.0868887</td>
 <td style="text-align: right;">3.9184566</td>
 <td style="text-align: right;">0.0823830</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">leafaera</td>
-<td style="text-align: right;">0.8828569</td>
-<td style="text-align: right;">0.8735613</td>
-<td style="text-align: right;">45.6894075</td>
-<td style="text-align: right;">0.5463049</td>
-<td style="text-align: right;">40.2655084</td>
-<td style="text-align: right;">0.4814518</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>

@@ -335,7 +335,7 @@ div.csl-indent {
 
 </header>
 
-<p>Calibration of forest structure parameters (crown radius allometry and mortality):</p>
+<p>Calibration of forest structure parameters (crown radius allometry and mortality) in TROLL 3.1.8:</p>
 <ul>
 <li><span class="math inline">\(m\)</span> : minimal death rate in death per year calibrated to 0.025 at Nouragues</li>
 <li><span class="math inline">\(a_{CR}\)</span> : crown radius intercept calibrated to 2.13 at Nouragues</li>
@@ -567,7 +567,7 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>calib <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_structure.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>calib <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str3.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">cut</span>(dbh_cm, </span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">205</span>, <span class="at">by =</span> <span class="dv">5</span>), </span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">200</span>, <span class="at">by =</span> <span class="dv">5</span>),</span>
@@ -804,12 +804,11 @@ div.csl-indent {
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -857,6 +856,41 @@ div.csl-indent {
 <td style="text-align: left;">m</td>
 <td style="text-align: right;">0.0550</td>
 <td style="text-align: right;">0.0500</td>
+<td style="text-align: right;">0.0600</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">a</td>
+<td style="text-align: right;">2.5000</td>
+<td style="text-align: right;">2.4000</td>
+<td style="text-align: right;">2.5000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">abundance</td>
+<td style="text-align: right;">467.2500</td>
+<td style="text-align: right;">453.7500</td>
+<td style="text-align: right;">485.5000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">agb</td>
+<td style="text-align: right;">152.7362</td>
+<td style="text-align: right;">137.3486</td>
+<td style="text-align: right;">167.9250</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">b</td>
+<td style="text-align: right;">0.8150</td>
+<td style="text-align: right;">0.7080</td>
+<td style="text-align: right;">0.8150</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">m</td>
+<td style="text-align: right;">0.0550</td>
+<td style="text-align: right;">0.0400</td>
 <td style="text-align: right;">0.0600</td>
 </tr>
 </tbody>
