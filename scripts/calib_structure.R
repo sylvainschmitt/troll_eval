@@ -41,6 +41,7 @@ pars <- generate_parameters(
   absorptance_leaves = 0.83,
   CR_a = cra, 
   CR_b = crb, 
+  sigma_height = 0.19,
   sigma_CR = 0.29,
   sigma_CD = 0.0,
   sigma_P = 0.24,

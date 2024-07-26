@@ -44,5 +44,5 @@ install.packages(c(
 ), repos = "https://cloud.r-project.org",
 dependencies = c('Depends', 'Imports', 'LinkingTo'))
 # rcontroll V3
-devtools::install_github("sylvainschmitt/rcontroll", ref = "dev2", 
+devtools::install_github("sylvainschmitt/rcontroll", ref = "dev", 
                          dependencies = c('Depends', 'Imports', 'LinkingTo'))

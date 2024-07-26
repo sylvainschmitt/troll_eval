@@ -394,7 +394,7 @@ data2 %>%
   rename(s_name = species, s_LMA = LMA, s_Nmass = N, s_Pmass = P, s_wsg = WSG,
          s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
          s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
-         s_tlp = TLP, s_leafaera = LA) %>% 
+         s_tlp = TLP, s_leafarea = LA) %>% 
   write_tsv("outputs/Tapajos_species_troll.tsv")
 data2 %>% 
   filter(forest != "tapajos") %>% 
@@ -404,7 +404,7 @@ data2 %>%
   rename(s_name = species, s_LMA = LMA, s_Nmass = N, s_Pmass = P, s_wsg = WSG,
          s_dbhmax = dbhmax, s_hmax = hmax, s_ah = ah, 
          s_seedmass = seedmass, s_regionalfreq = regionalfreq, 
-         s_tlp = TLP, s_leafaera = LA) %>% 
+         s_tlp = TLP, s_leafarea = LA) %>% 
   write_tsv("outputs/Paracou_species_troll.tsv")
 ```
 

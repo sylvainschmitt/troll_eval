@@ -138,8 +138,8 @@ par_clim <- generate_climate(
   era5land_hour = "data/climate3/paracou_hr.nc",
   era5land_month = "data/climate3/paracou_mt.nc"
 )
-write_tsv(par_clim$daytimevar, "data/climate3/Paracou_climatedaytime12.tsv")
-write_tsv(par_clim$climatedaytime12, "data/climate3/Paracou_daytimevar.tsv")
+write_tsv(par_clim$climatedaytime12, "data/climate3/Paracou_climatedaytime12.tsv")
+write_tsv(par_clim$daytimevar, "data/climate3/Paracou_daytimevar.tsv")
 
 tap_clim <- generate_climate(
   x = 0.5,
@@ -148,5 +148,5 @@ tap_clim <- generate_climate(
   era5land_hour = "data/climate3/tapajos_hr.nc",
   era5land_month = "data/climate3/tapajos_mt.nc"
 )
-write_tsv(tap_clim$daytimevar, "data/climate3/Tapajos_climatedaytime12.tsv")
-write_tsv(tap_clim$climatedaytime12, "data/climate3/Tapajos_daytimevar.tsv")
+write_tsv(tap_clim$climatedaytime12, "data/climate3/Tapajos_climatedaytime12.tsv")
+write_tsv(tap_clim$daytimevar, "data/climate3/Tapajos_daytimevar.tsv")
