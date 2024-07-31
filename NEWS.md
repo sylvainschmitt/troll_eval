@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9044: str4 fix
 -   troll_eval 0.1.0.9043: cluster config
 -   troll_eval 0.1.0.9042: calib pheno & eval for Paracou & Tapajos
 -   troll_eval 0.1.0.9041: wkfl calib_str4 & parameter space suggestion

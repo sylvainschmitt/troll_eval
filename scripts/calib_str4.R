@@ -7,8 +7,7 @@ sink(log_file, append = TRUE)
 climate_in <- snakemake@input[[1]]
 species_in <- snakemake@input[[2]]
 soil_in <- snakemake@input[[3]]
-fileout <- snakemake@output[[1]]
-folderout <- snakemake@output[[2]]
+folderout <- snakemake@output[[1]]
 sit <- as.character(snakemake@params$site)
 cra <- as.numeric(snakemake@params$cra)
 crberr <- as.numeric(snakemake@params$crberr)
@@ -98,12 +97,7 @@ sim <- troll(
   climate = clim,
   daily = day,
   pedology = soil,
-  load = TRUE,
+  load = FALSE,
   verbose = verbose,
   overwrite = TRUE
 )
-sim@forest %>% 
-  mutate(site = sit, a = cra, b = crb, m = m, dbh_cm = dbh*100, agb = AGB) %>%
-  select(site, a, b, m, dbh_cm, agb) %>% 
-  filter(dbh_cm >= 10) %>% 
-  write_tsv(fileout, col_names = FALSE)

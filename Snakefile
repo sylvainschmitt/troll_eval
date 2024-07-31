@@ -25,6 +25,7 @@ include: "rules/merge_str3.py"
 include: "rules/format_data4.py"
 include: "rules/prepare_clim600.py"
 include: "rules/calib_str4.py"
+include: "rules/prep_str4.py"
 include: "rules/merge_str4.py"
 
 # calib pheno #

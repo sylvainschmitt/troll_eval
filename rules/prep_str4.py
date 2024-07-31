@@ -1,10 +1,8 @@
-rule calib_str4:
+rule prep_str4:
     input:
-        "results/data/{site}_climate600.tsv",
-        "results/data/{site}_species.tsv",
-        "results/data/{site}_soil.tsv"
+         directory("results/calib_str4_run/{site}_{cra}_{crberr}_{m}")
     output:
-        directory("results/calib_str4_run/{site}_{cra}_{crberr}_{m}")
+        "results/calib_str4/{site}_{cra}_{crberr}_{m}.tsv",
     log:
         "results/logs/calib_str4_{site}_{cra}_{crberr}_{m}.log"
     benchmark:
@@ -26,4 +24,4 @@ rule calib_str4:
         test=config["test"],
         test_years=config["test_years"]
     script:
-        "../scripts/calib_str4.R"
+        "../scripts/prep_str4.R"

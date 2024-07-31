@@ -14,7 +14,7 @@ Calibration of forest structure parameters (crown radius allometry and mortality
 
 ## Parameters spaces
 
-We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b for Paracou and Tapajos independently using calibration of forest crown radius allometry from TROLL 3.1.8 as prior and tests with TROLL 4.0.1 for the mortality prior. We obtained a calibration grid of **972 simulations**. Dashed lines shows prior values. The last figure shows the corresponding projected allometries of crown radius.
+We prepared the parameter space for calibration defining low limit, high limit, and step for a, m, and the error of b for Paracou and Tapajos independently using calibration of forest crown radius allometry from TROLL 3.1.8 as prior and tests with TROLL 4.0.1 for the mortality prior. We obtained a calibration grid of **810 simulations**. Dashed lines shows prior values. The last figure shows the corresponding projected allometries of crown radius.
 
 ```{r prepparamspace}
 pars_par <- data.frame(site = "Paracou",
