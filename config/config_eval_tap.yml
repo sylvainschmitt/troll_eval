@@ -6,16 +6,15 @@ day_start: 6
 day_end: 18
 
 # calib structure
-# paste0("[", paste(seq(1.8, 2.2, 0.01), collapse = ", "), "]")
-cra: [2.50]
-crberr: [-0.25]
-m: [0.045]
+cra: 2.45
+crberr: -0.25
+m: 0.040
 
 # selected structure
-cra_f: 2.50
-crb_f: 0.8150
+cra_f: 2.45
+crb_f: 0.7565
 crberr_f: -0.25
-m_f: 0.045
+m_f: 0.040
 
 # calib pheno
 a0: [0.2]

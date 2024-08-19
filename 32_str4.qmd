@@ -157,3 +157,292 @@ ggplot(obs, (aes(dbh_class, abundance, col = site))) +
   xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
   ggtitle(paste("Total:", round(sum(obs$abundance))))
 ```
+
+## Parameters effect
+
+```{r calib}
+#| eval: false
+bind_rows(
+  read_tsv("results/calib_str4_Paracou.tsv"),
+  read_tsv("results/calib_str4_Tapajos.tsv")
+) %>% 
+  mutate(dbh_class = cut(dbh_cm, 
+                         breaks = seq(10, 205, by = 5), 
+                         labels = seq(10, 200, by = 5),
+                         include.lowest = TRUE)) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  group_by(site, a, b, m, dbh_class) %>% 
+  summarise(abundance = n()/4, 
+            agb = sum(agb)/4, 
+            ba = sum((dbh_cm/2)^2*pi)/10^4/4) %>% 
+  write_tsv("outputs/calib_str4.tsv")
+```
+
+### $a_{CR}$
+
+```{r aCR}
+#| message: false
+#| warning: false
+dat <-  read_tsv("outputs/calib_str4.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(agb = sum(agb)/10^3/2,
+            ba = sum(ba),
+            abundance = sum(abundance)) %>% 
+  filter(m == 0.040)
+cowplot::plot_grid(
+ dat %>% 
+  ggplot(aes(a, b, col = agb)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free") +
+  theme_bw() +
+  scale_color_viridis_c("AGB") +
+  xlab(expression(a[CR|m==0.04])) + ylab(expression(b[CR|m==0.04])),
+  dat %>% 
+  ggplot(aes(a, b, col = ba)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free") +
+  theme_bw() +
+  scale_color_viridis_c("BA") +
+  xlab(expression(a[CR|m==0.04])) + ylab(expression(b[CR|m==0.04])),
+   dat %>% 
+  ggplot(aes(a, b, col = abundance)) +
+  geom_point() +
+  facet_wrap(~ site, scales = "free") +
+  theme_bw() +
+  scale_color_viridis_c("Abundance") +
+  xlab(expression(a[CR|m==0.04])) + ylab(expression(b[CR|m==0.04])), 
+ nrow = 3)
+```
+
+```{r aCR2}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = a)) +
+  geom_point() +
+  theme_bw() +
+  scale_color_viridis_c(expression(a[CR])) +
+  facet_wrap(~ site)
+```
+
+```{r aCRdist}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  filter(m == 0.040) %>% 
+  mutate(berr = -0.39 + 0.57*a - b) %>% 
+  filter(berr > 0.1, berr < 0.3) %>% 
+  ggplot(aes(dbh_class, abundance)) +
+  geom_line(aes(col = a, group = paste(a, b, m))) +
+  geom_point(data = filter(obs, dbh_class < 150), col = "red") +
+  scale_y_log10(labels = scales::comma) +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  scale_color_viridis_c(expression(a[CR|m==0.04|berr==0.02])) +
+  theme_bw() +
+  facet_wrap(~ site, nrow = 2)
+```
+
+### $b_{CR}$
+
+```{r bCR}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = b)) +
+  geom_point() +
+  theme_bw() +
+  scale_color_viridis_c(expression(b[CR])) +
+  facet_wrap(~ site)
+```
+
+### $m$
+
+```{r m2}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), 
+            agb = sum(agb)/10^3/2) %>% 
+  ggplot(aes(abundance, agb, col = m)) +
+  geom_point() +
+  theme_bw() +
+  scale_color_viridis_c(expression(m)) +
+  facet_wrap(~ site)
+```
+
+## Best parameters
+
+### Paracou
+
+```{r best_par}
+#| message: false
+#| warning: false
+eval_par <- read_tsv("outputs/calib_str4.tsv") %>% 
+  filter(site == "Paracou") %>% 
+  select(site, a, b, m) %>% 
+  unique() %>% 
+  mutate(dbh_class = list(seq(10, 150, by = 5))) %>% 
+  unnest(dbh_class) %>% 
+  left_join(read_tsv("outputs/calib_str4.tsv")) %>% 
+  select(-agb) %>% 
+  mutate_at(c("abundance", "ba"), ~ifelse(is.na(.), 0, .)) %>% 
+  rename(simulated = abundance) %>% 
+  left_join(rename(obs, observed = abundance)) %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(rmsep_dist = sqrt(mean((observed - simulated)^2)),
+            rmsep_ba = sqrt((30.8 - sum(ba))^2),
+            rmsep_abund = sqrt((612 - sum(simulated))^2)
+            ) %>% 
+  ungroup() %>% 
+  mutate(all_rmsep_norm = rmsep_dist/30.5 + rmsep_ba/30.8 + rmsep_abund/612) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m))
+best_par <- eval_par %>% 
+  group_by(site) %>% 
+  slice_min(all_rmsep_norm, n = 5)
+```
+
+```{r besttab_par}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best_par) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), ba = sum(ba)) %>% 
+  gather(variable, value, -site) %>% 
+  group_by(site, variable) %>% 
+  summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
+  knitr::kable(caption = "Best structure parameters according to calibration with inventory data.")
+```
+
+```{r bestfig_par}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best_par %>% slice_min(all_rmsep_norm)) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  ggplot(aes(dbh_class, abundance)) +
+  geom_line(aes(group = sim)) +
+  geom_point(data = obs %>% filter(site == "Paracou"), col = "red") +
+  scale_y_log10(labels = scales::comma) +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  theme_bw() +
+  facet_wrap(~ site)
+```
+
+### Tapajos
+
+```{r best_tap}
+#| message: false
+#| warning: false
+eval_tap <- read_tsv("outputs/calib_str4.tsv") %>% 
+  filter(site == "Tapajos") %>% 
+  select(site, a, b, m) %>% 
+  unique() %>% 
+  mutate(dbh_class = list(seq(10, 150, by = 5))) %>% 
+  unnest(dbh_class) %>% 
+  left_join(read_tsv("outputs/calib_str4.tsv")) %>% 
+  select(-ba) %>% 
+  mutate_at(c("abundance", "agb"), ~ifelse(is.na(.), 0, .)) %>% 
+  rename(simulated = abundance) %>% 
+  left_join(rename(obs, observed = abundance)) %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(rmsep_dist = sqrt(mean((observed - simulated)^2)),
+            rmsep_agb = sqrt((143.7 - sum(agb)/10^3/2)^2),
+            rmsep_abund = sqrt((470 - sum(simulated))^2)
+            ) %>% 
+  ungroup() %>% 
+  mutate(all_rmsep_norm = rmsep_dist/16.2 + rmsep_agb/143.7 + rmsep_abund/470) %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m))
+best_tap <- eval_tap %>% 
+  group_by(site) %>% 
+  slice_min(all_rmsep_norm, n = 5)
+```
+
+```{r besttab_tap}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best_tap) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), agb = sum(agb)/10^3/2) %>% 
+  gather(variable, value, -site) %>% 
+  group_by(site, variable) %>% 
+  summarise(median = median(value), minimum = min(value), maximum = max(value)) %>% 
+  knitr::kable(caption = "Best structure parameters according to calibration with inventory data.")
+```
+
+```{r bestfig_tap}
+#| message: false
+#| warning: false
+read_tsv("outputs/calib_str4.tsv") %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(best_tap %>% slice_min(all_rmsep_norm)) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  ggplot(aes(dbh_class, abundance)) +
+  geom_line(aes(group = sim)) +
+  geom_point(data = obs %>% filter(site == "Tapajos"), col = "red") +
+  scale_y_log10(labels = scales::comma) +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  theme_bw() +
+  facet_wrap(~ site)
+```
+
+### All
+
+```{r bestab2}
+bind_rows(
+  best_par %>% slice_min(all_rmsep_norm),
+  best_tap %>% slice_min(all_rmsep_norm)
+) %>% 
+  select(site, a, b, m) %>% 
+  mutate(berr = b + 0.39 - 0.57*a) %>% 
+  kable()
+```
+
+```{r bestfig2}
+#| message: false
+#| warning: false
+g <- read_tsv("outputs/calib_str4.tsv") %>% 
+  mutate(sim = paste0(site, "_", a, "_", b, "_", m)) %>% 
+  left_join(
+    bind_rows(
+      best_tap %>% slice_min(all_rmsep_norm),
+      best_par %>% slice_min(all_rmsep_norm)
+    )
+  ) %>% 
+  filter(!is.na(all_rmsep_norm)) %>% 
+  ggplot(aes(dbh_class, abundance)) +
+  geom_line(aes(group = sim, col = "TROLL")) +
+  geom_point(data = obs, aes(col = "field")) +
+  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  theme_bw() +
+  facet_wrap(~ site) +
+  scale_colour_manual("", values = c("#3f3f3f", "#0da1f8")) +
+  theme(legend.position = "bottom") +
+  geom_text(aes(col = "field", label = lab), 
+            data = data.frame(dbh_class = 80, abundance = 200,
+                              lab = c("470 tress/ha & 143.7 MgC/ha",
+                                      "612 tress/ha & 30.8 m2/ha"),
+                              site = c("Tapajos", "Paracou"))) +
+  geom_text(aes(col = "TROLL", label = lab), 
+            data = data.frame(dbh_class = 80, abundance = 180,
+                              lab = c("471 tress/ha & 144.9 MgC/ha",
+                                      "622 tress/ha & 30.5 m2/ha"),
+                              site = c("Tapajos", "Paracou")))
+ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
+```

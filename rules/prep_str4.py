@@ -1,12 +1,12 @@
 rule prep_str4:
     input:
-         directory("results/calib_str4_run/{site}_{cra}_{crberr}_{m}")
+         "results/calib_str4_run/{site}_{cra}_{crberr}_{m}"
     output:
         "results/calib_str4/{site}_{cra}_{crberr}_{m}.tsv",
     log:
-        "results/logs/calib_str4_{site}_{cra}_{crberr}_{m}.log"
+        "results/logs/prep_str4_{site}_{cra}_{crberr}_{m}.log"
     benchmark:
-        "results/benchmarks/calib_str4_{site}_{cra}_{crberr}_{m}.benchmark.txt"
+        "results/benchmarks/prep_str4_{site}_{cra}_{crberr}_{m}.benchmark.txt"
     singularity:
         config["troll4"]
     threads: 1

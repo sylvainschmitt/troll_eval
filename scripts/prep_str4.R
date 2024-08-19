@@ -37,7 +37,8 @@ library(tidyverse)
 library(vroom)
 
 # code
-file.path(folderout,
+crb = -0.39 + 0.57*cra + crberr
+file.path(folderin,
           paste0(paste0(sit, "_", cra, "_", crberr, "_", m), 
                  "_0_final_pattern.txt")) %>% 
   vroom() %>% 
