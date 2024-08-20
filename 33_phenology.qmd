@@ -19,7 +19,7 @@ prep_sim <- function(f) {
   t <- vroom::vroom(f)  %>% 
     select(iter, litterfall) %>% 
     mutate(file = f) %>% 
-    mutate(file = gsub("results/calib/", "", file)) %>% 
+    mutate(file = gsub("results/calib_pheno/", "", file)) %>% 
     mutate(file = gsub("_0_sumstats.txt", "", file)) %>% 
     separate(file, c("site", "a0", "b0", "delta"), "_", convert = T) %>% 
     mutate(date = as_date(ifelse(site == "Tapajos", 
@@ -44,8 +44,8 @@ prep_sim <- function(f) {
     na.omit()
 }
 
-files <- list.files("results/calib", full.names = T, pattern = "sumstats.txt")
-names(files) <- list.files("results/calib/sumstats", full.names = F, pattern = "sumstats.txt")
+files <- list.files("results/calib_pheno", full.names = T, pattern = "sumstats.txt")
+names(files) <- list.files("results/calib_pheno", full.names = F, pattern = "sumstats.txt")
 raw <- files %>% 
   lapply(prep_sim)  %>% 
   bind_rows()
@@ -217,7 +217,7 @@ ggsave("figures/fs02.png", g, dpi = 300, width = 16, height = 8, bg = "white")
 
 ## Best parameters
 
-We found similar $a=0.2$ and $b=0.015$ to be the best in Paracou and Tapajos, but slightly different $delta$ with $delta=0.1$ in Paracou and $delta=0.3$ in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (\~September Paracou, \~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.
+We found similar $a=0.2$ and $b=0.015$ to be the best in Paracou and Tapajos, but slightly different $delta$ with $delta=0.1$ in Paracou and $delta=0.2$ in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (\~September Paracou, \~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.
 
 ```{r best}
 #| message: false

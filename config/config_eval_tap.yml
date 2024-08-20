@@ -17,14 +17,14 @@ crberr_f: -0.25
 m_f: 0.040
 
 # calib pheno
-a0: [0.2]
-b0: [0.015]
-delta: [0.3]
+a0: 0.2
+b0: 0.015
+delta: 0.2
 
 # selected pheno
 a0_f: 0.2
 b0_f: 0.015
-delta_f: 0.3
+delta_f: 0.2
 
 # sim pars
 spinup: 600

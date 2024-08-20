@@ -321,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  t <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(f)  <span class="sc">%&gt;%</span> </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(iter, litterfall) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">file =</span> f) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">file =</span> <span class="fu">gsub</span>(<span class="st">"results/calib/"</span>, <span class="st">""</span>, file)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">file =</span> <span class="fu">gsub</span>(<span class="st">"results/calib_pheno/"</span>, <span class="st">""</span>, file)) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">file =</span> <span class="fu">gsub</span>(<span class="st">"_0_sumstats.txt"</span>, <span class="st">""</span>, file)) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">separate</span>(file, <span class="fu">c</span>(<span class="st">"site"</span>, <span class="st">"a0"</span>, <span class="st">"b0"</span>, <span class="st">"delta"</span>), <span class="st">"_"</span>, <span class="at">convert =</span> T) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="fu">ifelse</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>, </span>
@@ -346,8 +346,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">na.omit</span>()</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"results/calib"</span>, <span class="at">full.names =</span> T, <span class="at">pattern =</span> <span class="st">"sumstats.txt"</span>)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(files) <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"results/calib/sumstats"</span>, <span class="at">full.names =</span> F, <span class="at">pattern =</span> <span class="st">"sumstats.txt"</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"results/calib_pheno"</span>, <span class="at">full.names =</span> T, <span class="at">pattern =</span> <span class="st">"sumstats.txt"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(files) <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"results/calib_pheno"</span>, <span class="at">full.names =</span> F, <span class="at">pattern =</span> <span class="st">"sumstats.txt"</span>)</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> files <span class="sc">%&gt;%</span> </span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(prep_sim)  <span class="sc">%&gt;%</span> </span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>()</span>
@@ -561,7 +561,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="best-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="best-parameters">Best parameters</h2>
-<p>We found similar <span class="math inline">\(a=0.2\)</span> and <span class="math inline">\(b=0.015\)</span> to be the best in Paracou and Tapajos, but slightly different <span class="math inline">\(delta\)</span> with <span class="math inline">\(delta=0.1\)</span> in Paracou and <span class="math inline">\(delta=0.3\)</span> in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (~September Paracou, ~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.</p>
+<p>We found similar <span class="math inline">\(a=0.2\)</span> and <span class="math inline">\(b=0.015\)</span> to be the best in Paracou and Tapajos, but slightly different <span class="math inline">\(delta\)</span> with <span class="math inline">\(delta=0.1\)</span> in Paracou and <span class="math inline">\(delta=0.2\)</span> in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (~September Paracou, ~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -604,16 +604,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: right;">0.2</td>
 <td style="text-align: right;">0.015</td>
 <td style="text-align: right;">0.1</td>
-<td style="text-align: right;">0.7155474</td>
+<td style="text-align: right;">1.0616194</td>
 <td style="text-align: left;">Paracou_0.2_0.015_0.1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: right;">0.2</td>
 <td style="text-align: right;">0.015</td>
-<td style="text-align: right;">0.3</td>
-<td style="text-align: right;">0.3464949</td>
-<td style="text-align: left;">Tapajos_0.2_0.015_0.3</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">0.3327142</td>
+<td style="text-align: left;">Tapajos_0.2_0.015_0.2</td>
 </tr>
 </tbody>
 </table>

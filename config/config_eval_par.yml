@@ -17,9 +17,9 @@ crberr_f: -0.25
 m_f: 0.035
 
 # calib pheno
-a0: [0.2]
-b0: [0.015]
-delta: [0.1]
+a0: 0.2
+b0: 0.015
+delta: 0.1
 
 # selected pheno
 a0_f: 0.2
