@@ -14,9 +14,9 @@ The main development of TROLL version 4 is the inclusion of a new explicit model
 
 ```{r simforestdata}
 #| eval: false
-files <- list.files("results/run3/", pattern = "final_pattern.txt", 
+files <- list.files("results/eval/", pattern = "final_pattern.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "final_pattern.txt", 
+names(files) <- list.files("results/eval/", pattern = "final_pattern.txt", 
                     recursive = T, full.names = F) 
 troll_forest <- files %>% 
   lapply(vroom::vroom) %>% 
@@ -28,9 +28,9 @@ troll_forest <- files %>%
   mutate(dbh = dbh*100)
 write_tsv(troll_forest, "outputs/evaluation_forest.tsv")
 
-files <- list.files("results/run3/", pattern = "CHM.txt", 
+files <- list.files("results/eval/", pattern = "CHM.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/run3/", pattern = "CHM.txt", 
+names(files) <- list.files("results/eval/", pattern = "CHM.txt", 
                     recursive = T, full.names = F) 
 troll_height <- files %>% 
   lapply(vroom::vroom) %>% 
@@ -175,9 +175,9 @@ labs <- understory %>%
   summarise(total = sum(m)) %>% 
   group_by(variable, site) %>% 
   pivot_wider(names_from = type, values_from = total) %>% 
-  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
+  mutate(label = paste0("Field: ", round(observed,1), "\nTROLL: ", round(simulated,1))) %>% 
   mutate(dbh_class = 5) %>% 
-  mutate(m = ifelse(variable == "log_abundance", 3, 0.6)) 
+  mutate(m = ifelse(variable == "log_abundance", 3, 0.5)) 
 g <- filter(understory, variable %in% c("ba", "log_abundance")) %>% 
   filter(site == "Paracou") %>% 
   ggplot(aes(dbh_class, m)) +
@@ -215,44 +215,6 @@ filter(understory, variable %in% c("ba", "abundance")) %>%
   select(-data) %>% 
   na.omit() %>% 
   knitr::kable(caption = "Evaluation of abundance and basal area distribution at Paracou for the understory.")
-```
-
-### All
-
-```{r allstr}
-#| message: false
-#| warning: false
-#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-all_str <- bind_rows(
-  mutate(understory, site = '"Paracou "<= "10 cm"'),
-  mutate(structure, site = ifelse(site == "Paracou", '"Paracou ">= "10 cm"', '"Tapajos ">= "10 cm"'))
-  ) %>% filter(variable %in% c("ba", "log_abundance"))
-labs <- all_str %>% 
-  filter(variable %in% c("ba", "log_abundance")) %>% 
-  mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
-  group_by(variable, varlong, type, site) %>% 
-  summarise(total = sum(m)) %>% 
-  group_by(variable, site) %>% 
-  pivot_wider(names_from = type, values_from = total) %>% 
-  mutate(label = paste0("Field: ", round(observed), "\nTROLL: ", round(simulated))) %>% 
-  ungroup() %>% 
-  mutate(dbh_class = c(8, 120, 120, 8, 120, 120)) %>% 
-  mutate(m = c(0.2, 7, 5, 3, 2, 2))
-labs$label[1] <- "Field: 4\nTROLL: 4"
-labs$label[4] <- "Field: 3787\nTROLL: 2312"
-all_str %>% 
-  ggplot(aes(dbh_class, m)) +
-  geom_linerange(aes(ymin = l, ymax = h, col = type)) +
-  geom_point(aes(col = type)) +
-  geom_line(aes(col = type)) +
-  theme_bw() +
-  facet_wrap(varlong ~ site, scales = "free", labeller = label_parsed) +
-  xlab("DBH [ cm ]") + ylab("") +
-  scale_color_discrete("") +
-  theme(legend.position = "bottom") +
-  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Field", "TROLL")) +
-  geom_text(data = labs, aes(label = label))
 ```
 
 ### Height
@@ -412,7 +374,8 @@ troll_traitdist <- read_tsv("outputs/evaluation_forest.tsv") %>%
   left_join(troll_traits)
 all_traits_q <- bind_rows(
   mutate(troll_traitdist, type = "sim"),
-  mutate(read_tsv("outputs/functional_composition.tsv"), type = "obs")
+  mutate(read_tsv("outputs/functional_composition.tsv"), type = "obs") %>% 
+    mutate(trait = ifelse(trait == "leafaera", "leafarea", trait))
 ) %>% 
   group_by(site, trait, plot, type) %>% 
   summarise(quantile = list(quantile(trait_value, seq(0, 1, length.out = 100)))) %>% 
@@ -433,6 +396,7 @@ all_traits_q <- bind_rows(
 #| warning: false
 #| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou site expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou."
 read_tsv("outputs/functional_composition.tsv") %>% 
+   mutate(trait = ifelse(trait == "leafaera", "leafarea", trait)) %>% 
   filter(site == "Paracou") %>% 
   ggplot(aes(trait_value, group = plot)) +
   geom_density(aes(col = "Observed")) +
@@ -452,6 +416,7 @@ read_tsv("outputs/functional_composition.tsv") %>%
 #| warning: false
 #| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Tapajos site expressed in terms of density distribution per trait and site. The analyses have been done at the genus level in Tapajos."
 read_tsv("outputs/functional_composition.tsv") %>% 
+   mutate(trait = ifelse(trait == "leafaera", "leafarea", trait)) %>% 
   filter(site == "Tapajos") %>% 
   ggplot(aes(trait_value, group = plot)) +
   geom_density(aes(col = "Observed")) +
@@ -471,8 +436,9 @@ read_tsv("outputs/functional_composition.tsv") %>%
 #| warning: false
 #| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou and the genus level in Tapajos."
 g <- read_tsv("outputs/functional_composition.tsv") %>%
+ mutate(trait = ifelse(trait == "leafaera", "leafarea", trait)) %>% 
   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
-                             "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
+                             "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
   filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long)) %>% 
@@ -482,7 +448,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
                data = troll_traitdist %>% 
                    mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]",
                                               "hmax" = "h[lim]",
-                             "leafaera" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
+                             "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
                  filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long))) +
@@ -502,7 +468,6 @@ g
 #| message: false
 #| warning: false
 all_traits_q %>% 
-  filter(trait != "LA", trait != "leafarea", trait != "leafaera") %>% 
   rename(simulated = m_sim, observed = m_obs) %>% 
   select(site, trait, quantile_id, observed, simulated) %>% 
   nest_by(site, trait) %>% 

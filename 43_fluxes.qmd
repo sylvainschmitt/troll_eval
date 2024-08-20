@@ -11,9 +11,9 @@ Evaluation of the TROLL version 4 simulations of daily fluxes in relation to fie
 ```{r fluxes}
 #| eval: false
 trollwater <- list(
-  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
+  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
+  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(swc0 = SWC_0, swc1 = SWC_1, swc2 = SWC_2,  swc3 = SWC_3,  swc4 = SWC_4,
@@ -27,9 +27,9 @@ trollwater <- list(
   select(-year) %>% 
   gather(variable, simulated, -site, -date)
 trollsum <- list(
-  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_sumstats.txt") %>% 
+  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_sumstats.txt") %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
+  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   select(-npp, -rday, -rnight, -rstem) %>% 
@@ -37,26 +37,26 @@ trollsum <- list(
   select(-iter, -litterfall) %>% 
   gather(variable, simulated, -site, -date)
 lai <- list(
-  Paracou = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIdynamics.txt") %>% 
+  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIdynamics.txt") %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
+  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(variable = "lai", simulated = LAI) %>% 
   select(site, date, variable, simulated)
 lai_age <- list(
   Paracou = list(
-    lai_young = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAImature.txt") %>% 
+    lai_young = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIyoung.txt"),
+    lai_mature = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAImature.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results/run3/Paracou_R1/Paracou_R1_0_LAIold.txt") %>% 
+    lai_old = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIold.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable"),
   Tapajos = list(
-    lai_young = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
+    lai_young = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
+    lai_mature = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
+    lai_old = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable")
 ) %>% bind_rows(.id = "site") %>% 
@@ -147,7 +147,7 @@ g <- daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-# ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -480,10 +480,10 @@ g
 #| eval: false
 #| fig-cap: "Mean annual cycle from monthly means of leaf area index per strata at Tapajos. Rectangles in the background correspond to the site’s climatological dry season."
 troll <- list(
-    lai_young = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
+    lai_young = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
+    lai_mature = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results/run3/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
+    lai_old = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable") %>% 
   mutate(date = as_date("2004/01/01")+iter) %>% 
