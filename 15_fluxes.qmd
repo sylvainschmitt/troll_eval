@@ -326,23 +326,9 @@ Canopy structure and dynamics was assessed using Leaf Area Index (LAI), Leaf Are
 library(sf)
 library(terra)
 library(ncdf4)
-roi <- invisible(st_read("data/fluxes/paddense_central.gpkg"))
-path <- "data/fluxes/dense_vox1m_angle45_newTif/"
-files <- list.files(path, full.names = TRUE)
-names(files) <- list.files(path)
-pad <- lapply(files, rast) %>%
-  lapply(function(r) {
-    names(r) <- c("dtm", "chm", "density", "angle", "bsi3m", "fpl3m", "pad3m")
-    return(r)}) %>%
-  lapply(terra::extract, roi) %>%
-  bind_rows(.id = "time") %>%
-  mutate(time = gsub(".tif", "", time)) %>%
-  mutate(time = gsub("YS-", "", time)) %>%
-  mutate(time = as_datetime(time))
-pad <- pad %>%
-  group_by(date = date(time)) %>%
-  summarise(value = quantile(pad3m, 0.5, na.rm = T)*10) %>% 
-  mutate(site = "Paracou", variable = "PAD")
+pad <- vroom::vroom("data/fluxes/PAI_ULS_TimeSeries.txt") %>% 
+  mutate(site = "Paracou", value = mean*0.68, variable = "PAI") %>% 
+  select(site, date, value, variable)
 dates <- readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
                   "abs_height", col_names = FALSE, skip = 0, n_max = 1) %>% 
   select(-`...1`) %>% 

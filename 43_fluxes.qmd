@@ -236,7 +236,7 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
     mutate(type = recode(type, 
                        "LAD" = "LAI (Smith et al., 2019)",
                        "LAI" = "LAI Modis",
-                       "PAD" = "PAI (Barbier, Verley, Vincent, unpublished)",
+                       "PAi" = "PAI (Barbier, Verley, Vincent, unpublished)",
                        "PhenoCam" = "PhenoCam (Wu et al. 2016)",
                        "simulated" = "TROLL"))
 monthly <- daily %>% 

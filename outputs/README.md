@@ -1,6 +1,6 @@
 # Outputs of analyses
 Sylvain Schmitt -
-May 2, 2024
+Aug 23, 2024
 
 This folder will contains the outputs of analyses from the quarto
 document. In particular :
@@ -27,8 +27,6 @@ document. In particular :
 - inventories.tsv: consolidated inventories data from the inventories
   chapter
 - lai.tsv: consolidated canopy metrics from the fluxes chapter
-- lai_tapajos_strat.tsv: consolidated canopy metrics from the fluxes
-  chapter for Tapajos strata
 - litter.tsv: consolidated litter data from the fluxes chapter
 - paracou_soil_troll.tsv: Paracou soil data ready for TROLL inputs
 - paracou_species_troll.tsv: Paracou species data ready for TROLL inputs
@@ -45,26 +43,31 @@ fs::dir_tree()
 ```
 
     .
+    ├── Paracou_soil_troll.tsv
+    ├── Paracou_species_troll.tsv
     ├── README.md
     ├── README.qmd
     ├── README.rmarkdown
+    ├── Tapajos_soil_troll.tsv
+    ├── Tapajos_species_troll.tsv
     ├── brms_tallo.Rdata
     ├── calib.tsv
+    ├── calib_str4.tsv
+    ├── calib_structure.tsv
+    ├── chm_fig.png
     ├── composition.tsv
     ├── evaluation_fluxes.tsv
     ├── evaluation_forest.tsv
+    ├── evaluation_height.tsv
     ├── fluxnet_climate.tsv
     ├── fluxnet_fluxes.tsv
     ├── functional_composition.tsv
     ├── guyaflux_swc.tsv
+    ├── hieght_chm.tsv
     ├── imputation.tsv
     ├── inventories.tsv
     ├── lai.tsv
     ├── lai_tapajos_strat.tsv
     ├── litter.tsv
-    ├── paracou_soil_troll.tsv
-    ├── paracou_species_troll.tsv
     ├── structure.tsv
-    ├── tallo_pars.tsv
-    ├── tapajos_soil_troll.tsv
-    └── tapajos_species_troll.tsv
+    └── tallo_pars.tsv
