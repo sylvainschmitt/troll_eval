@@ -234,9 +234,9 @@ daily <- read_tsv("outputs/evaluation_fluxes.tsv") %>%
               mutate(site = "Tapajos", type = "PhenoCam", value = `Camera_LAI (m^2 m^-2)`) %>% 
               select(date, value, site, type)) %>% 
     mutate(type = recode(type, 
-                       "LAD" = "LAI (Smith et al., 2019)",
-                       "LAI" = "LAI Modis",
-                       "PAi" = "PAI (Barbier, Verley, Vincent, unpublished)",
+                       "LAD" = "TLS (Smith et al., 2019)",
+                       "LAI" = "Modis",
+                       "PAI" = "UAV (Barbier, Verley, Vincent, unpublished)",
                        "PhenoCam" = "PhenoCam (Wu et al. 2016)",
                        "simulated" = "TROLL"))
 monthly <- daily %>% 
@@ -286,8 +286,8 @@ g <- daily %>%
   geom_smooth(aes(col = type), se = FALSE) +
   theme_bw() +
   theme(legend.position = "bottom") +
-  scale_fill_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#3f3f3f",  "#0da1f8")) +
-  scale_color_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#3f3f3f",  "#0da1f8")) +
+  scale_fill_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#0da1f8", "#3f3f3f")) +
+  scale_color_manual("", values = c("#ffa006", "#fb7754", "#197b14", "#0da1f8", "#3f3f3f")) +
   facet_wrap(~ site, scales = "free_x") +
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +

@@ -189,7 +189,23 @@ g <- filter(understory, variable %in% c("ba", "log_abundance")) %>%
   xlab("DBH [ cm ]") + ylab("") +
   scale_color_discrete("") +
   theme(legend.position = "bottom") +
-  geom_text(data = labs, aes(label = label)) +
+  # geom_text(data = labs, aes(label = label)) +
+  geom_text(aes(col = "observed", label = lab), 
+            data = data.frame(dbh_class = 5, 
+                              site = "Paracou",
+                              m = c(3.25, .55),
+                              lab = c("3,787 trees/ha",
+                                      "3.7 m2/ha"),
+                              varlong = c("Log[10]~abundance~\"[\"~ha^{-~1}~\"]\"",
+                                          "Basal~area~\"[\"~m^{2}~ha^{-~1}~\"]\""))) +
+  geom_text(aes(col = "simulated", label = lab), 
+            data = data.frame(dbh_class = 5, 
+                              site = "Paracou",
+                              m = c(3, .5),
+                              lab = c("2,138 trees/ha",
+                                      "2.9 m2/ha"),
+                              varlong = c("Log[10]~abundance~\"[\"~ha^{-~1}~\"]\"",
+                                          "Basal~area~\"[\"~m^{2}~ha^{-~1}~\"]\""))) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
 ggsave("figures/f03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
