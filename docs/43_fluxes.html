@@ -84,7 +84,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./98_companion_figures.html" rel="next">
-<link href="./43_forest2.html" rel="prev">
+<link href="./42_forest.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -127,7 +127,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./40_evaluation.html">Evaluation</a></li><li class="breadcrumb-item"><a href="./44_fluxes.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Fluxes</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./40_evaluation.html">Evaluation</a></li><li class="breadcrumb-item"><a href="./43_fluxes.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Fluxes</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -262,12 +262,7 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./43_forest2.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Forest 2</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./44_fluxes.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Fluxes</span></a>
+  <a href="./43_fluxes.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Fluxes</span></a>
   </div>
 </li>
       </ul>
@@ -305,7 +300,7 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#growth-primary-productivity" id="toc-growth-primary-productivity" class="nav-link active" data-scroll-target="#growth-primary-productivity">Growth Primary Productivity</a></li>
+  <li><a href="#gross-primary-productivity" id="toc-gross-primary-productivity" class="nav-link active" data-scroll-target="#gross-primary-productivity">Gross Primary Productivity</a></li>
   <li><a href="#leaf-area-index" id="toc-leaf-area-index" class="nav-link" data-scroll-target="#leaf-area-index">Leaf Area Index</a></li>
   <li><a href="#leaf-area-index-per-age" id="toc-leaf-area-index-per-age" class="nav-link" data-scroll-target="#leaf-area-index-per-age">Leaf Area Index per Age</a></li>
   <li><a href="#evapotranspiration" id="toc-evapotranspiration" class="nav-link" data-scroll-target="#evapotranspiration">Evapotranspiration</a></li>
@@ -396,9 +391,9 @@ div.csl-indent {
 <span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/evaluation_fluxes.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="growth-primary-productivity" class="level2">
-<h2 class="anchored" data-anchor-id="growth-primary-productivity">Growth Primary Productivity</h2>
-<p>The new version of TROLL correctly simulated the phenology of Growth Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.</p>
+<section id="gross-primary-productivity" class="level2">
+<h2 class="anchored" data-anchor-id="gross-primary-productivity">Gross Primary Productivity</h2>
+<p>The new version of TROLL correctly simulated the phenology of Gross Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -432,7 +427,7 @@ div.csl-indent {
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Growth Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Gross Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>))</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fs04.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
@@ -441,7 +436,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/gppdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/gppdaily-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily and monthly means of growth primary productivity for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days.</figcaption>
 </figure>
 </div>
@@ -474,7 +469,7 @@ div.csl-indent {
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">paste</span>(<span class="st">"2000-"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="st">"-01"</span>))),</span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"J"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"A"</span>, <span class="st">"M"</span>, <span class="st">"J"</span>, <span class="st">"J"</span>, <span class="st">"A"</span>, <span class="st">"S"</span>, <span class="st">"O"</span>, <span class="st">"N"</span>, <span class="st">"D"</span>)) <span class="sc">+</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Growth Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Gross Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
@@ -486,7 +481,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/gpp15days-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/gpp15days-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of growth primary productivity for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -509,7 +504,7 @@ div.csl-indent {
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(site <span class="sc">~</span> det_long, <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">labeller =</span> label_parsed) <span class="sc">+</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> <span class="st">"y ~ 1+log(x+10^-6)"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Growth Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Gross Primary Productivity ["</span><span class="sc">~</span>kgC<span class="sc">~</span>m<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">2</span>}<span class="sc">~</span>yr<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"Satellite"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
@@ -523,7 +518,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/gppdet-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/gppdet-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily averages of growth primary productivity as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos.</figcaption>
 </figure>
 </div>
@@ -549,7 +544,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/gppevalplot-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/gppevalplot-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Evaluation of simulated versus observed daily means of GPP in Paracou and Tapajos.</figcaption>
 </figure>
 </div>
@@ -697,7 +692,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/laidaily-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/laidaily-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily and monthly means of leaf area index for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations with the exception of satellite data for which data are available only every 8 days.</figcaption>
 </figure>
 </div>
@@ -738,7 +733,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/lai15days-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/lai15days-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -884,7 +879,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/laiadaily-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/laiadaily-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily and monthly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Dark lines are the monthly means, semi-transparent lines are the daily means variations.</figcaption>
 </figure>
 </div>
@@ -951,7 +946,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/laia15days-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/laia15days-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -1018,7 +1013,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/laia15daysb-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/laia15daysb-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos with leaf cohorts of yound, mature and old leaves. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -1122,7 +1117,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/etdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/etdaily-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily and monthly means of evapotranpsiration for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations</figcaption>
 </figure>
 </div>
@@ -1167,7 +1162,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/et15days-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/et15days-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of evapotranspiration for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -1204,7 +1199,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/etdet-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/etdet-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily averages of evapotranspiration as a function of vapour pressure deficit, incoming photosynthetically active radiation, temperature, and wind speed for model-, satellite- and tower-based estimates at Paracou and Tapajos.</figcaption>
 </figure>
 </div>
@@ -1229,7 +1224,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/etevalplot-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/etevalplot-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Evaluation of simulated versus observed daily means of ET in Paracou and Tapajos.</figcaption>
 </figure>
 </div>
@@ -1345,7 +1340,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/rswcdaily-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/rswcdaily-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Daily and monthly means of relative soil water content for Paracou and Tapajos. Dark lines are the monthly means, semi-transparent lines are the daily means variations.</figcaption>
 </figure>
 </div>
@@ -1386,7 +1381,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/rswc15days-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/rswc15days-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from fortnightly means of relative soil water content for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -1501,7 +1496,7 @@ div.csl-indent {
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="44_fluxes_files/figure-html/swc-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="43_fluxes_files/figure-html/swc-1.png" class="img-fluid figure-img" width="672"></p>
 <figcaption class="figure-caption">Mean annual cycle from daily means of soil water content for Paracou and Tapajos at different depths. The depth value indicates the maximum depth of the layer. Dark lines are the daily means across years, and bands are the intervals of means across ten years The vertical yellow bands in the background correspond to the site’s climatological dry season.</figcaption>
 </figure>
 </div>
@@ -1752,8 +1747,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./43_forest2.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Forest 2</span></span>
+      <a href="./42_forest.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Forest</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

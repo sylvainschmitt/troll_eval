@@ -267,7 +267,7 @@ g <- vroom::vroom("outputs/calib.tsv") %>%
   theme_bw() +
   theme(legend.position = "bottom") +
   facet_wrap(~ site, nrow = 2) +
-  xlab("") + 
+  xlab("") + ylim(0, NA) +
   scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
                    labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 

@@ -6,7 +6,7 @@ cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8", "sat" = "#fb7754")
 
 # Forest
 
-Evaluation of the TROLL version 4 final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites.
+Evaluation of the TROLL version 4 final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites with spin-up repetitions.
 
 ## Structure
 
@@ -14,9 +14,9 @@ The main development of TROLL version 4 is the inclusion of a new explicit model
 
 ```{r simforestdata}
 #| eval: false
-files <- list.files("results/eval/", pattern = "final_pattern.txt", 
+files <- list.files("results/eval_isa/", pattern = "final_pattern.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/eval/", pattern = "final_pattern.txt", 
+names(files) <- list.files("results/eval_isa/", pattern = "final_pattern.txt", 
                     recursive = T, full.names = F) 
 troll_forest <- files %>% 
   lapply(vroom::vroom) %>% 
@@ -26,11 +26,11 @@ troll_forest <- files %>%
   mutate(repetition = as.numeric(gsub("R", "", repetition))) %>% 
   mutate(species = gsub("_", " ", s_name)) %>% 
   mutate(dbh = dbh*100)
-write_tsv(troll_forest, "outputs/evaluation_forest.tsv")
+write_tsv(troll_forest, "outputs/evaluation_forest2.tsv")
 
-files <- list.files("results/eval/", pattern = "CHM.txt", 
+files <- list.files("results/eval_isa/", pattern = "CHM.txt", 
                     recursive = T, full.names = T) 
-names(files) <- list.files("results/eval/", pattern = "CHM.txt", 
+names(files) <- list.files("results/eval_isa/", pattern = "CHM.txt", 
                     recursive = T, full.names = F) 
 troll_height <- files %>% 
   lapply(vroom::vroom) %>% 
@@ -41,7 +41,7 @@ troll_height <- files %>%
   group_by(site, repetition, height) %>% 
   summarise(n = n()) %>% 
   mutate(pct = n/sum(n)*100)
-write_tsv(troll_height, "outputs/evaluation_height.tsv")
+write_tsv(troll_height, "outputs/evaluation_height2.tsv")
 ```
 
 ### Forest
@@ -50,7 +50,7 @@ We characterized global forests structure through their distribution of basal ar
 
 ```{r str}
 #| message: false
-structure <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+structure <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
   filter(dbh >= 10) %>% 
   mutate(plot = repetition) %>% 
   select(site, plot, dbh) %>% 
@@ -138,7 +138,7 @@ Taking advantage of new inventories of understory in Paracou, we assessed TROLL 
 
 ```{r understory}
 #| message: false
-understory <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+understory <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
   filter(dbh <= 10) %>% 
   mutate(plot = repetition) %>% 
   select(site, plot, dbh) %>% 
@@ -239,7 +239,7 @@ filter(understory, variable %in% c("ba", "abundance")) %>%
 #| message: false
 #| warning: false
 #| fig-cap: "Evaluation of the height structure estimated by TROLL at the Paracou and Tapajos sites. Confidence intervals on inventory analysis at 95% are shown with shaded areas. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
-g <- read_tsv("outputs/evaluation_height.tsv") %>% 
+g <- read_tsv("outputs/evaluation_height2.tsv") %>% 
   group_by(site, height) %>% 
   summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
             m = quantile(pct, 0.5, na.rm = TRUE), 
@@ -267,7 +267,7 @@ g
 ```{r heightevaltab}
 #| message: false
 #| warning: false
-read_tsv("outputs/evaluation_height.tsv") %>% 
+read_tsv("outputs/evaluation_height2.tsv") %>% 
   group_by(site, height) %>% 
   summarise(l = quantile(pct, 0.025, na.rm = TRUE), 
             m = quantile(pct, 0.5, na.rm = TRUE), 
@@ -305,7 +305,7 @@ Observed species rank-abundance curves in Paracou and Tapajos revealed low evenn
 ```{r compodata}
 #| message: false
 #| warning: false
-compositon <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+compositon <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
   filter(dbh >= 10) %>% 
   mutate(plot = repetition) %>% 
   mutate(species = gsub("_", " ", s_name)) %>% 
@@ -383,7 +383,7 @@ troll_traits <- list(
   rename(species = name) %>% 
   mutate(species = gsub("_", " ", species)) %>% 
   gather(trait, trait_value, -species)
-troll_traitdist <- read_tsv("outputs/evaluation_forest.tsv") %>% 
+troll_traitdist <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
   filter(dbh >= 10) %>% 
   mutate(plot = repetition) %>% 
   select(site, plot, species) %>% 

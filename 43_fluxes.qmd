@@ -69,9 +69,9 @@ bind_rows(trollwater, trollsum, lai, lai_age) %>%
   write_tsv("outputs/evaluation_fluxes.tsv")
 ```
 
-## Growth Primary Productivity
+## Gross Primary Productivity
 
-The new version of TROLL correctly simulated the phenology of Growth Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.
+The new version of TROLL correctly simulated the phenology of Gross Primary Productivity (GPP, kgC/m2/yr) with a lower GPP in wet season and higher values in the dry season. However, TROLL version 4 is globally overestimating GPP with daily values overlapping wet season values but significantly higher values in dry season with a pike around 5 instead of 4 kgC/m2/yr. Remotely-sensed observation from TROPOMI Solar Induced Fluorescence showed under-estimated values of GPP between 2.5 and 3.5 kgC/m2/yr monthly means but with a similar phenology. The new version of TROLL seems to be too deterministic in the relation between available light (incoming PAR mol/m2/day) and GPP with a correlation coefficient of 0.94 against an observed coefficient of 0.58. The overestimation of GPP seems to be linked to over-efficient GPP for high light availability (PAR above 5 mol/m2/day). Globally, simulated GPP showed a very good evaluation with a correlation coefficient of 0.59 in Paracou and 0.46 in Tapajos against daily observations from eddy-flux towers, and corresponding RMSEP of respectively 0.9 and 1.6 kgC/m2/yr.
 
 ```{r gppdata}
 #| message: false
@@ -106,7 +106,7 @@ g <- daily %>%
   theme_bw() +
   theme(legend.position = "bottom") +
   xlab("") +
-  ylab(expression("Growth Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
+  ylab(expression("Gross Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
 ggsave("figures/fs04.png", g, dpi = 300, width = 10, height = 5, bg = "white")
@@ -141,7 +141,7 @@ g <- daily %>%
   facet_wrap(~ site, scales = "free_x") +
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
-  ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
+  ylab(expression("Gross Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
   xlab("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
@@ -169,7 +169,7 @@ g <- daily %>%
   facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
   theme(legend.position = "bottom") +
   geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
-  ylab(expression("Growth Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
+  ylab(expression("Gross Primary Productivity ["~kgC~m^{-~2}~yr^{-~1}~"]")) +
   xlab("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +

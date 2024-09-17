@@ -1,3 +1,5 @@
+-   troll_eval 0.1.0.9050: eval_isa cleaned
+-   troll_eval 0.1.0.9049: eval_isa
 -   troll_eval 0.1.0.9048: updated PAI for Paracou from Greg Vincent
 -   troll_eval 0.1.0.9047: all updated results
 -   troll_eval 0.1.0.9046: pheno res
