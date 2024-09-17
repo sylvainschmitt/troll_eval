@@ -28,7 +28,8 @@ book:
       chapters: 
         - 41_variation.qmd
         - 42_forest.qmd
-        - 43_fluxes.qmd
+        - 43_forest2.qmd
+        - 44_fluxes.qmd
   appendices:
     - 98_companion_figures.qmd
     - 99_references.qmd
