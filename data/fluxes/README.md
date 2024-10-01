@@ -1,6 +1,6 @@
 # Fluxes data
 Sylvain Schmitt -
-Aug 23, 2024
+Oct 1, 2024
 
 This folder contains our point to fluxes data used to evaluate the TROLL
 model outputs:
@@ -35,6 +35,8 @@ model outputs:
 - Data_LAI_new.xlsx: LAI seasonality of leaf age cohorts. The first two
   sheets are observed by Jin Wu. The third one are those predicted by
   Xiuzhi Chen et al. (pers. com.).
+- Tapajos soil water content from Restrepo-Coupe, Natalia et al. (2023),
+  <https://doi.org/10.2139/ssrn.4442514>
 
 ``` r
 fs::dir_tree()
@@ -57,6 +59,7 @@ fs::dir_tree()
     ├── README.rmarkdown
     ├── get_lai_age.R
     ├── get_sif.R
+    ├── km67.eddyflux.seasonal.txt
     ├── lai_age.tsv
     ├── litterfall_2003_2022.csv
     ├── nph15726-sup-0002-notess4.xlsx

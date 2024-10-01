@@ -1,6 +1,6 @@
 # Data for the evaluation
 Sylvain Schmitt -
-Aug 23, 2024
+Oct 1, 2024
 
 This folder will contains all data for the TROLL V4 evaluation used in
 both the snakemake workflow and the analyses in the quarto document.
@@ -23,7 +23,9 @@ fs::dir_tree()
     │   ├── era5_tapajos.csv
     │   ├── get_era.py
     │   ├── get_era.yml
-    │   └── manifest.txt
+    │   ├── km67.eddyflux.seasonal.txt
+    │   ├── manifest.txt
+    │   └── tapajos_chirps.csv
     ├── climate3
     │   ├── Paracou_climatedaytime12.tsv
     │   ├── Paracou_daytimevar.tsv
@@ -52,6 +54,7 @@ fs::dir_tree()
     │   ├── README.qmd
     │   ├── get_lai_age.R
     │   ├── get_sif.R
+    │   ├── km67.eddyflux.seasonal.txt
     │   ├── lai_age.tsv
     │   ├── litterfall_2003_2022.csv
     │   ├── nph15726-sup-0002-notess4.xlsx
@@ -72,12 +75,6 @@ fs::dir_tree()
     │   ├── data
     │   │   ├── Tapajos_inventory_data_2010.csv
     │   │   └── forest_inventory_tapajos.zip
-    │   ├── gedi
-    │   │   ├── GEDI02_A_2020159001018_O08412_04_T04932_02_003_01_V002.h5
-    │   │   ├── GEDI02_A_2020162223544_O08473_04_T00663_02_003_01_V002.h5
-    │   │   └── GEDI02_A_2020292081028_O10479_02_T07373_02_003_02_V002.h5
-    │   ├── gedi.tsv
-    │   ├── get_gedi.R
     │   ├── guide
     │   │   └── Online_Version_Forest_Inventory_Tapajos.html
     │   ├── guyafor.tsv

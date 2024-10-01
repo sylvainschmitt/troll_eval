@@ -92,6 +92,106 @@ read_tsv("outputs/fluxnet_climate.tsv") %>%
   ggtitle("Monthly variations")
 ```
 
+```{r tap_rain}
+#| message: false
+#| warning: false
+#| eval: false
+#| include: false
+# https://noaa-ghcn-pds.s3.amazonaws.com/index.html#csv/by_station/
+g1 <- read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  filter(site == "Tapajos") %>% 
+  select(time, rainfall) %>% 
+  group_by(date = date(time)) %>% 
+  summarise(rainfall = sum(rainfall, na.rm = TRUE)) %>% 
+  left_join(
+    read_csv("data/fluxes/km67.eddyflux.seasonal.txt") %>% 
+      mutate(date = as_date(paste0(YYYY, "-", MM, "-", DD))) %>% 
+      select(date, rainBelterra, rainTRMM) %>% 
+      rename(Belterra = rainBelterra, TRMM = rainTRMM)
+  ) %>% 
+  ggplot(aes(rainfall, Belterra)) +
+  geom_point() +
+  geom_abline() +
+  theme_bw()  +
+  ggpubr::stat_cor() +
+  xlab("Precipitation from ERA5-Land [mm/day]") +
+  ylab("Precipitation from Belterra [mm/day]") +
+  scale_x_log10() +
+  scale_y_log10() +
+  ggtitle("Daily ERA5-Land vs. Belterra", "446 days")
+g2 <- read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  filter(site == "Tapajos") %>% 
+  select(time, rainfall) %>% 
+  group_by(date = date(time)) %>% 
+  summarise(rainfall = sum(rainfall, na.rm = TRUE)) %>% 
+  group_by(date = floor_date(date, "15 days")) %>% 
+  summarise(rainfall = sum(rainfall)) %>% 
+  left_join(
+    read_csv("data/fluxes/km67.eddyflux.seasonal.txt") %>% 
+      mutate(date = as_date(paste0(YYYY, "-", MM, "-", DD))) %>% 
+      select(date, rainBelterra, rainTRMM) %>% 
+      rename(Belterra = rainBelterra, TRMM = rainTRMM) %>% 
+      group_by(date = floor_date(date, "15 days")) %>% 
+      summarise(TRMM = sum(TRMM))
+  ) %>% 
+  ggplot(aes(rainfall, TRMM)) +
+  geom_point() +
+  geom_abline() +
+  theme_bw()  +
+  ggpubr::stat_cor() +
+  xlab("Precipitation from ERA5-Land [mm/16-day]") +
+  ylab("Precipitation from TRMM [mm/16-day]") +
+  scale_x_log10() +
+  scale_y_log10() +
+  ggtitle("16-day ERA5-Land vs. TRMM", "460 16-day")
+g3 <- read_csv("data/climate/tapajos_chirps.csv") %>% 
+      rename(date = time, rainfall = pr) %>% 
+  select(date, rainfall) %>% 
+  filter(rainfall > 0.1) %>% 
+  left_join(
+    read_csv("data/fluxes/km67.eddyflux.seasonal.txt") %>% 
+      mutate(date = as_date(paste0(YYYY, "-", MM, "-", DD))) %>% 
+      select(date, rainBelterra, rainTRMM) %>% 
+      rename(Belterra = rainBelterra, TRMM = rainTRMM)
+  ) %>% 
+  ggplot(aes(rainfall, Belterra)) +
+  geom_point() +
+  geom_abline() +
+  theme_bw()  +
+  ggpubr::stat_cor() +
+  xlab("Precipitation from CHIRPS [mm/day]") +
+  ylab("Precipitation from Belterra [mm/day]") +
+  scale_x_log10() +
+  scale_y_log10() +
+  ggtitle("Daily CHIRPS vs. Belterra", "446 days")
+g4 <- read_csv("data/climate/tapajos_chirps.csv") %>% 
+  rename(date = time, rainfall = pr) %>% 
+  select(date, rainfall) %>% 
+  filter(rainfall > 0.1) %>% 
+  group_by(date = floor_date(date, "15 days")) %>% 
+  summarise(rainfall = sum(rainfall)) %>% 
+  left_join(
+    read_csv("data/fluxes/km67.eddyflux.seasonal.txt") %>% 
+      mutate(date = as_date(paste0(YYYY, "-", MM, "-", DD))) %>% 
+      select(date, rainBelterra, rainTRMM) %>% 
+      rename(Belterra = rainBelterra, TRMM = rainTRMM) %>% 
+      group_by(date = floor_date(date, "15 days")) %>% 
+      summarise(TRMM = sum(TRMM))
+  ) %>% 
+  ggplot(aes(rainfall, TRMM)) +
+  geom_point() +
+  geom_abline() +
+  theme_bw()  +
+  ggpubr::stat_cor() +
+  xlab("Precipitation from CHIRPS [mm/16-day]") +
+  ylab("Precipitation from TRMM [mm/16-day]") +
+  scale_x_log10() +
+  scale_y_log10() +
+  ggtitle("16-day CHIRPS vs. TRMM", "460 16-day")
+g <- cowplot::plot_grid(g1, g2, g3, g4)
+ggsave("test.png", g)
+```
+
 ## Input data
 
 TROLL input data for climate includes:

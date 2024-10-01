@@ -284,7 +284,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#paracou" id="toc-paracou" class="nav-link active" data-scroll-target="#paracou">Paracou</a></li>
   <li><a href="#paracou---understory" id="toc-paracou---understory" class="nav-link" data-scroll-target="#paracou---understory">Paracou - Understory</a></li>
   <li><a href="#tapajos" id="toc-tapajos" class="nav-link" data-scroll-target="#tapajos">Tapajos</a></li>
-  <li><a href="#airborne-lidar-scanning-als-global-ecosystem-dynamics-investigation-gedi" id="toc-airborne-lidar-scanning-als-global-ecosystem-dynamics-investigation-gedi" class="nav-link" data-scroll-target="#airborne-lidar-scanning-als-global-ecosystem-dynamics-investigation-gedi">Airborne Lidar Scanning (ALS) &amp; Global Ecosystem Dynamics Investigation (GEDI)</a></li>
+  <li><a href="#airborne-lidar-scanning-als" id="toc-airborne-lidar-scanning-als" class="nav-link" data-scroll-target="#airborne-lidar-scanning-als">Airborne Lidar Scanning (ALS)</a></li>
   <li><a href="#structure" id="toc-structure" class="nav-link" data-scroll-target="#structure">Structure</a></li>
   <li><a href="#composition" id="toc-composition" class="nav-link" data-scroll-target="#composition">Composition</a></li>
   </ul>
@@ -463,9 +463,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="airborne-lidar-scanning-als-global-ecosystem-dynamics-investigation-gedi" class="level2">
-<h2 class="anchored" data-anchor-id="airborne-lidar-scanning-als-global-ecosystem-dynamics-investigation-gedi">Airborne Lidar Scanning (ALS) &amp; Global Ecosystem Dynamics Investigation (GEDI)</h2>
-<p>Fabian Fischer personal communication to detail. GEDI to describe</p>
+<section id="airborne-lidar-scanning-als" class="level2">
+<h2 class="anchored" data-anchor-id="airborne-lidar-scanning-als">Airborne Lidar Scanning (ALS)</h2>
+<p>We evaluated tree height distributions using ALS data from 2015 at Paracou (unpublished data) and from 2012 at Tapajos (dos-Santos et al., 2019), which were processed into canopy height models with a standardised pipeline (Fischer et al., 2024). From both simulated and ALS-derived canopy height models, we derived the distribution of canopy height, expressed in proportion of 1-m2 pixels per 1-m height class.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -492,8 +492,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n<span class="sc">/</span><span class="fu">sum</span>(n)<span class="sc">*</span><span class="dv">100</span>, <span class="at">type =</span> <span class="st">"ALS"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">read_tsv</span>(<span class="st">"data/inventories/gedi.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/hieght_chm.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"outputs/hieght_chm.tsv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -581,7 +580,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"[ % ]"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Height [ m ]"</span>) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Density [ % ]"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Height [ m ]"</span>) <span class="sc">+</span></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>

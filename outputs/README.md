@@ -1,6 +1,6 @@
 # Outputs of analyses
 Sylvain Schmitt -
-Aug 23, 2024
+Sep 18, 2024
 
 This folder will contains the outputs of analyses from the quarto
 document. In particular :
@@ -58,7 +58,9 @@ fs::dir_tree()
     ├── composition.tsv
     ├── evaluation_fluxes.tsv
     ├── evaluation_forest.tsv
+    ├── evaluation_forest2.tsv
     ├── evaluation_height.tsv
+    ├── evaluation_height2.tsv
     ├── fluxnet_climate.tsv
     ├── fluxnet_fluxes.tsv
     ├── functional_composition.tsv
@@ -67,7 +69,6 @@ fs::dir_tree()
     ├── imputation.tsv
     ├── inventories.tsv
     ├── lai.tsv
-    ├── lai_tapajos_strat.tsv
     ├── litter.tsv
     ├── structure.tsv
     └── tallo_pars.tsv

@@ -577,7 +577,6 @@ g
 #| warning: false
 #| fig-cap: "Mean annual cycle from fortnightly means of evapotranspiration for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
 g <- daily %>% 
-  bind_rows(daily_etp) %>% 
   group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
   summarise_all(mean, na.rm = T) %>%
   mutate(week = week(date)) %>%  
@@ -602,10 +601,10 @@ g <- daily %>%
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + xlab("") +
-    scale_color_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
-                     labels = c("Potential", "Tower", "TROLL")) +
-  scale_fill_manual("", values = as.vector(cols[c("sat", "obs", "sim")]), 
-                     labels = c("Potential", "Tower", "TROLL"))
+    scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL"))
 ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
@@ -638,6 +637,28 @@ g <- daily %>%
   ggpubr::stat_cor(aes(label = ..rr.label..))
 ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
+```
+
+```{r}
+#| eval: false
+#| include: false
+daily %>% 
+  select(-determinant, -determinant_value) %>% 
+  left_join(rename(daily_etp, determinant = type, determinant_value = value)) %>% 
+  ggplot(aes(determinant_value, value, col = type)) +
+  geom_point(alpha = 0.1) +
+  theme_bw() +
+  facet_wrap( ~ site) +
+  theme(legend.position = "bottom") +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
+  ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) + 
+  xlab(expression("Potential Evapotranspiration ["~mm~day^{-~1}~"]")) + 
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  ylim(0, 5.5) +
+  ggpubr::stat_cor(aes(label = ..rr.label..))
 ```
 
 ```{r etevalplot}

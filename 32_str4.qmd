@@ -435,13 +435,13 @@ g <- read_tsv("outputs/calib_str4.tsv") %>%
   theme(legend.position = "bottom") +
   geom_text(aes(col = "field", label = lab), 
             data = data.frame(dbh_class = 80, abundance = 200,
-                              lab = c("470 trees/ha & 143.7 MgC/ha",
-                                      "612 trees/ha & 30.8 m2/ha"),
+                              lab = c("470 trees/ha & 287 Mg/ha",
+                                      "612 trees/ha & 419 Mg/ha"),
                               site = c("Tapajos", "Paracou"))) +
   geom_text(aes(col = "TROLL", label = lab), 
             data = data.frame(dbh_class = 80, abundance = 180,
-                              lab = c("471 trees/ha & 144.9 MgC/ha",
-                                      "622 trees/ha & 30.5 m2/ha"),
+                              lab = c("471 trees/ha & 290 Mg/ha",
+                                      "622 trees/ha & 413 Mg/ha"),
                               site = c("Tapajos", "Paracou")))
 ggsave("figures/f01.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g

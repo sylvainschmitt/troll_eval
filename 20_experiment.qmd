@@ -1,3 +1,19 @@
 # Experiment
 
 Virtual experiment for TROLL evaluation relies on several methods and tools developed in this part.
+
+## Revision todo list
+
+This is a list of point to review in case of revision or new runs of calibration/evaluation.
+
+-   Improve Tapajos precipitation data with data from Marcos Longo.
+-   Check the potential effect of leaf lifespan allometry on basal litterfall flux.
+-   Use 10 600-years spin-up replicates followed by 10 10-years replicates for structure and fluxes evaluation independently from model calibration.
+-   Update the snakemake workflow accordingly.
+-   Have a look to publicly available LAI data from Florest Seca near Tapajos.
+
+<!-- Note for \@[sylvain.m.schmitt\@gmail.com](mailto:sylvain.m.schmitt@gmail.com) : if we want to have a closer look at this issue for the revision, there are two non -mutually exclusive paths:\ -->
+
+<!-- - first go back to the leaf lifespan allometry, which should definitely have a strong effect on the background litterfall rate.\ -->
+
+<!-- - also, having Greg's comment in mind, it is somewhat weird that the parameters that set up the a priori proportion of carbon allocated to leaves (before hierarchical reallocation) is lower (0.25) than the one to woody growth (0.35). With the new hierarchical scheme implemented by Fabian, this should have no effect however, but maybe worth launching a few simulations to test the sensibility of the current version to these values, before diving into the LL issue. -->

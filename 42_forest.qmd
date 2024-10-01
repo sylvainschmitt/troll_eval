@@ -256,9 +256,9 @@ g <- read_tsv("outputs/evaluation_height2.tsv") %>%
   facet_wrap(~ site) +
   theme_bw() +
   coord_flip() +
-  ylab("[ % ]") + xlab("Height [ m ]") +
-  scale_color_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
-  scale_fill_manual("", values =  as.vector(cols[c("obs", "sat", "sim")])) +
+  ylab("Density [ % ]") + xlab("Height [ m ]") +
+  scale_color_manual("", values =  as.vector(cols[c("obs", "sim")])) +
+  scale_fill_manual("", values =  as.vector(cols[c("obs", "sim")])) +
   theme(legend.position = "bottom")
 ggsave("figures/f02.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
@@ -455,7 +455,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
  mutate(trait = ifelse(trait == "leafaera", "leafarea", trait)) %>% 
   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
                              "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
-                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+                             "tlp" = "pi[tlp]", "wsg" = "WSG")) %>% 
   filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long)) %>% 
   ggplot(aes(trait_value, group = plot)) +
@@ -465,7 +465,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
                    mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]",
                                               "hmax" = "h[lim]",
                              "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
-                             "tlp" = "psi[tlp]", "wsg" = "WSG")) %>% 
+                             "tlp" = "pi[tlp]", "wsg" = "WSG")) %>% 
                  filter(!(trait %in% c("ah", "hmax"))) %>% 
   mutate(varlong = paste0('"', site, ':"~', trait_long))) +
   facet_wrap(~ varlong, scales = "free", labeller = label_parsed, nrow = 2) +

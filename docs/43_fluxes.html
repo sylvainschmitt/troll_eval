@@ -1127,37 +1127,36 @@ div.csl-indent {
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> daily <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(daily_etp) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable, type, <span class="at">date =</span> <span class="fu">floor_date</span>(date, <span class="st">"15 days"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(mean, <span class="at">na.rm =</span> T) <span class="sc">%&gt;%</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week =</span> <span class="fu">week</span>(date)) <span class="sc">%&gt;%</span>  </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable, type, week) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">l =</span> <span class="fu">quantile</span>(value, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">h =</span> <span class="fu">quantile</span>(value, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(week, m)) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> week, <span class="at">xmax =</span> end), <span class="at">fill  =</span> <span class="st">"#fff4e0"</span>,</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">week =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">c</span>(<span class="st">"2000-8-1"</span>, <span class="st">"2000-06-15"</span>))),</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>                             <span class="at">m =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">c</span>(<span class="st">"2000-12-1"</span>, <span class="st">"2000-11-1"</span>))),</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                             <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Paracou"</span>, <span class="st">"Tapajos"</span>))) <span class="sc">+</span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> l, <span class="at">ymax =</span> h, <span class="at">fill =</span> type), <span class="at">col =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">col =</span> type), <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">paste</span>(<span class="st">"2000-"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="st">"-01"</span>))),</span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"J"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"A"</span>, <span class="st">"M"</span>, <span class="st">"J"</span>, <span class="st">"J"</span>, <span class="st">"A"</span>, <span class="st">"S"</span>, <span class="st">"O"</span>, <span class="st">"N"</span>, <span class="st">"D"</span>)) <span class="sc">+</span> </span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Evapotranspiration ["</span><span class="sc">~</span>mm<span class="sc">~</span>day<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"sat"</span>, <span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Potential"</span>, <span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
-<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"sat"</span>, <span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Potential"</span>, <span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f10.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable, type, <span class="at">date =</span> <span class="fu">floor_date</span>(date, <span class="st">"15 days"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(mean, <span class="at">na.rm =</span> T) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week =</span> <span class="fu">week</span>(date)) <span class="sc">%&gt;%</span>  </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable, type, week) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">l =</span> <span class="fu">quantile</span>(value, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="fu">mean</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">h =</span> <span class="fu">quantile</span>(value, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(week, m)) <span class="sc">+</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> week, <span class="at">xmax =</span> end), <span class="at">fill  =</span> <span class="st">"#fff4e0"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">week =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">c</span>(<span class="st">"2000-8-1"</span>, <span class="st">"2000-06-15"</span>))),</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">m =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">c</span>(<span class="st">"2000-12-1"</span>, <span class="st">"2000-11-1"</span>))),</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Paracou"</span>, <span class="st">"Tapajos"</span>))) <span class="sc">+</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> l, <span class="at">ymax =</span> h, <span class="at">fill =</span> type), <span class="at">col =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">col =</span> type), <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">week</span>(<span class="fu">as_date</span>(<span class="fu">paste</span>(<span class="st">"2000-"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="st">"-01"</span>))),</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"J"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"A"</span>, <span class="st">"M"</span>, <span class="st">"J"</span>, <span class="st">"J"</span>, <span class="st">"A"</span>, <span class="st">"S"</span>, <span class="st">"O"</span>, <span class="st">"N"</span>, <span class="st">"D"</span>)) <span class="sc">+</span> </span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="fu">expression</span>(<span class="st">"Evapotranspiration ["</span><span class="sc">~</span>mm<span class="sc">~</span>day<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tower"</span>, <span class="st">"TROLL"</span>))</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f10.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1409,12 +1408,12 @@ div.csl-indent {
 <colgroup>
 <col style="width: 10%">
 <col style="width: 11%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 11%">
-<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1436,8 +1435,18 @@ div.csl-indent {
 <td style="text-align: right;">0.7714005</td>
 <td style="text-align: right;">0.2358212</td>
 <td style="text-align: right;">0.3244888</td>
-<td style="text-align: right;">0.128365</td>
+<td style="text-align: right;">0.1283650</td>
 <td style="text-align: right;">0.1766295</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">rswc10</td>
+<td style="text-align: right;">0.9826553</td>
+<td style="text-align: right;">0.3900953</td>
+<td style="text-align: right;">0.1972941</td>
+<td style="text-align: right;">0.2445000</td>
+<td style="text-align: right;">0.1078694</td>
+<td style="text-align: right;">0.1336790</td>
 </tr>
 </tbody>
 </table>

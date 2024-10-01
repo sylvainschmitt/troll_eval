@@ -243,7 +243,13 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#revision-todo-list" id="toc-revision-todo-list" class="nav-link active" data-scroll-target="#revision-todo-list">Revision todo list</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -266,8 +272,22 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <p>Virtual experiment for TROLL evaluation relies on several methods and tools developed in this part.</p>
+<section id="revision-todo-list" class="level2">
+<h2 class="anchored" data-anchor-id="revision-todo-list">Revision todo list</h2>
+<p>This is a list of point to review in case of revision or new runs of calibration/evaluation.</p>
+<ul>
+<li>Improve Tapajos precipitation data with data from Marcos Longo.</li>
+<li>Check the potential effect of leaf lifespan allometry on basal litterfall flux.</li>
+<li>Use 10 600-years spin-up replicates followed by 10 10-years replicates for structure and fluxes evaluation independently from model calibration.</li>
+<li>Update the snakemake workflow accordingly.</li>
+<li>Have a look to publicly available LAI data from Florest Seca near Tapajos.</li>
+</ul>
+<!-- Note for \@[sylvain.m.schmitt\@gmail.com](mailto:sylvain.m.schmitt@gmail.com) : if we want to have a closer look at this issue for the revision, there are two non -mutually exclusive paths:\ -->
+<!-- - first go back to the leaf lifespan allometry, which should definitely have a strong effect on the background litterfall rate.\ -->
+<!-- - also, having Greg's comment in mind, it is somewhat weird that the parameters that set up the a priori proportion of carbon allocated to leaves (before hierarchical reallocation) is lower (0.25) than the one to woody growth (0.35). With the new hierarchical scheme implemented by Fabian, this should have no effect however, but maybe worth launching a few simulations to test the sensibility of the current version to these values, before diving into the LL issue. -->
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

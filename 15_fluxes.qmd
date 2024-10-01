@@ -158,16 +158,16 @@ read_tsv("data/fluxes/rtsif.tsv") %>%
   xlab("") + ylab("Growth Primary Productivity (kgC/m2/yr)")
 ```
 
-## Soil water content - Guyaflux
+## Soil water content
 
-Guyaflux are Paracou Eddy Flux tower raw data [@bonal2008] from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 [@ukkola2022] or FLUXNET [@PastorelloGilberto2020]. Guyaflux was mainly used for TROLL simulations validation including soil water content (SWC) at different depths.
+Guyaflux are Paracou Eddy Flux tower raw data [@bonal2008] from 2004 to 2022. Vapour Pressure Deficit (VPD, kPa) is computed from relative humidity (%). Data are available on demand and can be partly retrieved from PLUMBER2 [@ukkola2022] or FLUXNET [@PastorelloGilberto2020]. Guyaflux was mainly used for TROLL simulations validation including soil water content (SWC) at different depths. TROLL 4.0 water fluxes were assessed using the relative variation of soil water content (RSWC, %) from the top horizon from Paracou eddy flux tower (Bonal et al., 2008) and from reanalysed top horizon eddy flux tower against climatic water deficit at Tapajos (Restrepo-Coupe et al., 2024), defined as the daily mean value of soil water content (m3.m-3) divided by the yearly 95th quantile of daily mean.
 
-PI: Damien Bonal
+PI: Damien Bonal & Natalia Restrepo-Coupe.
 
 ```{r guyaflux}
 #| eval: false
 #| message: false
-read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
+swc_par <- read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
       locale = locale(decimal_mark = ",")) %>% 
   group_by(Year) %>% 
   mutate(date = as_date(paste0(min(Year), "/", min(Month),
@@ -175,7 +175,8 @@ read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
     separate(`Hour/min`, c("hour", "minute")) %>% 
   ungroup() %>% 
   mutate(minute = ifelse(is.na(minute), 0, 60*as.numeric(minute)/10)) %>% 
-  mutate(time = as_datetime(paste(as.character(date), paste0(hour, ":", minute, ":00")))) %>% 
+  mutate(time = as_datetime(paste(as.character(date), 
+                                  paste0(hour, ":", minute, ":00")))) %>% 
   mutate(time = time - 30*60) %>% 
   filter(year(time)  %in% 2004:2014) %>% 
   mutate(swc10 = `SWC (-10 cm)`,
@@ -189,29 +190,36 @@ read_csv2("data/climate/GX-METEO^MEDDY-2004-2022.csv",
   summarise_all(mean, na.rm = TRUE) %>% 
   select(-time) %>% 
   gather(variable, value, -site, -date) %>% 
-  na.omit() %>% 
+  na.omit()
+swc_tap <- read_csv("data/fluxes/km67.eddyflux.seasonal.txt") %>% 
+  mutate(date = as_date(paste0(YYYY, "-", MM, "-", DD))) %>%
+  select(date, SMshallow, SMdeep) %>% 
+  rename(swc10 = SMshallow, swc160 = SMdeep) %>% 
+  mutate(site = "Tapajos") %>% 
+  gather(variable, value, -site, -date) %>% 
+  na.omit()
+bind_rows(swc_par, swc_tap) %>% 
   write_tsv("outputs/guyaflux_swc.tsv")
 ```
 
 ```{r swc}
 #| message: false
-#| fig-cap: "Mean annual cycle of daily means of soil water content at Paracou across ten years and for 5 differents depths."
+#| fig-cap: "Mean annual cycle of daily means of soil water content."
 read_tsv("outputs/guyaflux_swc.tsv") %>% 
   mutate(depth = as.numeric(gsub("swc", "", variable))) %>% 
-  group_by(depth, day = yday(date)) %>% 
+  group_by(site, depth, day = yday(date)) %>% 
   summarise(l = quantile(value, 0.025, na.rm = TRUE), 
             m = mean(value, na.rm = TRUE), 
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   ggplot(aes(day, m, col = depth, fill = depth, group = depth)) +
-   annotate("rect", xmin = 214, xmax = 306, fill  = "#fff4e0",
-           ymin = -Inf, ymax = Inf, alpha = 0.5) +
   geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
   geom_line() +
   theme_bw() +
   scale_color_viridis_c(direction = -1) +
   scale_fill_viridis_c(direction = -1) +
   theme(axis.title = element_blank()) +
-  ggtitle("Daily means variations of SWC in Paracou") +
+  facet_wrap(~ site) +
+  ggtitle("Daily means variations of SWC") +
   scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
                    labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
 ```
@@ -448,39 +456,4 @@ bind_rows(lai_age_wu, lai_age_chen) %>%
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")]))
-```
-
-```{r laistrata}
-#| message: false
-#| fig-cap: "Mean annual cycle from monthly means of leaf area index per strata at Tapajos. Rectangles in the background correspond to the site’s climatological dry season."
-dates <- readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
-                  "abs_height", col_names = FALSE, skip = 0, n_max = 1) %>% 
-  select(-`...1`) %>% 
-  gather(key, date) %>% 
-  mutate(key = as.character(1:n()))
-readxl::read_xlsx("~/Documents/data/Tapajos/nph15726-sup-0002-notess4.xlsx", 
-                  "abs_height", col_names = c("height", dates$key), skip = 1) %>% 
-  mutate(canopy = ifelse(height < 20, "lower", "upper")) %>% 
-  gather(key, lad, -height, -canopy) %>% 
-  left_join(dates) %>% 
-  mutate(date = as_date(date)) %>%
-  group_by(date, canopy) %>% 
-  summarise(value = sum(lad)) %>% 
-  mutate(site = "Tapajos", variable = "LAI") %>% 
-  mutate(week = week(date), year = year(date)) %>% 
-  write_tsv(file = "outputs/lai_tapajos_strat.tsv")
-read_tsv("outputs/lai_tapajos_strat.tsv") %>% 
-  ggplot(aes(week, value)) +
-    geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
-            ymin = -Inf, ymax = Inf, alpha = 0.5,
-            data = data.frame(week = week(as_date(c("2000-06-15"))),
-                              value = -Inf,
-                              end = week(as_date(c("2000-11-1"))))) +
-  geom_line(aes(group = paste(year, canopy), col = canopy)) +
-  geom_smooth(aes(col = canopy), se = FALSE) +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
-  scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
-                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) 
 ```

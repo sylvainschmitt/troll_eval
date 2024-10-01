@@ -716,9 +716,9 @@ div.csl-indent {
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site) <span class="sc">+</span></span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"[ % ]"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Height [ m ]"</span>) <span class="sc">+</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sat"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Density [ % ]"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">"Height [ m ]"</span>) <span class="sc">+</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="st">""</span>, <span class="at">values =</span>  <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)])) <span class="sc">+</span></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f02.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
 <span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -800,16 +800,6 @@ div.csl-indent {
 <td style="text-align: right;">0.4694979</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">GEDI</td>
-<td style="text-align: right;">0.9460125</td>
-<td style="text-align: right;">0.9578053</td>
-<td style="text-align: right;">0.5890065</td>
-<td style="text-align: right;">0.3400572</td>
-<td style="text-align: right;">0.5876667</td>
-<td style="text-align: right;">0.3392837</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">Tapajos</td>
 <td style="text-align: left;">ALS</td>
 <td style="text-align: right;">0.9668732</td>
@@ -818,16 +808,6 @@ div.csl-indent {
 <td style="text-align: right;">0.2364139</td>
 <td style="text-align: right;">0.3952359</td>
 <td style="text-align: right;">0.2383574</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">GEDI</td>
-<td style="text-align: right;">0.9383485</td>
-<td style="text-align: right;">0.9416842</td>
-<td style="text-align: right;">0.5482834</td>
-<td style="text-align: right;">0.4021951</td>
-<td style="text-align: right;">0.4727662</td>
-<td style="text-align: right;">0.3467992</td>
 </tr>
 </tbody>
 </table>
@@ -1058,7 +1038,7 @@ div.csl-indent {
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"psi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
@@ -1068,7 +1048,7 @@ div.csl-indent {
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>,</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"psi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long))) <span class="sc">+</span></span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> varlong, <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">labeller =</span> label_parsed, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>

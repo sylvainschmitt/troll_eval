@@ -132,9 +132,9 @@ read_tsv("outputs/inventories.tsv", show_col_types = FALSE) %>%
   coord_equal()
 ```
 
-## Airborne Lidar Scanning (ALS) & Global Ecosystem Dynamics Investigation (GEDI)
+## Airborne Lidar Scanning (ALS)
 
-Fabian Fischer personal communication to detail. GEDI to describe
+We evaluated tree height distributions using ALS data from 2015 at Paracou (unpublished data) and from 2012 at Tapajos (dos-Santos et al., 2019), which were processed into canopy height models with a standardised pipeline (Fischer et al., 2024). From both simulated and ALS-derived canopy height models, we derived the distribution of canopy height, expressed in proportion of 1-m2 pixels per 1-m height class.
 
 ```{r chm_data}
 #| eval: false
@@ -161,7 +161,6 @@ bind_rows(paracou, tapajos) %>%
   summarise(n = n()) %>% 
   group_by(site) %>% 
   mutate(pct = n/sum(n)*100, type = "ALS") %>% 
-  bind_rows(read_tsv("data/inventories/gedi.tsv")) %>% 
   write_tsv("outputs/hieght_chm.tsv")
 ```
 
@@ -226,7 +225,7 @@ read_tsv("outputs/hieght_chm.tsv") %>%
   geom_line() +
   theme_bw() +
   coord_flip() +
-  ylab("[ % ]") + xlab("Height [ m ]") +
+  ylab("Density [ % ]") + xlab("Height [ m ]") +
   theme(legend.position = "bottom") +
   scale_color_discrete("")
 ```
