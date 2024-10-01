@@ -9,3 +9,5 @@
 /.quarto/
 results2
 .cache
+refs.html
+refs_files

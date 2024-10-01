@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9052: msc refs
 -   troll_eval 0.1.0.9051: book cleaning for submission with tapajos rswc
 -   troll_eval 0.1.0.9050: eval_isa cleaned
 -   troll_eval 0.1.0.9049: eval_isa
