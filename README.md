@@ -1,5 +1,7 @@
 # TROLL V4 Evaluation
 
+[![DOI](https://zenodo.org/badge/761786703.svg)](https://doi.org/10.5281/zenodo.14012084)
+
 Sylvain Schmitt
 
 The aim of these analyses is to evaluate the TROLL 4.0 simulations of daily fluxes and the final structure and composition of the forest in relation to field observations and remote sensing at two Amazonian sites. All steps (including data, methods, uses of singularity and snakemake) and results are described in the following document: <https://sylvainschmitt.github.io/troll_eval/> .
