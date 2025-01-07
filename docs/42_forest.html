@@ -265,6 +265,11 @@ div.csl-indent {
   <a href="./43_fluxes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Fluxes</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./44_dynamics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Dynamics</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -936,6 +941,94 @@ div.csl-indent {
 </table>
 </div>
 </div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_forest2.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> repetition) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, s_name)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">simulated =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sim_m =</span> <span class="fu">median</span>(simulated), </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">sim_h =</span> <span class="fu">quantile</span>(simulated, .<span class="dv">95</span>),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">sim_l =</span> <span class="fu">quantile</span>(simulated, .<span class="dv">5</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>              <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">"abundance"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>              <span class="fu">group_by</span>(site, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>              <span class="fu">summarise</span>(<span class="at">obs_m =</span> <span class="fu">median</span>(observed), </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">obs_h =</span> <span class="fu">quantile</span>(observed, .<span class="dv">95</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">obs_l =</span> <span class="fu">quantile</span>(observed, .<span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(obs_m, sim_m)) <span class="sc">+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> obs_l, <span class="at">xmax =</span> obs_h), <span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> sim_l, <span class="at">ymax =</span> sim_h), <span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>(<span class="fu">aes</span>(<span class="at">label =</span> ..rr.label..))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="42_forest_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Abund-abund</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>troll_traits <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Tapajos_species_troll.tsv"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, trait_value, <span class="sc">-</span>species)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_forest2.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> repetition) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, s_name)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">simulated =</span> <span class="fu">n</span>()<span class="sc">/</span><span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"sim"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">value =</span> simulated) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>              <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">"abundance"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>              <span class="fu">group_by</span>(site, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"obs"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">value =</span> observed) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>              <span class="fu">select</span>(<span class="sc">-</span>variable)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(troll_traits)</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>t <span class="sc">%&gt;%</span> </span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"wsg"</span>, <span class="st">"LMA"</span>, <span class="st">"hmax"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, value, <span class="at">col =</span> type)) <span class="sc">+</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> trait, <span class="at">scales =</span> <span class="st">"free_x"</span>) <span class="sc">+</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  ggpubr<span class="sc">::</span><span class="fu">stat_cor</span>(<span class="fu">aes</span>(<span class="at">label =</span> ..rr.label..))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="42_forest_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Abund-trait</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="functional" class="level3">
 <h3 class="anchored" data-anchor-id="functional">Functional</h3>
@@ -943,57 +1036,57 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>troll_traits <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>),</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Tapajos_species_troll.tsv"</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, trait_value, <span class="sc">-</span>species)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>troll_traitdist <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_forest2.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> repetition) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(troll_traits)</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>all_traits_q <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(troll_traitdist, <span class="at">type =</span> <span class="st">"sim"</span>),</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>), <span class="at">type =</span> <span class="st">"obs"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait))</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, trait, plot, type) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">quantile =</span> <span class="fu">list</span>(<span class="fu">quantile</span>(trait_value, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">100</span>)))) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(quantile) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, trait, type, quantile_id)<span class="sc">%&gt;%</span> </span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">l =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">h =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(quantile, value, <span class="sc">-</span>site, <span class="sc">-</span>trait, <span class="sc">-</span>type, <span class="sc">-</span>quantile_id) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quantile =</span> <span class="fu">paste0</span>(quantile, <span class="st">"_"</span>, type)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>type) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> quantile, <span class="at">values_from =</span> value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>troll_traits <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_tsv</span>(<span class="st">"outputs/Tapajos_species_troll.tsv"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, trait_value, <span class="sc">-</span>species)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>troll_traitdist <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/evaluation_forest2.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dbh <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">plot =</span> repetition) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, plot, species) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(troll_traits)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>all_traits_q <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(troll_traitdist, <span class="at">type =</span> <span class="st">"sim"</span>),</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>), <span class="at">type =</span> <span class="st">"obs"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait))</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, trait, plot, type) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">quantile =</span> <span class="fu">list</span>(<span class="fu">quantile</span>(trait_value, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">100</span>)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_longer</span>(quantile) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, trait, type, quantile_id)<span class="sc">%&gt;%</span> </span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">l =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.025</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">m =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.5</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">h =</span> <span class="fu">quantile</span>(quantile, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(quantile, value, <span class="sc">-</span>site, <span class="sc">-</span>trait, <span class="sc">-</span>type, <span class="sc">-</span>quantile_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quantile =</span> <span class="fu">paste0</span>(quantile, <span class="st">"_"</span>, type)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>type) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> quantile, <span class="at">values_from =</span> value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>),</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> <span class="fu">filter</span>(troll_traitdist, site <span class="sc">==</span> <span class="st">"Paracou"</span>)) <span class="sc">+</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> trait, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Paracou"</span>, <span class="st">"546,498 inds represented on 577,761 (94.59%)"</span>) <span class="sc">+</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> <span class="fu">filter</span>(troll_traitdist, site <span class="sc">==</span> <span class="st">"Paracou"</span>)) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> trait, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Paracou"</span>, <span class="st">"546,498 inds represented on 577,761 (94.59%)"</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1007,20 +1100,20 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>),</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> <span class="fu">filter</span>(troll_traitdist, site <span class="sc">==</span> <span class="st">"Tapajos"</span>)) <span class="sc">+</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> trait, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Tapajos Genus level"</span>, <span class="st">"19,188 inds represented on 19,499 (98.65%)"</span>) <span class="sc">+</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> <span class="fu">filter</span>(troll_traitdist, site <span class="sc">==</span> <span class="st">"Tapajos"</span>)) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> trait, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Tapajos Genus level"</span>, <span class="st">"19,188 inds represented on 19,499 (98.65%)"</span>) <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1034,33 +1127,33 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>), </span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> troll_traitdist <span class="sc">%&gt;%</span> </span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long))) <span class="sc">+</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> varlong, <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">labeller =</span> label_parsed, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.spacing =</span> <span class="fu">unit</span>(<span class="dv">0</span>,<span class="st">'lines'</span>), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>)) <span class="sc">+</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f05.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/functional_composition.tsv"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">trait =</span> <span class="fu">ifelse</span>(trait <span class="sc">==</span> <span class="st">"leafaera"</span>, <span class="st">"leafarea"</span>, trait)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(trait_value, <span class="at">group =</span> plot)) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Observed"</span>)) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"Simulated"</span>), </span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> troll_traitdist <span class="sc">%&gt;%</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"leafarea"</span> <span class="ot">=</span> <span class="st">"LA"</span>, <span class="st">"Nmass"</span> <span class="ot">=</span> <span class="st">"N[mass]"</span>, <span class="st">"Pmass"</span> <span class="ot">=</span> <span class="st">"P[mass]"</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"tlp"</span> <span class="ot">=</span> <span class="st">"pi[tlp]"</span>, <span class="st">"wsg"</span> <span class="ot">=</span> <span class="st">"WSG"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">filter</span>(<span class="sc">!</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">paste0</span>(<span class="st">'"'</span>, site, <span class="st">':"~'</span>, trait_long))) <span class="sc">+</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> varlong, <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">labeller =</span> label_parsed, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.spacing =</span> <span class="fu">unit</span>(<span class="dv">0</span>,<span class="st">'lines'</span>), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>)) <span class="sc">+</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f05.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1074,18 +1167,18 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>all_traits_q <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> m_sim, <span class="at">observed =</span> m_obs) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, trait, quantile_id, observed, simulated) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>all_traits_q <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> m_sim, <span class="at">observed =</span> m_obs) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, trait, quantile_id, observed, simulated) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest_by</span>(site, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">R2 =</span> <span class="fu">summary</span>(<span class="fu">lm</span>(observed <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> simulated, <span class="at">data =</span> data))<span class="sc">$</span>r.squared,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">CC =</span> <span class="fu">cor</span>(data<span class="sc">$</span>simulated, data<span class="sc">$</span>observed),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">RMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">RRMSEP =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of functional trait distribution for 100 quantiles at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">

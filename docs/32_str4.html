@@ -267,6 +267,11 @@ div.csl-indent {
   <a href="./43_fluxes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Fluxes</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./44_dynamics.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Dynamics</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -310,11 +315,13 @@ div.csl-indent {
   <li><a href="#b_cr" id="toc-b_cr" class="nav-link" data-scroll-target="#b_cr"><span class="math inline">\(b_{CR}\)</span></a></li>
   <li><a href="#m" id="toc-m" class="nav-link" data-scroll-target="#m"><span class="math inline">\(m\)</span></a></li>
   </ul></li>
+  <li><a href="#sensitivity-to-parameters" id="toc-sensitivity-to-parameters" class="nav-link" data-scroll-target="#sensitivity-to-parameters">Sensitivity to parameters</a></li>
   <li><a href="#best-parameters" id="toc-best-parameters" class="nav-link" data-scroll-target="#best-parameters">Best parameters</a>
   <ul class="collapse">
   <li><a href="#paracou" id="toc-paracou" class="nav-link" data-scroll-target="#paracou">Paracou</a></li>
   <li><a href="#tapajos" id="toc-tapajos" class="nav-link" data-scroll-target="#tapajos">Tapajos</a></li>
   <li><a href="#all" id="toc-all" class="nav-link" data-scroll-target="#all">All</a></li>
+  <li><a href="#spinup" id="toc-spinup" class="nav-link" data-scroll-target="#spinup">Spinup</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -710,6 +717,50 @@ div.csl-indent {
 </div>
 </section>
 </section>
+<section id="sensitivity-to-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity-to-parameters">Sensitivity to parameters</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb), <span class="at">ba =</span> <span class="fu">sum</span>(ba))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"agb"</span>, <span class="st">"ba"</span>), <span class="cf">function</span>(var) </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  sensitivity<span class="sc">::</span><span class="fu">pcc</span>(t[<span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"m"</span>)], t[var], <span class="at">nboot =</span> <span class="dv">100</span>)<span class="sc">$</span>PCC <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"parameter"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">variable =</span> var)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> sens <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parameter =</span> <span class="fu">recode</span>(parameter,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"a"</span> <span class="ot">=</span> <span class="st">"a[CR]"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"b"</span> <span class="ot">=</span> <span class="st">"b[CR]"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"m"</span> <span class="ot">=</span> <span class="st">"m"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="fu">recode</span>(variable,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"abundance"</span> <span class="ot">=</span> <span class="st">"Abundance"</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"agb"</span> <span class="ot">=</span> <span class="st">"AGB"</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"ba"</span> <span class="ot">=</span> <span class="st">"BA"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(parameter, original, <span class="at">col =</span> variable)) <span class="sc">+</span> </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.4</span>)) <span class="sc">+</span> </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> <span class="st">`</span><span class="at">min. c.i.</span><span class="st">`</span>, <span class="at">ymax =</span> <span class="st">`</span><span class="at">max. c.i.</span><span class="st">`</span>), </span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.4</span>)) <span class="sc">+</span> </span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Partial Correlation Coefficients (PCC)"</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_parse</span>()) <span class="sc">+</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_discrete</span>(<span class="st">""</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="32_str4_files/figure-html/pcc_fig-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 <section id="best-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="best-parameters">Best parameters</h2>
 <section id="paracou" class="level3">
@@ -717,44 +768,44 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>eval_par <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">150</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>agb) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"ba"</span>), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rmsep_dist =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_ba =</span> <span class="fu">sqrt</span>((<span class="fl">30.8</span> <span class="sc">-</span> <span class="fu">sum</span>(ba))<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_abund =</span> <span class="fu">sqrt</span>((<span class="dv">612</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_norm =</span> rmsep_dist<span class="sc">/</span><span class="fl">30.5</span> <span class="sc">+</span> rmsep_ba<span class="sc">/</span><span class="fl">30.8</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">612</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>best_par <span class="ot">&lt;-</span> eval_par <span class="sc">%&gt;%</span> </span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(all_rmsep_norm, <span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>eval_par <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">150</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>agb) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"ba"</span>), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rmsep_dist =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_ba =</span> <span class="fu">sqrt</span>((<span class="fl">30.8</span> <span class="sc">-</span> <span class="fu">sum</span>(ba))<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_abund =</span> <span class="fu">sqrt</span>((<span class="dv">612</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_norm =</span> rmsep_dist<span class="sc">/</span><span class="fl">30.5</span> <span class="sc">+</span> rmsep_ba<span class="sc">/</span><span class="fl">30.8</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">612</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>best_par <span class="ot">&lt;-</span> eval_par <span class="sc">%&gt;%</span> </span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(all_rmsep_norm, <span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_par) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">ba =</span> <span class="fu">sum</span>(ba)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_par) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">ba =</span> <span class="fu">sum</span>(ba)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -811,17 +862,17 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Paracou"</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="32_str4_files/figure-html/bestfig_par-1.png" class="img-fluid" width="672"></p>
@@ -833,44 +884,44 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>eval_tap <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">150</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ba) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"agb"</span>), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rmsep_dist =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_agb =</span> <span class="fu">sqrt</span>((<span class="fl">143.7</span> <span class="sc">-</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_abund =</span> <span class="fu">sqrt</span>((<span class="dv">470</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_norm =</span> rmsep_dist<span class="sc">/</span><span class="fl">16.2</span> <span class="sc">+</span> rmsep_agb<span class="sc">/</span><span class="fl">143.7</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">470</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>best_tap <span class="ot">&lt;-</span> eval_tap <span class="sc">%&gt;%</span> </span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(all_rmsep_norm, <span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>eval_tap <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">150</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ba) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">"abundance"</span>, <span class="st">"agb"</span>), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rmsep_dist =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_agb =</span> <span class="fu">sqrt</span>((<span class="fl">143.7</span> <span class="sc">-</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">rmsep_abund =</span> <span class="fu">sqrt</span>((<span class="dv">470</span> <span class="sc">-</span> <span class="fu">sum</span>(simulated))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">all_rmsep_norm =</span> rmsep_dist<span class="sc">/</span><span class="fl">16.2</span> <span class="sc">+</span> rmsep_agb<span class="sc">/</span><span class="fl">143.7</span> <span class="sc">+</span> rmsep_abund<span class="sc">/</span><span class="dv">470</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m))</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>best_tap <span class="ot">&lt;-</span> eval_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(all_rmsep_norm, <span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_tap) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_tap) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">sum</span>(abundance), <span class="at">agb =</span> <span class="fu">sum</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span><span class="sc">/</span><span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>site) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, variable) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(value), <span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Best structure parameters according to calibration with inventory data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -927,17 +978,17 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim)) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">==</span> <span class="st">"Tapajos"</span>), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="32_str4_files/figure-html/bestfig_tap-1.png" class="img-fluid" width="672"></p>
@@ -949,13 +1000,127 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">berr =</span> b <span class="sc">+</span> <span class="fl">0.39</span> <span class="sc">-</span> <span class="fl">0.57</span><span class="sc">*</span>a) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RRMSEP ALL"</span>, <span class="at">value =</span> all_rmsep_norm),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_dist) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP Distribution"</span>, <span class="at">value =</span> rmsep_dist),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_ba) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP BA"</span>, <span class="at">value =</span> rmsep_ba),</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_abund) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP Abundance"</span>, <span class="at">value =</span> rmsep_abund),</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RRMSEP ALL"</span>, <span class="at">value =</span> all_rmsep_norm),</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_dist) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP Distribution"</span>, <span class="at">value =</span> rmsep_dist),</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_agb) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP AGB"</span>, <span class="at">value =</span> rmsep_agb),</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_min</span>(rmsep_abund) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="st">"RMSEP Abundance"</span>, <span class="at">value =</span> rmsep_abund)</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, metric, value, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">site</th>
+<th style="text-align: left;">metric</th>
+<th style="text-align: right;">value</th>
+<th style="text-align: right;">a</th>
+<th style="text-align: right;">b</th>
+<th style="text-align: right;">m</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">RRMSEP ALL</td>
+<td style="text-align: right;">0.1347289</td>
+<td style="text-align: right;">1.80</td>
+<td style="text-align: right;">0.3860</td>
+<td style="text-align: right;">0.0350</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">RMSEP Distribution</td>
+<td style="text-align: right;">2.5461695</td>
+<td style="text-align: right;">1.90</td>
+<td style="text-align: right;">0.4430</td>
+<td style="text-align: right;">0.0325</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">RMSEP BA</td>
+<td style="text-align: right;">0.2903003</td>
+<td style="text-align: right;">1.80</td>
+<td style="text-align: right;">0.3860</td>
+<td style="text-align: right;">0.0350</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">RMSEP Abundance</td>
+<td style="text-align: right;">5.7500000</td>
+<td style="text-align: right;">1.80</td>
+<td style="text-align: right;">0.3860</td>
+<td style="text-align: right;">0.0375</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">RRMSEP ALL</td>
+<td style="text-align: right;">0.1802522</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">0.7565</td>
+<td style="text-align: right;">0.0400</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">RMSEP Distribution</td>
+<td style="text-align: right;">2.7423917</td>
+<td style="text-align: right;">2.35</td>
+<td style="text-align: right;">0.6995</td>
+<td style="text-align: right;">0.0500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">RMSEP AGB</td>
+<td style="text-align: right;">1.1842691</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">0.7565</td>
+<td style="text-align: right;">0.0400</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">RMSEP Abundance</td>
+<td style="text-align: right;">0.7500000</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">0.7565</td>
+<td style="text-align: right;">0.0400</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">berr =</span> b <span class="sc">+</span> <span class="fl">0.39</span> <span class="sc">-</span> <span class="fl">0.57</span><span class="sc">*</span>a) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -990,38 +1155,76 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>      best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim, <span class="at">col =</span> <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>)) <span class="sc">+</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site) <span class="sc">+</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#3f3f3f"</span>, <span class="st">"#0da1f8"</span>)) <span class="sc">+</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>, <span class="at">label =</span> lab), </span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">200</span>,</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"470 trees/ha &amp; 287 Mg/ha"</span>,</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"612 trees/ha &amp; 419 Mg/ha"</span>),</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>))) <span class="sc">+</span></span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"TROLL"</span>, <span class="at">label =</span> lab), </span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">180</span>,</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"471 trees/ha &amp; 290 Mg/ha"</span>,</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"622 trees/ha &amp; 413 Mg/ha"</span>),</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>)))</span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f01.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>      best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>      best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim, <span class="at">col =</span> <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>)) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Abundance<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site) <span class="sc">+</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#3f3f3f"</span>, <span class="st">"#0da1f8"</span>)) <span class="sc">+</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>, <span class="at">label =</span> lab), </span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">200</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"470 trees/ha &amp; 287 Mg/ha"</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"612 trees/ha &amp; 419 Mg/ha"</span>),</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>))) <span class="sc">+</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"TROLL"</span>, <span class="at">label =</span> lab), </span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">180</span>,</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"471 trees/ha &amp; 290 Mg/ha"</span>,</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"622 trees/ha &amp; 413 Mg/ha"</span>),</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>)))</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f01.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="32_str4_files/figure-html/bestfig2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="spinup" class="level3">
+<h3 class="anchored" data-anchor-id="spinup">Spinup</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>spinup <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">paracou =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"1404/01/01"</span>)<span class="sc">+</span>iter),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">tapajos =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"1402/01/01"</span>)<span class="sc">+</span>iter)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"site"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, <span class="at">year =</span> <span class="fu">year</span>(date)) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">mean</span>(sum10), <span class="at">agb =</span> <span class="fu">mean</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>year, <span class="sc">-</span>site)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>spinup <span class="sc">%&gt;%</span> </span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">var_long =</span> <span class="fu">recode</span>(variable, </span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"agb"</span> <span class="ot">=</span> <span class="st">'AGB~"["~Mg~ha^{-~1}~"]"'</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"abundance"</span> <span class="ot">=</span> <span class="st">'Abundance~"["~ha^{-~1}~"]"'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, value, <span class="at">col =</span> site)) <span class="sc">+</span> </span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>   <span class="fu">facet_wrap</span>(<span class="sc">~</span> var_long, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">labeller =</span> label_parsed) <span class="sc">+</span> </span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">scale_colour_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>), <span class="at">legend.background =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="32_str4_files/figure-html/sinup-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Spinup simulations.</figcaption>
+</figure>
+</div>
 </div>
 </div>
 

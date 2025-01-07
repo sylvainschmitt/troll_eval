@@ -192,6 +192,63 @@ g <- cowplot::plot_grid(g1, g2, g3, g4)
 ggsave("test.png", g)
 ```
 
+```{r par_rain}
+#| message: false
+#| warning: false
+#| fig-cap: "Paracou precipitation across products."
+pr_paracou <- read_tsv("outputs/fluxnet_climate.tsv") %>% 
+  filter(site == "Paracou") %>% 
+  select(time, rainfall) %>% 
+  group_by(date = date(time)) %>% 
+  summarise(pr_fluxnet = sum(rainfall)) %>% 
+  left_join(read_tsv("data/climate/era5_Paracou.tsv") %>% 
+              select(time, rainfall) %>% 
+              group_by(date = date(time)) %>% 
+              summarise(pr_era5 = sum(rainfall, na.rm = TRUE))) %>% 
+  left_join(read_csv("data/climate/paracou_chirps.csv") %>% 
+              group_by(date = date(time)) %>% 
+              summarise(pr_chirps = sum(pr, na.rm = TRUE)))
+dat_daily <- pr_paracou %>% 
+  rename("ERA5-Land" = pr_era5, CHIRPS = pr_chirps) %>% 
+  gather(source, pr, -date, -pr_fluxnet) %>% 
+  mutate(type = "day")
+dat_pentad <- pr_paracou %>% 
+  group_by(date = floor_date(date, "5 days")) %>% 
+  summarise_all(sum) %>% 
+  rename("ERA5-Land" = pr_era5, CHIRPS = pr_chirps) %>% 
+  gather(source, pr, -date, -pr_fluxnet) %>%
+  mutate(type = "5-days")
+dat_biweek <- pr_paracou %>% 
+  group_by(date = floor_date(date, "15 days")) %>% 
+  summarise_all(sum) %>% 
+  rename("ERA5-Land" = pr_era5, CHIRPS = pr_chirps) %>% 
+  gather(source, pr, -date, -pr_fluxnet) %>%
+  mutate(type = "15-days")
+dat_month <- pr_paracou %>% 
+  group_by(date = floor_date(date, "month")) %>% 
+  summarise_all(sum) %>% 
+  rename("ERA5-Land" = pr_era5, CHIRPS = pr_chirps) %>% 
+  gather(source, pr, -date, -pr_fluxnet) %>% 
+  mutate(type = "month")
+bind_rows(dat_daily, dat_pentad, dat_biweek, dat_month) %>% 
+  mutate(type = factor(type, levels = c("day", "5-days", "15-days", "month"))) %>% 
+  mutate(pr = ifelse(pr < 1, 0, pr)) %>% 
+  mutate(pr_fluxnet = ifelse(pr_fluxnet < 1, 0, pr_fluxnet)) %>% 
+  ggplot(aes(pr_fluxnet, pr, col = source)) +
+  geom_abline() +
+  geom_point(alpha = 0.2) +
+  theme_bw() +
+  coord_equal() +
+  scale_y_log10() +
+  scale_x_log10() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggpubr::stat_cor(aes(label = ..rr.label..)) +
+  facet_wrap(~ type) +
+  xlab("Precipitation FLUXNET2015") +
+  ylab("Precipitation other products") +
+  scale_color_discrete("")
+```
+
 ## Input data
 
 TROLL input data for climate includes:

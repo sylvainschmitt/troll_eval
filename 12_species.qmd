@@ -321,6 +321,7 @@ complete(imputation) %>%
 #| fig-cap: "Traits density distribution before and after species trait values imputation by predictive means matching."
 t <- vroom::vroom("outputs/imputation.tsv") %>% 
   filter(trait %in% c("ah", "dbhmax", "hmax", "TLP")) %>% 
+  filter(species %in% unique(troll$species, tapajos$species)) %>% 
   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
 labels <- t %>% 
   group_by(trait, type) %>% 
@@ -328,8 +329,8 @@ labels <- t %>%
   pivot_wider(names_from = type, values_from = N) %>% 
   mutate(label = paste0("Raw: ", raw, "\nImputed:", imputed)) %>% 
   ungroup() %>% 
-  mutate(value = c(-2, 0.1, 1, 30),
-         density = c(0.25, 5, 1, 0.05)) %>% 
+  mutate(value = c(-1.8, 0.25, 0.35, 40),
+         density = c(0.5, 10, 1, 0.05)) %>% 
   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
 g <- ggplot(t, aes(value)) +
   geom_density(aes(col = type)) +

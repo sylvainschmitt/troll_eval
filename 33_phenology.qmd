@@ -1,6 +1,5 @@
 ```{r setup}
 #| include: false 
-rm(list = ls())
 library(tidyverse) 
 cols <- c("sim" = "#0da1f8", "obs" = "#3f3f3f")
 ```
@@ -50,6 +49,48 @@ raw <- files %>%
   lapply(prep_sim)  %>% 
   bind_rows()
 write_tsv(raw, "outputs/calib.tsv")
+```
+
+```{r calib_test_ll_isa}
+#| eval: false
+prep_sim <- function(f) {
+  t <- vroom::vroom(f)  %>% 
+    select(iter, litterfall) %>% 
+    mutate(iter = iter - 219000 + 365*10 + 1) %>% 
+    filter(iter > 0) %>% 
+    mutate(file = f) %>% 
+    mutate(file = gsub("results/test_ll_isa/", "", file)) %>% 
+    mutate(file = gsub("_testLL_0_sumstats.txt", "", file)) %>% 
+    mutate(file = gsub("TROLLv4_", "", file)) %>% 
+    rename(site = file) %>% 
+    mutate(date = as_date(ifelse(site == "Tapajos", 
+                                 "2002/01/01", "2004/01/01")) + iter) %>% 
+    mutate(litterfall = litterfall*365) %>% 
+    select(-iter) %>% 
+    left_join(vroom::vroom("outputs/litter.tsv") %>% 
+                rename(observed = litterfall))
+  t$obs_group <- NA
+  t$obs_group[!is.na(t$dt)] <- 1:length(t$dt[!is.na(t$dt)])
+  t %>% 
+    fill(obs_group, .direction = "up") %>% 
+    mutate(dt_full = dt) %>% 
+    fill(dt_full, .direction = "up") %>% 
+    group_by(obs_group) %>% 
+    filter(n() >= dt_full) %>% 
+    mutate(simulated = ifelse(!is.na(dt), 
+                              zoo::rollmeanr(litterfall, unique(dt_full), fill = NA), 
+                              NA)) %>% 
+    ungroup() %>% 
+    select(site, date, dt, observed, simulated) %>% 
+    na.omit()
+}
+
+files <- list.files("results/test_ll_isa", full.names = T, pattern = "sumstats.txt")
+names(files) <- list.files("results/test_ll_isa", full.names = F, pattern = "sumstats.txt")
+raw <- files %>% 
+  lapply(prep_sim)  %>% 
+  bind_rows()
+write_tsv(raw, "outputs/calib_test_ll_isa.tsv")
 ```
 
 ```{r indices}
@@ -215,6 +256,75 @@ g <- cowplot::plot_grid(ga1 +
 ggsave("figures/fs02.png", g, dpi = 300, width = 16, height = 8, bg = "white")
 ```
 
+## Sensitivity to parameters
+
+```{r pcc}
+#| message: false
+#| warning: false
+t <- sim_metrics %>% filter(type == "simulated")
+sens <- lapply(c("peak_day", "ratio"), function(var) 
+  sensitivity::pcc(t[c("a0", "b0", "delta")], t[var], nboot = 100)$PCC %>%
+                      rownames_to_column(var = "parameter") %>% 
+    mutate(variable = var)) %>% 
+  bind_rows()
+```
+
+```{r pcc_fig}
+#| message: false
+#| warning: false
+g2 <- sens %>% 
+  mutate(parameter = recode(parameter,
+                            "a0" = "a[0]",
+                            "b0" = "b[0]",
+                            "delta" = "delta[0]")) %>% 
+   mutate(variable = recode(variable,
+                            "peak_day" = "Peak day",
+                            "ratio" = "Ratio")) %>% 
+  ggplot(aes(parameter, original, col = variable)) + 
+  geom_point(position = position_dodge(0.4)) + 
+  theme_bw() +
+  coord_flip() + 
+  geom_linerange(aes(ymin = `min. c.i.`, ymax = `max. c.i.`), 
+                 position = position_dodge(0.4)) + 
+  ylab("Partial Correlation Coefficients (PCC)") + xlab("") +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = scales::label_parse()) +
+  scale_colour_discrete("")
+g2
+```
+
+```{r}
+#| eval: false
+t <- data.frame(file = list.files("results/calib_pheno/")) %>% 
+  rowwise() %>% 
+  mutate(structure = list(read_tsv(file.path("results", "calib_pheno", file),
+                                   col_select = c(3,5,7), skip = 4015, col_names = F) %>% 
+                            tail(1))) %>% 
+  unnest(structure) %>% 
+  rename(abundance = X3, ba = X5, agb = X7) %>% 
+  separate(file, c("site", "a0", "b0", "delta"), sep = "_", convert = TRUE)
+sens <- lapply(c("abundance", "ba", "agb"), function(var) 
+  sensitivity::pcc(t[c("a0", "b0", "delta")], t[var], nboot = 100)$PCC %>%
+                      rownames_to_column(var = "parameter") %>% 
+    mutate(variable = var)) %>% 
+  bind_rows()
+sens %>% 
+  mutate(parameter = recode(parameter,
+                            "a0" = "a[0]",
+                            "b0" = "b[0]",
+                            "delta" = "delta[0]")) %>% 
+  ggplot(aes(parameter, original, col = variable)) + 
+  geom_point(position = position_dodge(0.4)) + 
+  theme_bw() +
+  coord_flip() + 
+  geom_linerange(aes(ymin = `min. c.i.`, ymax = `max. c.i.`), 
+                 position = position_dodge(0.4)) + 
+  ylab("Partial Correlation Coefficients (PCC)") + xlab("") +
+  theme(legend.position = "bottom") +
+  scale_x_discrete(labels = scales::label_parse()) +
+  scale_colour_discrete("")
+```
+
 ## Best parameters
 
 We found similar $a=0.2$ and $b=0.015$ to be the best in Paracou and Tapajos, but slightly different $delta$ with $delta=0.1$ in Paracou and $delta=0.2$ in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (\~September Paracou, \~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.
@@ -275,6 +385,65 @@ g <- vroom::vroom("outputs/calib.tsv") %>%
   ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
 ggsave("figures/f06.png", g, dpi = 300, width = 5, height = 5, bg = "white")
 g
+```
+
+```{r}
+vroom::vroom("outputs/calib.tsv") %>% 
+  mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
+  filter(sim %in% best$sim) %>%
+  left_join(vroom::vroom("outputs/calib_test_ll_isa.tsv") %>% 
+  rename(simulated_ll = simulated)) %>% 
+  select(-sim, -a0, -b0, -delta, -dt) %>% 
+  gather(type, value, -site, -date) %>%  
+  mutate(day = yday(date)) %>% 
+  ggplot(aes(day, value)) +
+  geom_rect(aes(xmin = day, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(day = yday(as_date(c("2000-8-1", "2000-06-15"))),
+                             value = -Inf,
+                             end = yday(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_smooth(aes(col = type),
+              method = "lm", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5, se = FALSE) +
+  geom_line(aes(col = type, group = paste0(year(date), type)), alpha = 0.6) +
+  geom_point(aes(col = type), alpha = 0.7) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  facet_wrap(~ site, nrow = 2) +
+  xlab("") + ylim(0, NA) +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
+  ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
+```
+
+```{r}
+vroom::vroom("outputs/calib.tsv") %>% 
+  mutate(sim = paste0(site, "_", a0, "_", b0, "_", delta)) %>% 
+  filter(sim %in% best$sim) %>%
+  select(-sim, -a0, -b0, -delta, -dt) %>% 
+  mutate(simulated = simulated*2) %>% 
+  gather(type, value, -site, -date) %>%  
+  mutate(day = yday(date)) %>% 
+  ggplot(aes(day, value)) +
+  geom_rect(aes(xmin = day, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(day = yday(as_date(c("2000-8-1", "2000-06-15"))),
+                             value = -Inf,
+                             end = yday(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_smooth(aes(col = type),
+              method = "lm", formula = y ~ poly(x, 20, raw = TRUE), alpha = 0.5, se = FALSE) +
+  geom_line(aes(col = type, group = paste0(year(date), type)), alpha = 0.6) +
+  geom_point(aes(col = type), alpha = 0.7) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  facet_wrap(~ site, nrow = 2) +
+  xlab("") + ylim(0, NA) +
+  scale_x_continuous(breaks = yday(as_date(paste0("2001-", 1:12, "-1"))),
+                   labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Litter traps", "TROLL")) +
+  ylab(expression(Litterfall~"["~MgC~ha^{-~1}~yr^{-~1}~"]")) 
 ```
 
 ```{r bestamng}

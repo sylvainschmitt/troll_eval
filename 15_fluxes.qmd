@@ -120,6 +120,42 @@ read_tsv("outputs/fluxnet_fluxes.tsv") %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"))
 ```
 
+```{r gpp_hhourly}
+#| message: false
+#| warning: false
+#| fig-cap: "GPP half-hourly."
+list(
+  "Paracou" = "data/climate/FLX_GF-Guy_FLUXNET2015_SUBSET_HH_2004-2014_2-4.csv",
+  "Tapajos" = "data/climate/FLX_BR-Sa1_FLUXNET2015_SUBSET_HR_2002-2011_1-4.csv"
+) %>% 
+  lapply(vroom::vroom, na = "-9999") %>% 
+  bind_rows(.id = "site") %>% 
+  select(site, TIMESTAMP_START, TIMESTAMP_END, P_F, SW_IN_F, 
+         TA_F, VPD_F, WS_F, GPP_NT_VUT_REF, LE_F_MDS) %>% 
+  mutate(time = as_datetime(as.character(as.POSIXlt(as.character(TIMESTAMP_START), 
+                                                    format = "%Y%m%d%H%M")))) %>% 
+  rename(gpp = GPP_NT_VUT_REF) %>% 
+  mutate(gpp = gpp/100*10^2*365/10^3) %>% 
+  select(site, time, gpp) %>% 
+  mutate(d_start = ifelse(site == "Paracou", yday("2020/08/01"), yday("2020/06/15"))) %>% 
+  mutate(d_end = ifelse(site == "Paracou", yday("2020/12/01"), yday("2020/11/01"))) %>% 
+  mutate(season = ifelse(yday(time) %in% d_start:d_end, "dry", "wet")) %>% 
+  group_by(site, season, time = hms::as_hms(time)) %>% 
+  summarise(l = quantile(gpp, 0.025, na.rm = TRUE), 
+            m = mean(gpp, na.rm = TRUE), 
+            h = quantile(gpp, 0.975, na.rm = TRUE)) %>% 
+  mutate(time = as.numeric(time)/(60*60)) %>% 
+  ggplot(aes(time, m, col = season, fill = season)) +
+  geom_ribbon(aes(ymin = l, ymax = h), col = NA, alpha = 0.2) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(~ site) +
+  theme(legend.position = "bottom") +
+  ylab(expression("Gross Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
+  xlab("")
+```
+
 ## Carbon flux - TROPOMI SIF
 
 Tapajos and Paracou Solar Induced Fluorescence (SIF) from TROPOMI satellites was retrieved from <https://figshare.com/ndownloader/articles/19336346/versions/2> and processed with the R script available in data. The SIF values were converted in Growth Primary Productivity (GPP) using $GPP = 15.343 \times SIF$ following @chen2022.

@@ -181,6 +181,37 @@ ggsave("figures/f11.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
+```{r luedet}
+#| message: false
+#| warning: false
+#| fig-cap: "LUE determinants."
+daily %>% 
+  pivot_wider(names_from = determinant, values_from = determinant_value) %>% 
+  mutate(value = value /(12.0107 * (par/10^2*(1-exp(-0.5*6))))) %>% 
+  # lue = gpp / (mass_carbon * (PPFD * fAPAR)) = gpp / (mass_carbon * (PPFD * (1-exp(k*LAI))))  = gpp / (mass_carbon * (PPFD * (1-exp(.5*6))))
+  mutate(variable = "lue") %>% 
+  select(-par) %>% 
+  gather(determinant, determinant_value, -site, -date, -variable, -type, -value) %>% 
+  mutate(det_long = recode(determinant, 
+                           "temperature" = 'Temperature~"["~degree~C~"]"',
+                            "vpd_max" = '"Vapour Pressure Deficit ["~kPa~day^{-~1}~"]"',
+                           "ws" = 'Wind~Speed~"["~m^{2}~s^{-~1}~"]"')) %>% 
+  ggplot(aes(determinant_value, value, col = type)) +
+  geom_point(alpha = 0.1) +
+  theme_bw() +
+  facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
+  theme(legend.position = "bottom") +
+  geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
+  ylab(expression("Light Use Efficiency ["~molC~mol^{-1}~"photons]")) +
+  xlab("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  ylim(0, 0.1) +
+  ggpubr::stat_cor(aes(label = ..rr.label..), label.x.npc = "middle")
+```
+
 ```{r gppevalplot}
 #| message: false
 #| warning: false
@@ -692,6 +723,50 @@ daily %>%
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
   knitr::kable(caption = "Evaluation fo daily means of ET at Paracou and Tapajos.")
+```
+
+## E/T
+
+```{r et_partition}
+#| message: false
+#| warning: false
+#| fig-cap: "E/T partitionning."
+list(
+  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
+     mutate(date = as_date("2004/01/01")+iter),
+  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
+     mutate(date = as_date("2002/01/01")+iter)
+) %>% bind_rows(.id = "site") %>% 
+  mutate(transpiration = (transpitation_0 + transpitation_1 + transpitation_2 + 
+                            transpitation_3 + transpitation_4)*1000,
+         "soil evaporation" = evaporation*1000,
+         "canopy evaporation" = (precipitation/1000-throughfall)*1000) %>% 
+  select(site, date, transpiration, "soil evaporation", "canopy evaporation") %>% 
+  gather(variable, value, -site, -date) %>% 
+  group_by(site, variable, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, variable, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1", "2000-06-15"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1", "2000-11-1"))),
+                             site = c("Paracou", "Tapajos"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = variable), col = NA, alpha = 0.2) +
+  geom_smooth(aes(col = variable), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+  facet_wrap(~ site, scales = "free_x") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Volume ["~mm~day^{-~1}~"]")) + xlab("")
 ```
 
 ## Relative Soil Water Content

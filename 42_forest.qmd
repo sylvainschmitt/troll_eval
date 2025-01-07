@@ -366,6 +366,80 @@ compositon %>%
   knitr::kable(caption = "Evaluation of rank-abundance distribution at Paracou and Tapajos.")
 ```
 
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Abund-abund"
+read_tsv("outputs/evaluation_forest2.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  mutate(species = gsub("_", " ", s_name)) %>% 
+  select(site, plot, species) %>% 
+  group_by(site, plot, species) %>% 
+  summarise(simulated = n()/4) %>% 
+  group_by(site, species) %>% 
+  summarise(sim_m = median(simulated), 
+            sim_h = quantile(simulated, .95),
+            sim_l = quantile(simulated, .5)) %>% 
+  left_join(read_tsv("outputs/composition.tsv") %>% 
+              filter(variable == "abundance") %>% 
+              group_by(site, species) %>% 
+              summarise(obs_m = median(observed), 
+                        obs_h = quantile(observed, .95),
+                        obs_l = quantile(observed, .5))) %>% 
+  ggplot(aes(obs_m, sim_m)) +
+  geom_abline() +
+  geom_linerange(aes(xmin = obs_l, xmax = obs_h), alpha = .2) +
+  geom_linerange(aes(ymin = sim_l, ymax = sim_h), alpha = .2) +
+  geom_point() + 
+  theme_bw() +
+  scale_y_log10() +
+  scale_x_log10() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor(aes(label = ..rr.label..))
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Abund-trait"
+troll_traits <- list(
+    read_tsv("outputs/Paracou_species_troll.tsv"),
+    read_tsv("outputs/Tapajos_species_troll.tsv")
+) %>% bind_rows() %>% 
+  unique() %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  rename(species = name) %>% 
+  mutate(species = gsub("_", " ", species)) %>% 
+  gather(trait, trait_value, -species)
+t <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  mutate(species = gsub("_", " ", s_name)) %>% 
+  select(site, plot, species) %>% 
+  group_by(site, plot, species) %>% 
+  summarise(simulated = n()/4) %>% 
+  mutate(type = "sim") %>% 
+  rename(value = simulated) %>% 
+  bind_rows(read_tsv("outputs/composition.tsv") %>% 
+              filter(variable == "abundance") %>% 
+              group_by(site, species) %>% 
+              mutate(type = "obs") %>% 
+              rename(value = observed) %>% 
+              select(-variable)) %>% 
+  left_join(troll_traits)
+t %>% 
+  filter(trait %in% c("wsg", "LMA", "hmax")) %>% 
+  ggplot(aes(trait_value, value, col = type)) +
+  geom_point(alpha = .2) +
+  theme_bw() +
+  facet_wrap(~ trait, scales = "free_x") +
+  scale_y_log10() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor(aes(label = ..rr.label..))
+```
+
 ### Functional
 
 Simulated functional trait distribution in Paracou and Tapajos matched the ones observed with quantiles correlations above 0.9 for all traits and sites, at th exception of leaf area in Paracou. However due to a poor species resolution in Tapajos we used mean genus values, which may result in an overestimation of assessment in Tapajos. Leaf area differences in Paracou come to the lack of very high leaf area species in the simulations compared to the Paracou plots, however the resulting correlation coefficient might have differed if we would have used log-transformed leaf area). Diving into the observed data, the high leaf area values are due to pioneer species including *Cecropia obtusa* and *sciadophylla*, *Sterculia speciosa* and *Perebea guianensis*. The three genus are present in the simulations inputs, but seems to lack in the final forest due to either a lack of forest gaps or a lack of survival.

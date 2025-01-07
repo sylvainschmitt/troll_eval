@@ -1,0 +1,184 @@
+```{r setup}
+#| include: false 
+library(tidyverse) 
+cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8")
+```
+
+# Dynamics
+
+```{r death_fig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of simulated versus observed death rates across 10-years in Paracou."
+paracou_death <- read_tsv("data/inventories/guyafor.tsv") %>% 
+  filter(Forest == "Paracou") %>% 
+  mutate(plot = as.numeric(Plot)) %>% 
+  filter(!is.na(plot)) %>% 
+  filter(Plot != 16) %>% 
+  filter(Plot %in% c(1, 6, 11, 13:15)) %>% 
+  filter(BotaSource == "Bota") %>% 
+  filter(!is.na(Xutm), !is.na(Yutm)) %>% 
+  mutate(dbh = CircCorr/pi, site = "Paracou", tree = idTree,
+         x = Xfield, y = Yfield) %>% 
+  filter(CensusYear %in% 2003:2014) %>% 
+  filter(dbh >= 10) %>% 
+  separate(Species, "Species") %>% 
+  mutate(species = paste(Genus, Species), plot_size = PlotArea, 
+         year = CensusYear, alive = CodeAlive, code = MeasCode) %>% 
+  select(alive, code, year, site, plot, tree, species, dbh, x, y, plot_size) %>% 
+  filter(paste(plot, year) != "15 2010") %>% 
+  group_by(tree) %>% 
+  arrange(year) %>% 
+  mutate(first_death = first(year[alive == 0])) %>% 
+  filter(year == first_death) %>% 
+  filter(code == 0) %>% 
+  filter(alive == 0) %>% 
+  group_by(site, plot, year) %>% 
+  summarise(dead = n()) %>% 
+  group_by(site, plot) %>% 
+  arrange(year) %>% 
+  mutate(delta_t = year - lag(year)) %>% 
+  mutate(death_rate = dead / 6.25 / delta_t)
+sim_death <- lapply(1:10, function(i)
+  read_tsv(paste0("results/eval/Paracou_R", i, "/Paracou_R", i, "_0_death.txt")) %>% 
+     mutate(date = as_date("2004/01/01")+iter) %>% 
+  group_by(year = year(date)) %>% 
+  summarise(death_rate = sum(nbdead_n10+nbTreefall10)/4) %>% 
+  mutate(plot = i)) %>% 
+  bind_rows()
+bind_rows(paracou_death %>% mutate(type = "obs"),
+          sim_death %>% mutate(type = "sim")) %>% 
+  group_by(type, year) %>% 
+  summarise(death_ll = quantile(death_rate, .05, na.rm = T),
+            death_m = median(death_rate, na.rm = T),  
+            death_hh  = quantile(death_rate, .95, na.rm = T)) %>% 
+  ggplot(aes(year, death_m, col = type)) +
+  geom_ribbon(aes(ymin = death_ll, ymax = death_hh, fill = type), col = NA, alpha = 0.2) +
+  geom_line() +
+  theme_bw() +
+  xlim(2004, 2014) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  theme(legend.position = "bottom") +
+  ylab(expression("Death rate ["~N~yr^{-1}~ha^{-1}~"]")) + xlab("")
+```
+
+```{r agr_fig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of simulated versus observed annual growth rates across 10-years dependent on tree original diameter in Paracou."
+sim_agr <- lapply(1:10, function(i)
+  read_tsv(paste0("results/eval/Paracou_R", i, 
+                  "/Paracou_R", i, "_0_final_pattern.txt")) %>% 
+  mutate(dbh_final = dbh*100) %>% 
+  select(col, row, dbh_final) %>% 
+  filter(dbh_final > 10) %>% 
+  left_join(read_tsv(paste0("results/eval/Paracou_R", i, 
+                            "/Paracou_R", i, "_0_initial_pattern.txt")) %>% 
+              mutate(dbh_initial = dbh*100) %>% 
+              select(col, row, dbh_initial) %>% 
+              filter(dbh_initial > 10)) %>% 
+  filter(!is.na(dbh_initial)) %>% 
+  mutate(agr = (dbh_final-dbh_initial)/10) %>% 
+  filter(agr > 0) %>% 
+  mutate(type = "sim") %>% 
+  mutate(plot = i)) %>% 
+  bind_rows()
+par_agr <- read_tsv("data/inventories/guyafor.tsv") %>% 
+  filter(Forest == "Paracou") %>% 
+  mutate(plot = as.numeric(Plot)) %>% 
+  filter(!is.na(plot)) %>% 
+  filter(Plot != 16) %>% 
+  filter(Plot %in% c(1, 6, 11, 13:15)) %>% 
+  filter(BotaSource == "Bota") %>% 
+  filter(!is.na(Xutm), !is.na(Yutm)) %>% 
+  mutate(dbh = CircCorr/pi, site = "Paracou", tree = idTree,
+         x = Xfield, y = Yfield) %>% 
+  filter(CensusYear %in% c(2003, 2013)) %>% 
+  filter(dbh >= 10, CodeAlive == 1) %>% 
+  group_by(plot, tree) %>% 
+  summarise(dbh_initial = min(dbh), dbh_final = max(dbh)) %>% 
+  mutate(agr = (dbh_final-dbh_initial)/10) %>% 
+  filter(agr > 0) %>% 
+  mutate(dbh_class = cut(dbh_initial, 
+                         breaks = c(seq(10, 155, by = 5)), 
+                         labels = c(seq(10, 150, by = 5)))) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  mutate(type = "obs")
+size <- 5
+bind_rows(sim_agr, par_agr) %>% 
+  mutate(dbh_class = cut(dbh_initial, 
+                         breaks = c(seq(10, 155, by = size)), 
+                         labels = c(seq(10, 155-size, by = size)))) %>% 
+  mutate(dbh_class = as.numeric(as.character(dbh_class))) %>% 
+  group_by(type, dbh_class) %>% 
+  summarise(agr_ll = quantile(agr, .05),
+            agr_m = median(agr),  
+            agr_hh  = quantile(agr, .95)) %>% 
+  ggplot(aes(dbh_class, agr_m, col = type)) +
+  geom_ribbon(aes(ymin = agr_ll, ymax = agr_hh, fill = type), col = NA, alpha = 0.2) +
+  geom_line() +
+  theme_bw() +
+  scale_y_log10() +
+  xlab("DBH [m]") +
+  ylab(expression("Annual Growth Rate [cm"~yr^{-1}~"]")) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  theme(legend.position = "bottom")
+```
+
+```{r ba_fig}
+#| message: false
+#| warning: false
+#| fig-cap: "Evaluation of simulated versus observed annual basal area variation across 10-years in Paracou."
+sim_ba <- lapply(1:10, function(i)
+  read_tsv(paste0("results/eval/Paracou_R", i, "/Paracou_R", i, "_0_sumstats.txt")) %>% 
+  mutate(date = as_date("2004/01/01")+iter) %>% 
+  group_by(year = year(date)) %>% 
+  summarise(ba = mean(ba)) %>% 
+  arrange(year) %>% 
+  mutate(delta_ba = (ba-lag(ba))/lag(ba)*100) %>% 
+  mutate(type = "sim") %>% 
+  mutate(plot = i)) %>% 
+  bind_rows()
+par_ba <- read_tsv("data/inventories/guyafor.tsv") %>% 
+  filter(Forest == "Paracou") %>% 
+  mutate(plot = as.numeric(Plot)) %>% 
+  filter(!is.na(plot)) %>% 
+  filter(Plot != 16) %>% 
+  filter(Plot %in% c(1, 6, 11, 13:15)) %>% 
+  filter(BotaSource == "Bota") %>% 
+  filter(!is.na(Xutm), !is.na(Yutm)) %>% 
+  mutate(dbh = CircCorr/pi, site = "Paracou", tree = idTree,
+         x = Xfield, y = Yfield) %>% 
+  filter(paste(plot, CensusYear) != "15 2010") %>% 
+  filter(CensusYear %in% 2003:2014) %>% 
+  filter(dbh >= 10, CodeAlive == 1) %>% 
+  rename(year = CensusYear) %>% 
+  group_by(year, plot) %>% 
+  summarise(ba = sum((dbh/2)^2*pi)) %>% 
+  group_by(plot) %>% 
+  arrange(year) %>% 
+  mutate(delta_ba = (ba-lag(ba))/lag(ba)/(year-lag(year))*100) %>% 
+  mutate(type = "obs")
+bind_rows(sim_ba, par_ba) %>% 
+  group_by(type, year) %>% 
+  summarise(ba_ll = quantile(delta_ba, .05, na.rm = T),
+            ba_m = median(delta_ba, na.rm = T),  
+            ba_hh  = quantile(delta_ba, .95, na.rm = T)) %>% 
+  ggplot(aes(year, ba_m, col = type)) +
+  geom_ribbon(aes(ymin = ba_ll, ymax = ba_hh, fill = type), col = NA, alpha = 0.2) +
+  geom_line() +
+  theme_bw() +
+  xlim(2004, 2014) +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Inventory", "TROLL")) +
+  theme(legend.position = "bottom") +
+  xlab("") + ylab(expression("Annual Basal Area Variation [%"[BA]~yr^{-1}~"]"))
+```
