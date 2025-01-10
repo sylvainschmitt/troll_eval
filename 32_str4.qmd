@@ -487,6 +487,19 @@ bind_rows(
   kable()
 ```
 
+```{r best_posteriors}
+#| message: false
+#| warning: false
+bind_rows(best_par, best_tap) %>% 
+  select(site, all_rmsep_norm, a, b, m) %>% 
+  gather(parameter, value, -site, -all_rmsep_norm) %>% 
+  group_by(site, parameter) %>% 
+  arrange(all_rmsep_norm) %>% 
+  summarise(minimum = min(value), median = median(value), 
+            best = first(value), maximum = max(value)) %>% 
+  kable()
+```
+
 ```{r bestfig2}
 #| message: false
 #| warning: false
@@ -528,9 +541,9 @@ g
 #| warning: false
 #| fig-cap: "Spinup simulations."
 spinup <- list(
-  paracou = read_tsv("results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt") %>% 
+  Paracou = read_tsv("results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt") %>% 
     mutate(date = as_date("1404/01/01")+iter),
-  tapajos = read_tsv("results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt") %>% 
+  Tapajos = read_tsv("results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt") %>% 
     mutate(date = as_date("1402/01/01")+iter)
 ) %>% 
   bind_rows(.id = "site") %>% 

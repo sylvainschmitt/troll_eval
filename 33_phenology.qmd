@@ -259,43 +259,26 @@ ggsave("figures/fs02.png", g, dpi = 300, width = 16, height = 8, bg = "white")
 ## Sensitivity to parameters
 
 ```{r pcc}
-#| message: false
-#| warning: false
-t <- sim_metrics %>% filter(type == "simulated")
-sens <- lapply(c("peak_day", "ratio"), function(var) 
-  sensitivity::pcc(t[c("a0", "b0", "delta")], t[var], nboot = 100)$PCC %>%
-                      rownames_to_column(var = "parameter") %>% 
+#| eval: false
+calib_str1 <- read_tsv("outputs/calib_str4.tsv") %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(abundance = sum(abundance), agb = sum(agb), ba = sum(ba))
+sens_str1 <- lapply(c("abundance", "agb", "ba"), function(var) 
+  sensitivity::pcc(calib_str1[c("a", "b", "m")], 
+                   calib_str1[var], 
+                   nboot = 100)$PCC %>%
+    rownames_to_column(var = "parameter") %>% 
     mutate(variable = var)) %>% 
   bind_rows()
-```
-
-```{r pcc_fig}
-#| message: false
-#| warning: false
-g2 <- sens %>% 
-  mutate(parameter = recode(parameter,
-                            "a0" = "a[0]",
-                            "b0" = "b[0]",
-                            "delta" = "delta[0]")) %>% 
-   mutate(variable = recode(variable,
-                            "peak_day" = "Peak day",
-                            "ratio" = "Ratio")) %>% 
-  ggplot(aes(parameter, original, col = variable)) + 
-  geom_point(position = position_dodge(0.4)) + 
-  theme_bw() +
-  coord_flip() + 
-  geom_linerange(aes(ymin = `min. c.i.`, ymax = `max. c.i.`), 
-                 position = position_dodge(0.4)) + 
-  ylab("Partial Correlation Coefficients (PCC)") + xlab("") +
-  theme(legend.position = "bottom") +
-  scale_x_discrete(labels = scales::label_parse()) +
-  scale_colour_discrete("")
-g2
-```
-
-```{r}
-#| eval: false
-t <- data.frame(file = list.files("results/calib_pheno/")) %>% 
+calib_pheno <- sim_metrics %>% filter(type == "simulated")
+sens_pheno <- lapply(c("peak_day", "ratio"), function(var) 
+  sensitivity::pcc(calib_pheno[c("a0", "b0", "delta")], 
+                   calib_pheno[var], 
+                   nboot = 100)$PCC %>%
+    rownames_to_column(var = "parameter") %>% 
+    mutate(variable = var)) %>% 
+  bind_rows()
+calib_str2 <- data.frame(file = list.files("results/calib_pheno/")) %>% 
   rowwise() %>% 
   mutate(structure = list(read_tsv(file.path("results", "calib_pheno", file),
                                    col_select = c(3,5,7), skip = 4015, col_names = F) %>% 
@@ -303,31 +286,83 @@ t <- data.frame(file = list.files("results/calib_pheno/")) %>%
   unnest(structure) %>% 
   rename(abundance = X3, ba = X5, agb = X7) %>% 
   separate(file, c("site", "a0", "b0", "delta"), sep = "_", convert = TRUE)
-sens <- lapply(c("abundance", "ba", "agb"), function(var) 
-  sensitivity::pcc(t[c("a0", "b0", "delta")], t[var], nboot = 100)$PCC %>%
-                      rownames_to_column(var = "parameter") %>% 
+sens_str2 <- lapply(c("abundance", "ba", "agb"), function(var) 
+  sensitivity::pcc(calib_str2[c("a0", "b0", "delta")], 
+                   calib_str2[var], 
+                   nboot = 100)$PCC %>%
+    rownames_to_column(var = "parameter") %>% 
     mutate(variable = var)) %>% 
   bind_rows()
-sens %>% 
-  mutate(parameter = recode(parameter,
-                            "a0" = "a[0]",
-                            "b0" = "b[0]",
-                            "delta" = "delta[0]")) %>% 
-  ggplot(aes(parameter, original, col = variable)) + 
-  geom_point(position = position_dodge(0.4)) + 
+bind_rows(sens_str1, sens_pheno, sens_str2) %>% 
+  write_tsv("outputs/sensitivity.tsv")
+```
+
+```{r pcc_fig}
+#| message: false
+#| warning: false
+read_tsv("outputs/sensitivity.tsv") %>% 
+   mutate(type = ifelse(parameter %in% c("a", "b", "m"),
+                        "Structure", "Litterfall")) %>% 
+  mutate(type = factor(type, levels = c("Structure", "Litterfall"))) %>% 
+    mutate(parameter = recode(parameter,
+                              "a" = "a[CR]",
+                              "b" = "b[CR]",
+                              "m" = "m",
+                              "a0" = "a[0]",
+                              "b0" = "b[0]",
+                              "delta" = "delta[0]")) %>% 
+   mutate(variable = recode(variable,
+                            "abundance" = "Abundance",
+                            "agb" = "AGB",
+                            "ba" = "BA",
+                            "peak_day" = "Litterfall peak day",
+                            "ratio" = "Litterfall peak ratio")) %>% 
+  ggplot(aes(parameter, original, 
+             ymin = `min. c.i.`, ymax = `max. c.i.`, 
+             fill = variable)) + 
+  geom_col(position = position_dodge2(width = 0.9, preserve = "single")) + 
+  geom_linerange(position = position_dodge2(width = 0.9, preserve = "single"),
+                 colour = "black") +
   theme_bw() +
-  coord_flip() + 
-  geom_linerange(aes(ymin = `min. c.i.`, ymax = `max. c.i.`), 
-                 position = position_dodge(0.4)) + 
   ylab("Partial Correlation Coefficients (PCC)") + xlab("") +
   theme(legend.position = "bottom") +
   scale_x_discrete(labels = scales::label_parse()) +
-  scale_colour_discrete("")
+  scale_fill_discrete("") +
+  facet_wrap(~ type, scales = "free_x")
 ```
 
 ## Best parameters
 
 We found similar $a=0.2$ and $b=0.015$ to be the best in Paracou and Tapajos, but slightly different $delta$ with $delta=0.1$ in Paracou and $delta=0.2$ in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (\~September Paracou, \~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.
+
+```{r best_all}
+#| message: false
+#| warning: false
+sim_metrics %>% 
+  ungroup() %>% 
+  mutate(ratio = as.vector(scale(ratio)), 
+         peak_day = as.vector(scale(peak_day))) %>% 
+  gather(metric, value, -site, -a0, -b0, -delta, -year, -type) %>% 
+  filter(metric %in% c("ratio", "peak_day")) %>% 
+  mutate(metric = paste0(metric, "_", type)) %>% 
+  select(-type) %>% 
+  pivot_wider(names_from = metric, values_from = value) %>% 
+  na.omit() %>% 
+  mutate(
+    error_both = sqrt((ratio_observed - ratio_simulated)^2
+                      +(peak_day_observed - peak_day_simulated)^2),
+    error_peak = sqrt((peak_day_observed - peak_day_simulated)^2),
+    error_ratio = sqrt((ratio_observed - ratio_simulated)^2),
+    ) %>% 
+  group_by(site, a0, b0, delta) %>% 
+  summarise(both = sqrt(mean(error_both^2, na.rm = T)),
+            peak = sqrt(mean(error_peak^2, na.rm = T)),
+            ratio = sqrt(mean(error_ratio^2, na.rm = T))) %>% 
+  gather(metric, rmsep, -site, -a0, -b0, -delta, -site) %>%  
+  group_by(site, metric) %>% 
+  slice_min(rmsep) %>% 
+  knitr::kable()
+```
 
 ```{r best}
 #| message: false

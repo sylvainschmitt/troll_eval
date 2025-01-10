@@ -352,6 +352,7 @@ g
 #| warning: false
 compositon %>% 
   select(site, rank, m, type) %>% 
+  mutate(m = log(m)) %>% 
    pivot_wider(names_from = type, values_from = m) %>% 
   ungroup() %>% 
   na.omit() %>% 
@@ -386,17 +387,18 @@ read_tsv("outputs/evaluation_forest2.tsv") %>%
               group_by(site, species) %>% 
               summarise(obs_m = median(observed), 
                         obs_h = quantile(observed, .95),
-                        obs_l = quantile(observed, .5))) %>% 
+                        obs_l = quantile(observed, .5))) %>%  
   ggplot(aes(obs_m, sim_m)) +
   geom_abline() +
-  geom_linerange(aes(xmin = obs_l, xmax = obs_h), alpha = .2) +
-  geom_linerange(aes(ymin = sim_l, ymax = sim_h), alpha = .2) +
   geom_point() + 
   theme_bw() +
   scale_y_log10() +
   scale_x_log10() +
-  geom_smooth(method = "lm") +
-  ggpubr::stat_cor(aes(label = ..rr.label..))
+  geom_smooth(method = "lm", se = FALSE) +
+  ggpubr::stat_cor(aes(label = ..rr.label..)) +
+  xlab(expression("Observed mean abundance ["~ha^{-1}~"]")) +
+  ylab(expression("Simulated mean abundance ["~ha^{-1}~"]")) +
+  coord_equal()
 ```
 
 ```{r}
@@ -430,14 +432,18 @@ t <- read_tsv("outputs/evaluation_forest2.tsv") %>%
               select(-variable)) %>% 
   left_join(troll_traits)
 t %>% 
-  filter(trait %in% c("wsg", "LMA", "hmax")) %>% 
+  filter(trait %in% c("wsg", "hmax")) %>% 
   ggplot(aes(trait_value, value, col = type)) +
   geom_point(alpha = .2) +
   theme_bw() +
   facet_wrap(~ trait, scales = "free_x") +
   scale_y_log10() +
-  geom_smooth(method = "lm") +
-  ggpubr::stat_cor(aes(label = ..rr.label..))
+  geom_smooth(method = "lm", se = FALSE) +
+  ggpubr::stat_cor(aes(label = ..rr.label..)) +
+  theme(legend.position = "bottom") +
+  xlab("Trait value") + ylab("Mean abundance ["~ha^{-1}~"]") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
 ```
 
 ### Functional
