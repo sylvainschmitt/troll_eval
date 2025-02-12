@@ -230,7 +230,7 @@ dat_month <- pr_paracou %>%
   rename("ERA5-Land" = pr_era5, CHIRPS = pr_chirps) %>% 
   gather(source, pr, -date, -pr_fluxnet) %>% 
   mutate(type = "month")
-bind_rows(dat_daily, dat_pentad, dat_biweek, dat_month) %>% 
+g <- bind_rows(dat_daily, dat_pentad, dat_biweek, dat_month) %>% 
   mutate(type = factor(type, levels = c("day", "5-days", "15-days", "month"))) %>% 
   mutate(pr = ifelse(pr < 1, 0, pr)) %>% 
   mutate(pr_fluxnet = ifelse(pr_fluxnet < 1, 0, pr_fluxnet)) %>% 
@@ -247,6 +247,7 @@ bind_rows(dat_daily, dat_pentad, dat_biweek, dat_month) %>%
   xlab("Precipitation FLUXNET2015") +
   ylab("Precipitation other products") +
   scale_color_discrete("")
+ggsave("figures/fa02.png", g, dpi = 300, width = 8, height = 6, bg = "white")
 ```
 
 ## Input data

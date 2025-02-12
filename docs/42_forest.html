@@ -378,7 +378,7 @@ div.csl-indent {
 </div>
 <section id="forest" class="level3">
 <h3 class="anchored" data-anchor-id="forest">Forest</h3>
-<p>We characterized global forests structure through their distribution of basal area (m2/ha) and logged abundance per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.</p>
+<p>We characterized global forests structure through their distribution of basal area (m2/ha) and log-transformed number of stems per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -446,7 +446,7 @@ div.csl-indent {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="42_forest_files/figure-html/dbhstr-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of number of stems and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
 </figure>
 </div>
 </div>
@@ -468,11 +468,11 @@ div.csl-indent {
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">SD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed),</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of abundance and basal area distribution at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of number of stems and basal area distribution at Paracou and Tapajos."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
-<caption>Evaluation of abundance and basal area distribution at Paracou and Tapajos.</caption>
+<caption>Evaluation of number of stems and basal area distribution at Paracou and Tapajos.</caption>
 <colgroup>
 <col style="width: 10%">
 <col style="width: 12%">
@@ -569,7 +569,7 @@ div.csl-indent {
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">h =</span> <span class="fu">quantile</span>(value, <span class="fl">0.975</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">varlong =</span> <span class="fu">recode</span>(variable, <span class="st">"ba"</span> <span class="ot">=</span> <span class="st">'Basal~area~"["~m^{2}~ha^{-~1}~"]"'</span>,</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"log_abundance"</span> <span class="ot">=</span> <span class="st">'Log[10]~abundance~"["~ha^{-~1}~"]"'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"log_abundance"</span> <span class="ot">=</span> <span class="st">'Log[10]~number~of~stems~"["~ha^{-~1}~"]"'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -604,7 +604,7 @@ div.csl-indent {
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                              <span class="at">m =</span> <span class="fu">c</span>(<span class="fl">3.25</span>, .<span class="dv">55</span>),</span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"3,787 trees/ha"</span>,</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"3.7 m2/ha"</span>),</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                              <span class="at">varlong =</span> <span class="fu">c</span>(<span class="st">"Log[10]~abundance~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                              <span class="at">varlong =</span> <span class="fu">c</span>(<span class="st">"Log[10]~number~of~stems~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>,</span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"Basal~area~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~m^{2}~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>))) <span class="sc">+</span></span>
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"simulated"</span>, <span class="at">label =</span> lab), </span>
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">5</span>, </span>
@@ -612,7 +612,7 @@ div.csl-indent {
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>                              <span class="at">m =</span> <span class="fu">c</span>(<span class="dv">3</span>, .<span class="dv">5</span>),</span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"2,138 trees/ha"</span>,</span>
 <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"2.9 m2/ha"</span>),</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                              <span class="at">varlong =</span> <span class="fu">c</span>(<span class="st">"Log[10]~abundance~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                              <span class="at">varlong =</span> <span class="fu">c</span>(<span class="st">"Log[10]~number~of~stems~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>,</span>
 <span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>                                          <span class="st">"Basal~area~</span><span class="sc">\"</span><span class="st">[</span><span class="sc">\"</span><span class="st">~m^{2}~ha^{-~1}~</span><span class="sc">\"</span><span class="st">]</span><span class="sc">\"</span><span class="st">"</span>))) <span class="sc">+</span></span>
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">as.vector</span>(cols[<span class="fu">c</span>(<span class="st">"obs"</span>, <span class="st">"sim"</span>)]), </span>
 <span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Field"</span>, <span class="st">"TROLL"</span>))</span>
@@ -623,7 +623,7 @@ div.csl-indent {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="42_forest_files/figure-html/understoryfig-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
+<figcaption class="figure-caption">Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of number of stems and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods).</figcaption>
 </figure>
 </div>
 </div>
@@ -646,11 +646,11 @@ div.csl-indent {
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">RSD =</span><span class="fu">sd</span>(data<span class="sc">$</span>simulated<span class="sc">-</span>data<span class="sc">$</span>observed)<span class="sc">/</span><span class="fu">mean</span>(data<span class="sc">$</span>observed)) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of abundance and basal area distribution at Paracou for the understory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Evaluation of number of stems and basal area distribution at Paracou for the understory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
-<caption>Evaluation of abundance and basal area distribution at Paracou for the understory.</caption>
+<caption>Evaluation of number of stems and basal area distribution at Paracou for the understory.</caption>
 <colgroup>
 <col style="width: 9%">
 <col style="width: 12%">

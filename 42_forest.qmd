@@ -1,4 +1,4 @@
-```{r setup}
+```{r set}
 #| include: false 
 library(tidyverse) 
 cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8", "sat" = "#fb7754")
@@ -46,7 +46,7 @@ write_tsv(troll_height, "outputs/evaluation_height2.tsv")
 
 ### Forest
 
-We characterized global forests structure through their distribution of basal area (m2/ha) and logged abundance per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.
+We characterized global forests structure through their distribution of basal area (m2/ha) and log-transformed number of stems per 10-cm classes of diameter at breast height (DBH, cm) for trees above 10 cm DBH. We found simulated back the same distributions in Paracou with a small lack of smaller diameters and slight increase in trees with a diameter around 100 cm. But beware of stochasticity that may have resulted in a few big trees surviving in the 16-ha simulations. We found back in Paracou a total basal area of 29 m2/ha against a mean observed of 30 across plots and a total number of 576 individuals simulated per hectare against a mean observed of 655 across plots. In Tapajos, we found very similar distribution but with increased small diameters in simulation and a lack of big trees (above 100cm). We thus overestimated basal area (30 m2/ha against 24 observed) and abundance (598 against 632 observed). However, Tapajos data are based on only 8 very small plots of 0.25ha, which may have resulted in an over-representation of a few big individuals. The resulting quantiles comparisons are very good with a correlation coefficient above 0.93 for all metrics and sites except Tapajos were basal area correlation coefficient was only 0.72.
 
 ```{r str}
 #| message: false
@@ -86,7 +86,7 @@ structure <- read_tsv("outputs/evaluation_forest2.tsv") %>%
 ```{r dbhstr}
 #| message: false
 #| warning: false
-#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou and Tapajos sites, expressed in terms of number of stems and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 labs <- structure %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
   mutate(m = ifelse(variable == "log_abundance", 10^m, m)) %>% 
@@ -129,7 +129,7 @@ filter(structure, variable %in% c("ba", "abundance")) %>%
          SD =sd(data$simulated-data$observed),
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
-  knitr::kable(caption = "Evaluation of abundance and basal area distribution at Paracou and Tapajos.")
+  knitr::kable(caption = "Evaluation of number of stems and basal area distribution at Paracou and Tapajos.")
 ```
 
 ### Understory
@@ -160,13 +160,13 @@ understory <- read_tsv("outputs/evaluation_forest2.tsv") %>%
             h = quantile(value, 0.975, na.rm = TRUE)) %>% 
   na.omit() %>% 
   mutate(varlong = recode(variable, "ba" = 'Basal~area~"["~m^{2}~ha^{-~1}~"]"',
-                          "log_abundance" = 'Log[10]~abundance~"["~ha^{-~1}~"]"'))
+                          "log_abundance" = 'Log[10]~number~of~stems~"["~ha^{-~1}~"]"'))
 ```
 
 ```{r understoryfig}
 #| message: false
 #| warning: false
-#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of abundance and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
+#| fig-cap: "Evaluation of the size structure estimated by TROLL at the Paracou site with understorey trees, expressed in terms of number of stems and basal area. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations. The confidence on the TROLL values was estimated generating an ensemble of 10 simulations (see methods)."
 labs <- understory %>% 
   filter(site == "Paracou") %>% 
   filter(variable %in% c("ba", "log_abundance")) %>% 
@@ -196,7 +196,7 @@ g <- filter(understory, variable %in% c("ba", "log_abundance")) %>%
                               m = c(3.25, .55),
                               lab = c("3,787 trees/ha",
                                       "3.7 m2/ha"),
-                              varlong = c("Log[10]~abundance~\"[\"~ha^{-~1}~\"]\"",
+                              varlong = c("Log[10]~number~of~stems~\"[\"~ha^{-~1}~\"]\"",
                                           "Basal~area~\"[\"~m^{2}~ha^{-~1}~\"]\""))) +
   geom_text(aes(col = "simulated", label = lab), 
             data = data.frame(dbh_class = 5, 
@@ -204,7 +204,7 @@ g <- filter(understory, variable %in% c("ba", "log_abundance")) %>%
                               m = c(3, .5),
                               lab = c("2,138 trees/ha",
                                       "2.9 m2/ha"),
-                              varlong = c("Log[10]~abundance~\"[\"~ha^{-~1}~\"]\"",
+                              varlong = c("Log[10]~number~of~stems~\"[\"~ha^{-~1}~\"]\"",
                                           "Basal~area~\"[\"~m^{2}~ha^{-~1}~\"]\""))) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Field", "TROLL"))
@@ -230,7 +230,7 @@ filter(understory, variable %in% c("ba", "abundance")) %>%
          RSD =sd(data$simulated-data$observed)/mean(data$observed)) %>% 
   select(-data) %>% 
   na.omit() %>% 
-  knitr::kable(caption = "Evaluation of abundance and basal area distribution at Paracou for the understory.")
+  knitr::kable(caption = "Evaluation of number of stems and basal area distribution at Paracou for the understory.")
 ```
 
 ### Height
@@ -301,6 +301,86 @@ read_tsv("outputs/evaluation_height2.tsv") %>%
 ### Species
 
 Observed species rank-abundance curves in Paracou and Tapajos revealed low evenness with a few dominating species even more intense in Tapajos. However, Tapajos data are based on only 8 very small plots of 0.25ha, which may not be representative despite their virtual pooling in two 1-ha plots, and the quality of the species identifications can be lower. Simulated rank-abundance curve in Paracou was similar to the observed one with a correlation coefficient of 0.95 but with higher evenness resulting in underestimation of dominant species abundances and overestimation of rare species abundances. Simulated rank-abundance curve in Tapajos was very similar to the one simulated in Paracou but differed a lot of the one in Tapajos with strong underestimation of dominant species abundances and overestimation of rare species abundances. But once again observation data in Tapajos might be question for species resolution.
+
+```{r}
+comp_sim <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  mutate(species = gsub("_", " ", s_name)) %>%
+  separate(species, "species") %>% 
+  select(site, plot, species) %>% 
+  group_by(site, plot, species) %>% 
+  summarise(value = n()/4) %>%
+  group_by(site, species) %>% 
+  summarise(l_sim = quantile(value, 0.025, na.rm = TRUE), 
+            m_sim = quantile(value, 0.5, na.rm = TRUE), 
+            h_sim = quantile(value, 0.975, na.rm = TRUE))
+comp_obs <- read_tsv("outputs/composition.tsv") %>% 
+  separate(species, "species") %>% 
+  filter(variable == "abundance") %>% 
+  group_by(site, species) %>% 
+  summarise(l_obs = quantile(observed, 0.025, na.rm = TRUE), 
+            m_obs = quantile(observed, 0.5, na.rm = TRUE), 
+            h_obs = quantile(observed, 0.975, na.rm = TRUE))
+g <- comp_sim %>% 
+  left_join(comp_obs) %>% 
+  ggplot(aes(m_sim, m_obs)) +
+  geom_point() + 
+  theme_bw() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggpubr::stat_cor() +
+  scale_y_log10() +
+  scale_x_log10() +
+  facet_wrap(~ site) +
+  ylab(expression("Observed mean abundance ["~ha^{-~1}~"]")) +
+  xlab(expression("Simulated mean abundance ["~ha^{-~1}~"]"))
+ggsave(filename = "tests/abundance.png", plot = g, width = 7, height = 5)
+```
+
+```{r}
+#| message: false
+#| warning: false
+troll_traits <- list(
+    read_tsv("outputs/Paracou_species_troll.tsv"),
+    read_tsv("outputs/Tapajos_species_troll.tsv")
+) %>% bind_rows() %>% 
+  unique() %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  rename(species = name) %>% 
+  mutate(species = gsub("_", " ", species)) %>% 
+  gather(trait, trait_value, -species) %>% 
+  separate(species, "species") %>% 
+  group_by(species, trait) %>% 
+  summarise(trait_value = median(trait_value))
+g <- comp_sim %>% 
+  left_join(comp_obs) %>% 
+  select(site, species, m_sim, m_obs) %>% 
+  gather(type, abundance, -site, -species) %>% 
+  left_join(troll_traits) %>% 
+  mutate(trait_long = recode(trait, "
+                             ah" = "a[h]", 
+                             "dbhmax" = "dbh[thres]~'['~m~']'", 
+                             "hmax" = "h[lim]~'['~m~']'",
+                             "leafarea" = "LA~'['~cm^2~']'",
+                             "LMA" = "LMA~'['~g~m^{-~2}~']'",
+                             "Nmass" = "N[mass]~'['~mg~g^{-~1}~']'", 
+                             "Pmass" = "P[mass]~'['~mg~g^{-~1}~']'",
+                             "tlp" = "pi[~tlp]~'['~MPa~']'", 
+                             "wsg" = "WSG~'['~g~cm^{-~3}~']'")) %>% 
+  ggplot(aes(trait_value, abundance, col = type)) +
+  geom_point(alpha = .2) +
+  theme_bw() +
+  facet_wrap(~ trait_long, scales = "free_x", label = label_parsed) +
+  scale_y_log10() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggpubr::stat_cor() +
+  theme(legend.position = "bottom") +
+  xlab("Trait value") + ylab("Mean abundance ["~ha^{-~1}~"]") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL"))
+ggsave(filename = "tests/trait.png", plot = g)
+```
 
 ```{r compodata}
 #| message: false
@@ -533,7 +613,7 @@ read_tsv("outputs/functional_composition.tsv") %>%
 #| fig-cap: "Evaluation of the functional composition estimated by TROLL at the Paracou and Tapajos sites expressed in terms of density distribution per trait and site. The analyses have been done at the species level in Paracou and the genus level in Tapajos."
 g <- read_tsv("outputs/functional_composition.tsv") %>%
  mutate(trait = ifelse(trait == "leafaera", "leafarea", trait)) %>% 
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]",
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]",
                              "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "pi[tlp]", "wsg" = "WSG")) %>% 
   filter(!(trait %in% c("ah", "hmax"))) %>% 
@@ -542,7 +622,7 @@ g <- read_tsv("outputs/functional_composition.tsv") %>%
   geom_density(aes(col = "Observed")) +
   geom_density(aes(col = "Simulated"), 
                data = troll_traitdist %>% 
-                   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]",
+                   mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]",
                                               "hmax" = "h[lim]",
                              "leafarea" = "LA", "Nmass" = "N[mass]", "Pmass" = "P[mass]",
                              "tlp" = "pi[tlp]", "wsg" = "WSG")) %>% 

@@ -109,7 +109,7 @@ g <- daily %>%
   ylab(expression("Gross Primary Productivity ["~kgC~m^{-2}~yr^{-1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-ggsave("figures/fs04.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+ggsave("figures/fa07.png", g, dpi = 300, width = 10, height = 5, bg = "white")
 g
 ```
 
@@ -147,7 +147,7 @@ g <- daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL"))
-ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -177,7 +177,7 @@ g <- daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 7.5) +
   ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f11.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
@@ -185,7 +185,7 @@ g
 #| message: false
 #| warning: false
 #| fig-cap: "LUE determinants."
-daily %>% 
+g <- daily %>% 
   pivot_wider(names_from = determinant, values_from = determinant_value) %>% 
   mutate(value = value /(12.0107 * (par/10^2*(1-exp(-0.5*6))))) %>% 
   # lue = gpp / (mass_carbon * (PPFD * fAPAR)) = gpp / (mass_carbon * (PPFD * (1-exp(k*LAI))))  = gpp / (mass_carbon * (PPFD * (1-exp(.5*6))))
@@ -202,7 +202,7 @@ daily %>%
   facet_grid(site ~ det_long, scales = "free", labeller = label_parsed) +
   theme(legend.position = "bottom") +
   geom_smooth(method = "lm", formula = "y ~ 1+log(x+10^-6)", se = FALSE) +
-  ylab(expression("Light Use Efficiency ["~molC~mol^{-1}~"photons]")) +
+  ylab(expression("Light Use Efficiency ["~molC~mol^{-~1}~"photons]")) +
   xlab("") +
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
@@ -210,6 +210,8 @@ daily %>%
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 0.1) +
   ggpubr::stat_cor(aes(label = ..rr.label..), label.x.npc = "middle")
+ggsave("figures/fa12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+g
 ```
 
 ```{r gppevalplot}
@@ -324,7 +326,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
   guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2))
-ggsave("figures/f07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -442,7 +444,7 @@ g <- daily %>%
   scale_color_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   scale_fill_manual("", values = as.vector(cols_laid[c("mature", "old", "young")])) +
   theme(legend.position = "bottom")
-ggsave("figures/fs03.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fa06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -502,7 +504,7 @@ g <- daily %>%
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Normalised Leaf Area Index")) + xlab("") +
   theme(legend.position = "bottom")
-ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -599,7 +601,7 @@ g <- daily %>%
   ylab(expression("Evapotranspiration ["~mm~day^{-~1}~"]")) +
   scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs05.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+ggsave("figures/fa08.png", g, dpi = 300, width = 10, height = 5, bg = "white")
 g
 ```
 
@@ -636,7 +638,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/f11.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -666,7 +668,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   ylim(0, 5.5) +
   ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+ggsave("figures/f13.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
 
@@ -731,7 +733,7 @@ daily %>%
 #| message: false
 #| warning: false
 #| fig-cap: "E/T partitionning."
-list(
+g <- list(
   Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
      mutate(date = as_date("2004/01/01")+iter),
   Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
@@ -767,6 +769,8 @@ list(
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
   ylab(expression("Volume ["~mm~day^{-~1}~"]")) + xlab("")
+ggsave("figures/fa09.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+g
 ```
 
 ## Relative Soil Water Content
@@ -842,7 +846,7 @@ g <- daily %>%
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL"))
-ggsave("figures/fs06.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fa10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
 
@@ -909,6 +913,6 @@ g <- daily %>%
   scale_x_continuous(breaks = c(1, 32, 61, 92, 122, 153, 183, 214, 245, 275, 306, 336),
                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   facet_wrap(~ type ~ site, nrow = 2, scales = "free_y")
-ggsave("figures/fs07.png", g, dpi = 300, width = 8, height = 5, bg = "white")
+ggsave("figures/fa11.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```

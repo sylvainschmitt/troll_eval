@@ -443,38 +443,55 @@ read_tsv("outputs/calib_str4.tsv") %>%
 
 ### All
 
+```{r}
+read_tsv("outputs/calib_str4.tsv") %>% 
+  select(site, a, b, m) %>% 
+  unique() %>% 
+  mutate(dbh_class = list(seq(10, 150, by = 5))) %>% 
+  unnest(dbh_class) %>% 
+  left_join(read_tsv("outputs/calib_str4.tsv")) %>% 
+  select(-agb, -ba) %>% 
+  mutate(abundance = ifelse(is.na(abundance), 0, abundance)) %>% 
+  rename(simulated = abundance) %>% 
+  left_join(rename(obs, observed = abundance)) %>% 
+  mutate(observed = ifelse(is.na(observed), 0, observed)) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise(normal = sqrt(mean((observed - simulated)^2)),
+            lognormal = exp(sqrt(mean((log(observed+1) - log(simulated+1))^2)))) %>% 
+  gather(metric, rmsep, -site, -a, -b, -m) %>% 
+  group_by(site, metric) %>% 
+  slice_min(rmsep, n = 5) %>% 
+  mutate(rmsep = round(rmsep, 2)) %>% 
+  summarise(
+    RMSEP = paste0(median(rmsep), " [", min(rmsep), "-", max(rmsep), "]"),
+    a = paste0(median(a), " [", min(a), "-", max(a), "]"),
+    b = paste0(median(b), " [", min(b), "-", max(b), "]"),
+    m = paste0(median(m), " [", min(m), "-", max(m), "]")
+  )
+  knitr::kable()
+```
+
 ```{r eval_all_tab}
 #| message: false
 #| warning: false
 bind_rows(
   best_par %>% 
-    slice_min(all_rmsep_norm) %>% 
-    mutate(metric = "RRMSEP ALL", value = all_rmsep_norm),
-  best_par %>% 
-    slice_min(rmsep_dist) %>% 
-    mutate(metric = "RMSEP Distribution", value = rmsep_dist),
-  best_par %>% 
-    slice_min(rmsep_ba) %>% 
-    mutate(metric = "RMSEP BA", value = rmsep_ba),
-  best_par %>% 
-    slice_min(rmsep_abund) %>% 
-    mutate(metric = "RMSEP Abundance", value = rmsep_abund),
+    select(-sim) %>% 
+    gather(metric, value, -site, -a, -b, -m),
   best_tap %>% 
-    slice_min(all_rmsep_norm) %>% 
-    mutate(metric = "RRMSEP ALL", value = all_rmsep_norm),
-  best_tap %>% 
-    slice_min(rmsep_dist) %>% 
-    mutate(metric = "RMSEP Distribution", value = rmsep_dist),
-  best_tap %>% 
-    slice_min(rmsep_agb) %>% 
-    mutate(metric = "RMSEP AGB", value = rmsep_agb),
-  best_tap %>% 
-    slice_min(rmsep_abund) %>% 
-    mutate(metric = "RMSEP Abundance", value = rmsep_abund)
-  ) %>% 
-  bind_rows() %>% 
-  select(site, metric, value, a, b, m) %>% 
-  kable()
+    select(-sim) %>% 
+    gather(metric, value, -site, -a, -b, -m)
+) %>% 
+  group_by(site, metric) %>% 
+  slice_min(value, n = 5) %>% 
+  mutate(value = round(value, 2)) %>% 
+  summarise(
+    RMSEP = paste0(median(value), " [", min(value), "-", max(value), "]"),
+    a = paste0(median(a), " [", min(a), "-", max(a), "]"),
+    b = paste0(median(b), " [", min(b), "-", max(b), "]"),
+    m = paste0(median(m), " [", min(m), "-", max(m), "]")
+  )
+  knitr::kable()
 ```
 
 ```{r bestab2}
@@ -515,7 +532,7 @@ g <- read_tsv("outputs/calib_str4.tsv") %>%
   ggplot(aes(dbh_class, abundance)) +
   geom_line(aes(group = sim, col = "TROLL")) +
   geom_point(data = obs, aes(col = "field")) +
-  xlab("DBH [ cm ]") + ylab(expression(Abundance~"["~ha^{-~1}~"]")) +
+  xlab("DBH [ cm ]") + ylab(expression(Number~of~stems~"["~ha^{-~1}~"]")) +
   theme_bw() +
   facet_wrap(~ site) +
   scale_colour_manual("", values = c("#3f3f3f", "#0da1f8")) +
@@ -542,24 +559,24 @@ g
 #| fig-cap: "Spinup simulations."
 spinup <- list(
   Paracou = read_tsv("results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt") %>% 
-    mutate(date = as_date("1404/01/01")+iter),
+    mutate(date = as_date("0000/01/01")+iter),
   Tapajos = read_tsv("results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt") %>% 
-    mutate(date = as_date("1402/01/01")+iter)
+    mutate(date = as_date("0000/01/01")+iter)
 ) %>% 
   bind_rows(.id = "site") %>% 
   group_by(site, year = year(date)) %>% 
   summarise(abundance = mean(sum10), agb = mean(agb)/10^3) %>% 
   gather(variable, value, -year, -site)
-  
-  
-spinup %>% 
+g <- spinup %>% 
   mutate(var_long = recode(variable, 
                            "agb" = 'AGB~"["~Mg~ha^{-~1}~"]"',
-                           "abundance" = 'Abundance~"["~ha^{-~1}~"]"')) %>% 
+                           "abundance" = 'Number~of~stems~"["~ha^{-~1}~"]"')) %>% 
   ggplot(aes(year, value, col = site)) + 
    geom_line() + 
    facet_wrap(~ var_long, scales = "free_y", nrow = 3, labeller = label_parsed) + 
    theme_bw() +
-  xlab("") + ylab("") + scale_colour_discrete("") +
+  xlab("[ Years ]") + ylab("") + scale_colour_discrete("") +
   theme(legend.position = c(0.8, 0.2), legend.background = element_blank())
+ggsave("figures/fa03.png", g, dpi = 300, width = 10, height = 5, bg = "white")
+g
 ```

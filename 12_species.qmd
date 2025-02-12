@@ -291,6 +291,14 @@ raw %>%
   geom_smooth(method = "lm", se = FALSE)
 ```
 
+```{r rawcorr2}
+filtered %>% 
+  select(hmax, ah, dbhmax, LA, LMA, N, P, TLP, WSG) %>% 
+  rename(hlim = hmax, dbhtres = dbhmax) %>% 
+  cor(use = "pairwise.complete.obs") %>% 
+  corrplot::corrplot(type = "upper", diag = FALSE)
+```
+
 ```{r rawcorr}
 #| fig-cap: "Species traits pairwise correlations."
 filtered %>% 
@@ -322,7 +330,7 @@ complete(imputation) %>%
 t <- vroom::vroom("outputs/imputation.tsv") %>% 
   filter(trait %in% c("ah", "dbhmax", "hmax", "TLP")) %>% 
   filter(species %in% unique(troll$species, tapajos$species)) %>% 
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
 labels <- t %>% 
   group_by(trait, type) %>% 
   summarise(N = n()) %>% 
@@ -331,7 +339,7 @@ labels <- t %>%
   ungroup() %>% 
   mutate(value = c(-1.8, 0.25, 0.35, 40),
          density = c(0.5, 10, 1, 0.05)) %>% 
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[max]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
 g <- ggplot(t, aes(value)) +
   geom_density(aes(col = type)) +
   geom_text(data = labels, aes(label = label, y = density)) +
@@ -339,7 +347,7 @@ g <- ggplot(t, aes(value)) +
   facet_wrap(~ trait_long, scales = "free", labeller = label_parsed) +
   scale_color_discrete("") +
   theme(legend.position = "bottom", axis.title = element_blank())
-ggsave("figures/fs01.png", g, dpi = 300, width = 5, height = 5, bg = "white")
+ggsave("figures/fa01.png", g, dpi = 300, width = 5, height = 5, bg = "white")
 g
 ```
 

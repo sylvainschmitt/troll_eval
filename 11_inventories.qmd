@@ -172,11 +172,11 @@ knitr::include_graphics("outputs/chm_fig.png")
 
 ## Structure
 
-Forest structure was simply assessed by DBH (m) classes using basal area (BA, m2/ha) and abundance for each plots (uncertainty bars in Paracou data).
+Forest structure was simply assessed by DBH (m) classes using basal area (BA, m2/ha) and number of stems for each plots (uncertainty bars in Paracou data).
 
 ```{r str}
 #| message: false
-#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
+#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of number of stems and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
 read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>% 
   filter(dbh_class >= 10) %>% 
   group_by(site, type, dbh_class, variable) %>% 
@@ -197,7 +197,7 @@ read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>%
 
 ```{r strunder}
 #| message: false
-#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of abundance and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
+#| fig-cap: "Size structure at the Paracou and Tapajos sites, expressed in terms of number of stems and basal area and including understorey trees at Paracou. Confidence intervals on inventory analysis at 95 % are shown with error bars and are based on among plots variations."
 read_tsv("outputs/structure.tsv", show_col_types = FALSE) %>% 
   filter(dbh_class < 10) %>% 
   group_by(site, type, dbh_class, variable) %>% 
