@@ -467,7 +467,7 @@ read_tsv("outputs/calib_str4.tsv") %>%
     a = paste0(median(a), " [", min(a), "-", max(a), "]"),
     b = paste0(median(b), " [", min(b), "-", max(b), "]"),
     m = paste0(median(m), " [", min(m), "-", max(m), "]")
-  )
+  ) %>% 
   knitr::kable()
 ```
 
@@ -475,22 +475,26 @@ read_tsv("outputs/calib_str4.tsv") %>%
 #| message: false
 #| warning: false
 bind_rows(
-  best_par %>% 
-    select(-sim) %>% 
-    gather(metric, value, -site, -a, -b, -m),
-  best_tap %>% 
-    select(-sim) %>% 
-    gather(metric, value, -site, -a, -b, -m)
+  eval_par %>% 
+  select(-sim) %>% 
+  gather(metric, rmsep, -site, -a, -b, -m) %>% 
+  mutate(metric = gsub("rmsep_", "", metric)),
+  eval_tap %>% 
+  select(-sim) %>% 
+  gather(metric, rmsep, -site, -a, -b, -m) %>% 
+  mutate(metric = gsub("rmsep_", "", metric))
 ) %>% 
   group_by(site, metric) %>% 
-  slice_min(value, n = 5) %>% 
-  mutate(value = round(value, 2)) %>% 
+  slice_min(rmsep, n = 5) %>% 
+  mutate(rmsep = round(rmsep, 2)) %>% 
   summarise(
-    RMSEP = paste0(median(value), " [", min(value), "-", max(value), "]"),
+    RMSEP = paste0(median(rmsep), " [", min(rmsep), "-", max(rmsep), "]"),
     a = paste0(median(a), " [", min(a), "-", max(a), "]"),
     b = paste0(median(b), " [", min(b), "-", max(b), "]"),
     m = paste0(median(m), " [", min(m), "-", max(m), "]")
-  )
+  ) %>% 
+  write_tsv("figures/table_a4.tsv")
+read_tsv("figures/table_a4.tsv") %>% 
   knitr::kable()
 ```
 

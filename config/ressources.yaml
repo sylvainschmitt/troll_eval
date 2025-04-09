@@ -10,6 +10,12 @@ calib_str4:
   mem: "10G"
   cpus: 1
   time: "48:00:00"
+
+eval600:
+  jobname: "eval600"
+  mem: "10G"
+  cpus: 1
+  time: "48:00:00"
   
 # run v4
 calib_pheno:

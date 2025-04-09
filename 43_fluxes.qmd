@@ -10,10 +10,14 @@ Evaluation of the TROLL version 4 simulations of daily fluxes in relation to fie
 
 ```{r fluxes}
 #| eval: false
+path <- "results/eval/"
+rep <- "R1"
+par_prefix <- paste0(path, "Paracou_", rep, "/Paracou_", rep, "_0_")
+tap_prefix <- paste0(path, "Tapajos_", rep, "/Tapajos_", rep, "_0_")
 trollwater <- list(
-  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_water_balance.txt") %>% 
+  Paracou = read_tsv(paste0(par_prefix, "water_balance.txt")) %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_water_balance.txt") %>% 
+  Tapajos = read_tsv(paste0(tap_prefix, "water_balance.txt")) %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(swc0 = SWC_0, swc1 = SWC_1, swc2 = SWC_2,  swc3 = SWC_3,  swc4 = SWC_4,
@@ -27,9 +31,9 @@ trollwater <- list(
   select(-year) %>% 
   gather(variable, simulated, -site, -date)
 trollsum <- list(
-  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_sumstats.txt") %>% 
+  Paracou = read_tsv(paste0(par_prefix, "sumstats.txt")) %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_sumstats.txt") %>% 
+  Tapajos = read_tsv(paste0(tap_prefix, "sumstats.txt")) %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   select(-npp, -rday, -rnight, -rstem) %>% 
@@ -37,26 +41,26 @@ trollsum <- list(
   select(-iter, -litterfall) %>% 
   gather(variable, simulated, -site, -date)
 lai <- list(
-  Paracou = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIdynamics.txt") %>% 
+  Paracou = read_tsv(paste0(par_prefix, "LAIdynamics.txt")) %>% 
      mutate(date = as_date("2004/01/01")+iter),
-  Tapajos = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIdynamics.txt") %>% 
+  Tapajos = read_tsv(paste0(tap_prefix, "LAIdynamics.txt")) %>% 
      mutate(date = as_date("2002/01/01")+iter)
 ) %>% bind_rows(.id = "site") %>% 
   mutate(variable = "lai", simulated = LAI) %>% 
   select(site, date, variable, simulated)
 lai_age <- list(
   Paracou = list(
-    lai_young = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAImature.txt") %>% 
+    lai_young = read_tsv(paste0(par_prefix, "LAIyoung.txt")),
+    lai_mature = read_tsv(paste0(par_prefix, "LAImature.txt")) %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results/eval/Paracou_R1/Paracou_R1_0_LAIold.txt") %>% 
+    lai_old = read_tsv(paste0(par_prefix, "LAIold.txt")) %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable"),
   Tapajos = list(
-    lai_young = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIyoung.txt"),
-    lai_mature = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAImature.txt") %>% 
+    lai_young = read_tsv(paste0(tap_prefix, "LAIyoung.txt")),
+    lai_mature = read_tsv(paste0(tap_prefix, "LAImature.txt")) %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit(),
-    lai_old = read_tsv("results/eval/Tapajos_R1/Tapajos_R1_0_LAIold.txt") %>% 
+    lai_old = read_tsv(paste0(tap_prefix, "LAIold.txt")) %>% 
       mutate(iter = as.numeric(iter)) %>% na.omit()
   ) %>% bind_rows(.id = "variable")
 ) %>% bind_rows(.id = "site") %>% 
@@ -146,7 +150,13 @@ g <- daily %>%
   scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
-                     labels = c("Tower", "Satellite", "TROLL"))
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  geom_text(aes(col = "simulated", label = lab), 
+            data = data.frame(week = 8, 
+                              m = 1,
+                              site = c("Paracou", "Tapajos"),
+                              lab = c("RMSEP=0.75",
+                                      "RMSEP=1.12")))
 ggsave("figures/f10.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
@@ -176,8 +186,9 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 7.5) +
-  ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+  ggpubr::stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),
+                   p.accuracy = 0.001)
+ggsave("figures/f12.png", g, dpi = 300, width = 10, height = 7, bg = "white")
 g
 ```
 
@@ -209,7 +220,8 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
                      labels = c("Tower", "Satellite", "TROLL")) +
   ylim(0, 0.1) +
-  ggpubr::stat_cor(aes(label = ..rr.label..), label.x.npc = "middle")
+  ggpubr::stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),
+                   p.accuracy = 0.001)
 ggsave("figures/fa12.png", g, dpi = 300, width = 10, height = 6, bg = "white")
 g
 ```
@@ -325,7 +337,13 @@ g <- daily %>%
     scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
                      labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
   ylab(expression("Leaf Area Index ["~m^2~m^{-~2}~"]")) + xlab("") +
-  guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2))
+  guides(col = guide_legend(nrow = 2), fill = guide_legend(nrow = 2)) +
+  geom_text(aes(col = "TROLL", label = lab), 
+            data = data.frame(week = 8, 
+                              m = 5.2,
+                              site = c("Paracou", "Tapajos"),
+                              lab = c("RMSEP=0.11",
+                                      "RMSEP=0.11")))
 ggsave("figures/f08.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
@@ -413,16 +431,6 @@ g <- daily %>%
               mutate(week = week(date)) %>% 
               select(site, week, type, young, mature, old) %>% 
               gather(age, m, -site, -week, -type)) %>% 
-  # bind_rows(readxl::read_xlsx("data/fluxes/Data_LAI_new.xlsx", 3) %>% 
-  #             mutate(site = recode(Site, "K67" = "Tapajos")) %>% 
-  #             rename(young = `LAIyoung (m^2 m^-2)`,
-  #                    mature = `LAImature (m^2 m^-2)`,
-  #                    old = `LAIold (m^2 m^-2)`) %>% 
-  #             mutate(type = "Chen et al. (in prep)") %>% 
-  #             mutate(date = as_date(paste0("2010-", month, "-15"))) %>% 
-  #             mutate(week = week(date)) %>% 
-  #             select(site, week, type, young, mature, old) %>% 
-  #             gather(age, m, -site, -week, -type)) %>% 
   mutate(type = factor(type, levels = c("TROLL", "Wu et al. (2016)\nPhenoCam",
                                         "Yang et al. (2023)\nReanalysis"))) %>% 
   ggplot(aes(week, m)) +
@@ -637,7 +645,13 @@ g <- daily %>%
     scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL")) +
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
-                     labels = c("Tower", "TROLL"))
+                     labels = c("Tower", "TROLL")) +
+  geom_text(aes(col = "simulated", label = lab), 
+            data = data.frame(week = 8, 
+                              m = 1,
+                              site = c("Paracou", "Tapajos"),
+                              lab = c("RMSEP=0.60",
+                                      "RMSEP=0.75")))
 ggsave("figures/f11.png", g, dpi = 300, width = 8, height = 5, bg = "white")
 g
 ```
@@ -667,8 +681,9 @@ g <- daily %>%
   scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
                      labels = c("Tower", "TROLL")) +
   ylim(0, 5.5) +
-  ggpubr::stat_cor(aes(label = ..rr.label..))
-ggsave("figures/f13.png", g, dpi = 300, width = 10, height = 6, bg = "white")
+  ggpubr::stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),
+                   p.accuracy = 0.001)
+ggsave("figures/f13.png", g, dpi = 300, width = 10, height = 7, bg = "white")
 g
 ```
 

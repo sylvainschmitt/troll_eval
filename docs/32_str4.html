@@ -1000,33 +1000,62 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gather</span>(metric, value, <span class="sc">-</span>site, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gather</span>(metric, value, <span class="sc">-</span>site, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, metric) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(value, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">round</span>(value, <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">RMSEP =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(value), <span class="st">" ["</span>, <span class="fu">min</span>(value), <span class="st">"-"</span>, <span class="fu">max</span>(value), <span class="st">"]"</span>),</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">a =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(a), <span class="st">" ["</span>, <span class="fu">min</span>(a), <span class="st">"-"</span>, <span class="fu">max</span>(a), <span class="st">"]"</span>),</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">b =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(b), <span class="st">" ["</span>, <span class="fu">min</span>(b), <span class="st">"-"</span>, <span class="fu">max</span>(b), <span class="st">"]"</span>),</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">m =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(m), <span class="st">" ["</span>, <span class="fu">min</span>(m), <span class="st">"-"</span>, <span class="fu">max</span>(m), <span class="st">"]"</span>)</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dbh_class =</span> <span class="fu">list</span>(<span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">150</span>, <span class="at">by =</span> <span class="dv">5</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(dbh_class) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>agb, <span class="sc">-</span>ba) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(abundance), <span class="dv">0</span>, abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">simulated =</span> abundance) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(obs, <span class="at">observed =</span> abundance)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(observed), <span class="dv">0</span>, observed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">normal =</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((observed <span class="sc">-</span> simulated)<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">lognormal =</span> <span class="fu">exp</span>(<span class="fu">sqrt</span>(<span class="fu">mean</span>((<span class="fu">log</span>(observed<span class="sc">+</span><span class="dv">1</span>) <span class="sc">-</span> <span class="fu">log</span>(simulated<span class="sc">+</span><span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span>)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(metric, rmsep, <span class="sc">-</span>site, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, metric) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rmsep, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rmsep =</span> <span class="fu">round</span>(rmsep, <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">RMSEP =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(rmsep), <span class="st">" ["</span>, <span class="fu">min</span>(rmsep), <span class="st">"-"</span>, <span class="fu">max</span>(rmsep), <span class="st">"]"</span>),</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">a =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(a), <span class="st">" ["</span>, <span class="fu">min</span>(a), <span class="st">"-"</span>, <span class="fu">max</span>(a), <span class="st">"]"</span>),</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">b =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(b), <span class="st">" ["</span>, <span class="fu">min</span>(b), <span class="st">"-"</span>, <span class="fu">max</span>(b), <span class="st">"]"</span>),</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">m =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(m), <span class="st">" ["</span>, <span class="fu">min</span>(m), <span class="st">"-"</span>, <span class="fu">max</span>(m), <span class="st">"]"</span>)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 15261 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (1): site
+dbl (7): a, b, m, dbh_class, abundance, agb, ba
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 15261 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (1): site
+dbl (7): a, b, m, dbh_class, abundance, agb, ba
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining with `by = join_by(site, a, b, m, dbh_class)`
+Joining with `by = join_by(site, dbh_class)`
+`summarise()` has grouped output by 'site', 'a', 'b'. You can override using the `.groups` argument.
+`summarise()` has grouped output by 'site'. You can override using the `.groups` argument.</code></pre>
+</div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
-<col style="width: 7%">
-<col style="width: 14%">
+<col style="width: 8%">
+<col style="width: 10%">
 <col style="width: 17%">
-<col style="width: 15%">
-<col style="width: 21%">
+<col style="width: 16%">
+<col style="width: 23%">
 <col style="width: 22%">
 </colgroup>
 <thead>
@@ -1042,67 +1071,35 @@ div.csl-indent {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">all_rmsep_norm</td>
-<td style="text-align: left;">0.16 [0.13-0.17]</td>
-<td style="text-align: left;">1.8 [1.8-1.9]</td>
-<td style="text-align: left;">0.386 [0.386-0.443]</td>
-<td style="text-align: left;">0.0325 [0.0325-0.0375]</td>
+<td style="text-align: left;">lognormal</td>
+<td style="text-align: left;">1.12 [1.11-1.14]</td>
+<td style="text-align: left;">1.8 [1.65-2]</td>
+<td style="text-align: left;">0.386 [0.3005-0.55]</td>
+<td style="text-align: left;">0.0325 [0.0325-0.035]</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">rmsep_abund</td>
-<td style="text-align: left;">15.25 [5.75-24.5]</td>
-<td style="text-align: left;">1.8 [1.8-1.9]</td>
-<td style="text-align: left;">0.386 [0.386-0.443]</td>
-<td style="text-align: left;">0.0325 [0.0325-0.0375]</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">rmsep_ba</td>
-<td style="text-align: left;">1.12 [0.29-1.34]</td>
-<td style="text-align: left;">1.8 [1.8-1.9]</td>
-<td style="text-align: left;">0.386 [0.386-0.443]</td>
-<td style="text-align: left;">0.0325 [0.0325-0.0375]</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Paracou</td>
-<td style="text-align: left;">rmsep_dist</td>
-<td style="text-align: left;">2.96 [2.55-3.65]</td>
-<td style="text-align: left;">1.8 [1.8-1.9]</td>
-<td style="text-align: left;">0.386 [0.386-0.443]</td>
-<td style="text-align: left;">0.0325 [0.0325-0.0375]</td>
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">2.4 [1.38-2.7]</td>
+<td style="text-align: left;">1.85 [1.8-1.9]</td>
+<td style="text-align: left;">0.4145 [0.386-0.443]</td>
+<td style="text-align: left;">0.0425 [0.0325-0.05]</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">all_rmsep_norm</td>
-<td style="text-align: left;">0.25 [0.18-0.25]</td>
-<td style="text-align: left;">2.45 [2.35-2.5]</td>
-<td style="text-align: left;">0.7565 [0.6995-0.785]</td>
-<td style="text-align: left;">0.04 [0.03-0.05]</td>
+<td style="text-align: left;">lognormal</td>
+<td style="text-align: left;">1.22 [1.19-1.22]</td>
+<td style="text-align: left;">2.55 [2.5-2.7]</td>
+<td style="text-align: left;">0.9135 [0.8635-0.9635]</td>
+<td style="text-align: left;">0.0325 [0.03-0.045]</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">rmsep_abund</td>
-<td style="text-align: left;">7.25 [0.75-14]</td>
-<td style="text-align: left;">2.45 [2.35-2.5]</td>
-<td style="text-align: left;">0.7565 [0.6995-0.785]</td>
-<td style="text-align: left;">0.04 [0.03-0.05]</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">rmsep_agb</td>
-<td style="text-align: left;">2.76 [1.18-4.96]</td>
-<td style="text-align: left;">2.45 [2.35-2.5]</td>
-<td style="text-align: left;">0.7565 [0.6995-0.785]</td>
-<td style="text-align: left;">0.04 [0.03-0.05]</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tapajos</td>
-<td style="text-align: left;">rmsep_dist</td>
-<td style="text-align: left;">3.17 [2.74-3.6]</td>
-<td style="text-align: left;">2.45 [2.35-2.5]</td>
-<td style="text-align: left;">0.7565 [0.6995-0.785]</td>
-<td style="text-align: left;">0.04 [0.03-0.05]</td>
+<td style="text-align: left;">normal</td>
+<td style="text-align: left;">2.54 [2.38-2.74]</td>
+<td style="text-align: left;">2.35 [2.3-2.35]</td>
+<td style="text-align: left;">0.6995 [0.671-0.6995]</td>
+<td style="text-align: left;">0.045 [0.0375-0.05]</td>
 </tr>
 </tbody>
 </table>
@@ -1111,13 +1108,128 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">berr =</span> b <span class="sc">+</span> <span class="fl">0.39</span> <span class="sc">-</span> <span class="fl">0.57</span><span class="sc">*</span>a) <span class="sc">%&gt;%</span> </span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  eval_par <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(metric, rmsep, <span class="sc">-</span>site, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="fu">gsub</span>(<span class="st">"rmsep_"</span>, <span class="st">""</span>, metric)),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  eval_tap <span class="sc">%&gt;%</span> </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sim) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(metric, rmsep, <span class="sc">-</span>site, <span class="sc">-</span>a, <span class="sc">-</span>b, <span class="sc">-</span>m) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="fu">gsub</span>(<span class="st">"rmsep_"</span>, <span class="st">""</span>, metric))</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, metric) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rmsep, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rmsep =</span> <span class="fu">round</span>(rmsep, <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">RMSEP =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(rmsep), <span class="st">" ["</span>, <span class="fu">min</span>(rmsep), <span class="st">"-"</span>, <span class="fu">max</span>(rmsep), <span class="st">"]"</span>),</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">a =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(a), <span class="st">" ["</span>, <span class="fu">min</span>(a), <span class="st">"-"</span>, <span class="fu">max</span>(a), <span class="st">"]"</span>),</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">b =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(b), <span class="st">" ["</span>, <span class="fu">min</span>(b), <span class="st">"-"</span>, <span class="fu">max</span>(b), <span class="st">"]"</span>),</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">m =</span> <span class="fu">paste0</span>(<span class="fu">median</span>(m), <span class="st">" ["</span>, <span class="fu">min</span>(m), <span class="st">"-"</span>, <span class="fu">max</span>(m), <span class="st">"]"</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_tsv</span>(<span class="st">"figures/table_a4.tsv"</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="fu">read_tsv</span>(<span class="st">"figures/table_a4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 17%">
+<col style="width: 16%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">site</th>
+<th style="text-align: left;">metric</th>
+<th style="text-align: left;">RMSEP</th>
+<th style="text-align: left;">a</th>
+<th style="text-align: left;">b</th>
+<th style="text-align: left;">m</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">abund</td>
+<td style="text-align: left;">5.75 [2-7.75]</td>
+<td style="text-align: left;">1.75 [1.75-1.8]</td>
+<td style="text-align: left;">0.3575 [0.3575-0.386]</td>
+<td style="text-align: left;">0.0475 [0.0375-0.05]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">all_norm</td>
+<td style="text-align: left;">0.16 [0.13-0.17]</td>
+<td style="text-align: left;">1.8 [1.8-1.9]</td>
+<td style="text-align: left;">0.386 [0.386-0.443]</td>
+<td style="text-align: left;">0.0325 [0.0325-0.0375]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">ba</td>
+<td style="text-align: left;">0.04 [0.03-0.07]</td>
+<td style="text-align: left;">1.85 [1.65-2]</td>
+<td style="text-align: left;">0.4715 [0.3505-0.5075]</td>
+<td style="text-align: left;">0.0325 [0.03-0.05]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Paracou</td>
+<td style="text-align: left;">dist</td>
+<td style="text-align: left;">2.4 [1.38-2.7]</td>
+<td style="text-align: left;">1.85 [1.8-1.9]</td>
+<td style="text-align: left;">0.4145 [0.386-0.443]</td>
+<td style="text-align: left;">0.0425 [0.0325-0.05]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">abund</td>
+<td style="text-align: left;">3 [0-3.5]</td>
+<td style="text-align: left;">2.5 [2.4-2.65]</td>
+<td style="text-align: left;">0.785 [0.728-0.9205]</td>
+<td style="text-align: left;">0.035 [0.03-0.04]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">agb</td>
+<td style="text-align: left;">0.13 [0.04-0.19]</td>
+<td style="text-align: left;">2.45 [2.35-2.5]</td>
+<td style="text-align: left;">0.835 [0.6495-0.885]</td>
+<td style="text-align: left;">0.045 [0.03-0.05]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">all_norm</td>
+<td style="text-align: left;">0.25 [0.18-0.25]</td>
+<td style="text-align: left;">2.45 [2.35-2.5]</td>
+<td style="text-align: left;">0.7565 [0.6995-0.785]</td>
+<td style="text-align: left;">0.04 [0.03-0.05]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tapajos</td>
+<td style="text-align: left;">dist</td>
+<td style="text-align: left;">2.54 [2.38-2.74]</td>
+<td style="text-align: left;">2.35 [2.3-2.35]</td>
+<td style="text-align: left;">0.6995 [0.671-0.6995]</td>
+<td style="text-align: left;">0.045 [0.0375-0.05]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">berr =</span> b <span class="sc">+</span> <span class="fl">0.39</span> <span class="sc">-</span> <span class="fl">0.57</span><span class="sc">*</span>a) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -1152,14 +1264,14 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(best_par, best_tap) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, all_rmsep_norm, a, b, m) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(parameter, value, <span class="sc">-</span>site, <span class="sc">-</span>all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, parameter) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">median =</span> <span class="fu">median</span>(value), </span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">best =</span> <span class="fu">first</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(best_par, best_tap) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, all_rmsep_norm, a, b, m) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(parameter, value, <span class="sc">-</span>site, <span class="sc">-</span>all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, parameter) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(all_rmsep_norm) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">minimum =</span> <span class="fu">min</span>(value), <span class="at">median =</span> <span class="fu">median</span>(value), </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">best =</span> <span class="fu">first</span>(value), <span class="at">maximum =</span> <span class="fu">max</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
@@ -1229,35 +1341,35 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>      best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>      best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim, <span class="at">col =</span> <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>)) <span class="sc">+</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Number<span class="sc">~</span>of<span class="sc">~</span>stems<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site) <span class="sc">+</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#3f3f3f"</span>, <span class="st">"#0da1f8"</span>)) <span class="sc">+</span></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>, <span class="at">label =</span> lab), </span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">200</span>,</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"470 trees/ha &amp; 287 Mg/ha"</span>,</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"612 trees/ha &amp; 419 Mg/ha"</span>),</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>))) <span class="sc">+</span></span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"TROLL"</span>, <span class="at">label =</span> lab), </span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">180</span>,</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"471 trees/ha &amp; 290 Mg/ha"</span>,</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"622 trees/ha &amp; 413 Mg/ha"</span>),</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>)))</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f01.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/calib_str4.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sim =</span> <span class="fu">paste0</span>(site, <span class="st">"_"</span>, a, <span class="st">"_"</span>, b, <span class="st">"_"</span>, m)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>      best_tap <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>      best_par <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(all_rmsep_norm)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(all_rmsep_norm)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(dbh_class, abundance)) <span class="sc">+</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> sim, <span class="at">col =</span> <span class="st">"TROLL"</span>)) <span class="sc">+</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> obs, <span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>)) <span class="sc">+</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"DBH [ cm ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="fu">expression</span>(Number<span class="sc">~</span>of<span class="sc">~</span>stems<span class="sc">~</span><span class="st">"["</span><span class="sc">~</span>ha<span class="sc">^</span>{<span class="sc">-</span><span class="er">~</span><span class="dv">1</span>}<span class="sc">~</span><span class="st">"]"</span>)) <span class="sc">+</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> site) <span class="sc">+</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">""</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#3f3f3f"</span>, <span class="st">"#0da1f8"</span>)) <span class="sc">+</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"field"</span>, <span class="at">label =</span> lab), </span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">200</span>,</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"470 trees/ha &amp; 287 Mg/ha"</span>,</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"612 trees/ha &amp; 419 Mg/ha"</span>),</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>))) <span class="sc">+</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">col =</span> <span class="st">"TROLL"</span>, <span class="at">label =</span> lab), </span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">dbh_class =</span> <span class="dv">80</span>, <span class="at">abundance =</span> <span class="dv">180</span>,</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>                              <span class="at">lab =</span> <span class="fu">c</span>(<span class="st">"471 trees/ha &amp; 290 Mg/ha"</span>,</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"622 trees/ha &amp; 413 Mg/ha"</span>),</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>                              <span class="at">site =</span> <span class="fu">c</span>(<span class="st">"Tapajos"</span>, <span class="st">"Paracou"</span>)))</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/f01.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">8</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="32_str4_files/figure-html/bestfig2-1.png" class="img-fluid" width="672"></p>
@@ -1269,28 +1381,28 @@ div.csl-indent {
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spinup <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Paracou =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"1404/01/01"</span>)<span class="sc">+</span>iter),</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Tapajos =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"1402/01/01"</span>)<span class="sc">+</span>iter)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"site"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, <span class="at">year =</span> <span class="fu">year</span>(date)) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">mean</span>(sum10), <span class="at">agb =</span> <span class="fu">mean</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>year, <span class="sc">-</span>site)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> spinup <span class="sc">%&gt;%</span> </span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">var_long =</span> <span class="fu">recode</span>(variable, </span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"agb"</span> <span class="ot">=</span> <span class="st">'AGB~"["~Mg~ha^{-~1}~"]"'</span>,</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"abundance"</span> <span class="ot">=</span> <span class="st">'Number~of~stems~"["~ha^{-~1}~"]"'</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, value, <span class="at">col =</span> site)) <span class="sc">+</span> </span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">facet_wrap</span>(<span class="sc">~</span> var_long, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">labeller =</span> label_parsed) <span class="sc">+</span> </span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">scale_colour_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>), <span class="at">legend.background =</span> <span class="fu">element_blank</span>())</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fa03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>spinup <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Paracou =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Paracou_1.8_-0.25_0.035/Paracou_1.8_-0.25_0.035_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"0000/01/01"</span>)<span class="sc">+</span>iter),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Tapajos =</span> <span class="fu">read_tsv</span>(<span class="st">"results/calib_str4_run/Tapajos_2.45_-0.25_0.04/Tapajos_2.45_-0.25_0.04_0_sumstats.txt"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="st">"0000/01/01"</span>)<span class="sc">+</span>iter)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"site"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, <span class="at">year =</span> <span class="fu">year</span>(date)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">abundance =</span> <span class="fu">mean</span>(sum10), <span class="at">agb =</span> <span class="fu">mean</span>(agb)<span class="sc">/</span><span class="dv">10</span><span class="sc">^</span><span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(variable, value, <span class="sc">-</span>year, <span class="sc">-</span>site)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> spinup <span class="sc">%&gt;%</span> </span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">var_long =</span> <span class="fu">recode</span>(variable, </span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"agb"</span> <span class="ot">=</span> <span class="st">'AGB~"["~Mg~ha^{-~1}~"]"'</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"abundance"</span> <span class="ot">=</span> <span class="st">'Number~of~stems~"["~ha^{-~1}~"]"'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, value, <span class="at">col =</span> site)) <span class="sc">+</span> </span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>   <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>   <span class="fu">facet_wrap</span>(<span class="sc">~</span> var_long, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">labeller =</span> label_parsed) <span class="sc">+</span> </span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"[ Years ]"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span> <span class="fu">scale_colour_discrete</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>), <span class="at">legend.background =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"figures/fa03.png"</span>, g, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">5</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">

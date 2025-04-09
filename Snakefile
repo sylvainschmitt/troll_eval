@@ -12,6 +12,8 @@ if(config["output"] == "calibration phenology"):
   out = expand("results/calib_pheno_{site}.txt", site=config["sites"])
 if(config["output"] == "evaluation"):
   out = expand("results/eval/{site}_R{reps}", site=config["sites"], reps=reps)
+if(config["output"] == "evaluation spinup"):
+  out = expand("results/eval600/{site}_R{reps}", site=config["sites"], reps=reps)
 
 rule all:
    input:
@@ -34,3 +36,4 @@ include: "rules/extract_pheno.py"
 
 # eval #
 include: "rules/eval.py"
+include: "rules/eval600.py"

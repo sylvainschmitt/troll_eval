@@ -32,7 +32,7 @@ ga <- daily %>%
   theme(legend.position = "None") +
   xlab("") +
   scale_y_continuous(
-    name = expression(atop("Growth Primary Productivity", 
+    name = expression(atop("Gross Primary Productivity", 
                            "["~kgC~m^{-~2}~yr^{-~1}~"]")),
     sec.axis = sec_axis(trans = ~.*1,
                         name = expression(atop("Evapotranspiration", 
@@ -211,7 +211,7 @@ troll_traitdist <- read_tsv("outputs/evaluation_forest.tsv") %>%
                             "LMA" = 'LMA~"["~g~m^{-~2}~"]"',
                             "Nmass" = 'N[mass]~"["~mg~g^{-~1}~"]"',
                             "Pmass" = 'P[mass]~"["~mg~g^{-~1}~"]"',
-                            "tlp" = 'Psi[TLP]~"["~MPa~"]"',
+                            "tlp" = 'pi[~" TLP"]~"["~MPa~"]"',
                             "wsg" = 'WSG~"["~g~cm^{-~3}~"]"'))
 gd <- troll_traitdist %>% 
   ggplot(aes(site, trait_value, fill = site)) +

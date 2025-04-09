@@ -1,4 +1,4 @@
-```{r setup}
+```{r set}
 #| include: false 
 rm(list = ls())
 library(tidyverse) 
@@ -144,7 +144,6 @@ TROLL version 4 species data were gathered from:
 -   TROLL version 3 species (partly from @baraloto2010, described in @maréchaux2017, and available in \@schmitt2023 and )
 -   @maréchaux2015
 -   @maréchaux2019
--   @nemetschek2024
 -   @schmitt2023a
 -   Boisseaux *et al.* submitted
 -   @ziegler2019
@@ -195,12 +194,16 @@ guillemot <- readxl::read_xlsx("data/species/guillemot.xlsx", "Dataset") %>%
   mutate(dataset = "Guillemot 2022") %>% 
   gather(trait, value, -dataset, -family, -genus, -species)
 # TROLL V4
+troll_tlp <- read_tsv("~/Téléchargements/meanTLP_withoutManagFoRes.txt", 
+         skip = 1, col_names = c("species", "TLP")) %>% 
+  mutate(species = gsub("_", " ", species))
 troll <- rcontroll::TROLLv4_species %>% 
   rename_all(~ gsub("s_", "", .)) %>% 
   rename(species = name, N =Nmass, P = Pmass,
          WSG = wsg, TLP = tlp, LA = leafarea) %>% 
    mutate(species = gsub("_", " ", species)) %>% 
-  select(-seedmass, -regionalfreq) %>% 
+  select(-seedmass, -regionalfreq, -TLP) %>% 
+  left_join(troll_tlp) %>% 
   left_join(select(vleminckx, family, genus, species) %>% unique()) %>% 
   mutate(dataset = "TROLL V4") %>% 
   gather(trait, value, -dataset, -family, -genus, -species)
@@ -330,7 +333,7 @@ complete(imputation) %>%
 t <- vroom::vroom("outputs/imputation.tsv") %>% 
   filter(trait %in% c("ah", "dbhmax", "hmax", "TLP")) %>% 
   filter(species %in% unique(troll$species, tapajos$species)) %>% 
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "pi[~~tlp]"))
 labels <- t %>% 
   group_by(trait, type) %>% 
   summarise(N = n()) %>% 
@@ -339,7 +342,7 @@ labels <- t %>%
   ungroup() %>% 
   mutate(value = c(-1.8, 0.25, 0.35, 40),
          density = c(0.5, 10, 1, 0.05)) %>% 
-  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "psi[~tlp]"))
+  mutate(trait_long = recode(trait, "ah" = "a[h]", "dbhmax" = "dbh[thres]", "hmax" = "h[lim]", "TLP" = "pi[~~tlp]"))
 g <- ggplot(t, aes(value)) +
   geom_density(aes(col = type)) +
   geom_text(data = labels, aes(label = label, y = density)) +
@@ -478,4 +481,66 @@ read_tsv("outputs/functional_composition.tsv") %>%
   ggtitle("Tapajos Genus level", "19,188 inds represented on 19,499 (98.65%)") +
   theme(axis.title = element_blank(), legend.position = "bottom") +
   scale_color_discrete("")
+```
+
+```{r}
+#| eval: false
+library(tidyverse)
+library(rcontroll)
+library(vroom)
+climate <- vroom("results/data/Paracou_climate.tsv") %>% 
+  arrange(time) %>% 
+  filter(paste0(month(time), "-", day(time)) != "2-29") %>% 
+  mutate(snet = ifelse(snet <= 1.1, 1.1, snet)) %>% 
+  mutate(vpd = ifelse(vpd <= 0.011, 0.011, vpd)) %>% 
+  mutate(ws = ifelse(ws <= 0.11, 0.11, ws))
+clim <- generate_climate(climate, 
+                         daytime_start = 7, 
+                         daytime_end = 19)
+day <- generate_dailyvar(climate, 
+                         daytime_start = 7, 
+                         daytime_end = 19)
+spinup <-  load_output(name = "Paracou_1.8_-0.25_0.035",
+                       path = "results/calib_str4_run/Paracou_1.8_-0.25_0.035/")
+n <- as.numeric(nrow(clim))
+parameters <- spinup@inputs$global %>% 
+  mutate(value = ifelse(param == "nbiter", n, value))
+sim <- troll(
+  name = "old",
+  path = "test_species",
+  global = parameters,
+  species = spinup@inputs$species, 
+  climate = clim,
+  daily = day,
+  pedology = spinup@inputs$pedology, 
+  forest = get_forest(spinup),
+  soil = get_soil(spinup), 
+  load = FALSE,
+  verbose = TRUE,
+  overwrite = TRUE
+)
+
+species_new <- read_tsv("outputs/Paracou_species_troll.tsv")
+sim <- troll(
+  name = "new",
+  path = "test_species",
+  global = parameters,
+  species = species_new, 
+  climate = clim,
+  daily = day,
+  pedology = spinup@inputs$pedology, 
+  forest = get_forest(spinup),
+  soil = get_soil(spinup), 
+  load = FALSE,
+  verbose = TRUE,
+  overwrite = TRUE
+)
+```
+
+```{r}
+#| eval: false
+library(tidyverse)
+stack <- rcontroll::load_stack("test_species", "test_species")
+g <- rcontroll::autoplot(stack)
+ggsave(plot = g, filename = "test_species.png", height = 30)
 ```

@@ -545,7 +545,6 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <li>TROLL version 3 species (partly from <span class="citation" data-cites="baraloto2010">Baraloto et al. (<a href="99_references.html#ref-baraloto2010" role="doc-biblioref">2010</a>)</span>, described in <span class="citation" data-cites="maréchaux2017">Maréchaux and Chave (<a href="99_references.html#ref-maréchaux2017" role="doc-biblioref">2017</a>)</span>, and available in @schmitt2023 and )</li>
 <li><span class="citation" data-cites="maréchaux2015">Maréchaux et al. (<a href="99_references.html#ref-maréchaux2015" role="doc-biblioref">2015</a>)</span></li>
 <li><span class="citation" data-cites="maréchaux2019">Maréchaux et al. (<a href="99_references.html#ref-maréchaux2019" role="doc-biblioref">2019</a>)</span></li>
-<li><span class="citation" data-cites="nemetschek2024">Nemetschek et al. (<a href="99_references.html#ref-nemetschek2024" role="doc-biblioref">2024</a>)</span></li>
 <li><span class="citation" data-cites="schmitt2023a">Schmitt and Boisseaux (<a href="99_references.html#ref-schmitt2023a" role="doc-biblioref">2023</a>)</span></li>
 <li>Boisseaux <em>et al.</em> submitted</li>
 <li><span class="citation" data-cites="ziegler2019">Ziegler et al. (<a href="99_references.html#ref-ziegler2019" role="doc-biblioref">2019</a>)</span></li>
@@ -595,42 +594,46 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Guillemot 2022"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
 <span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co"># TROLL V4</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>troll <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span>TROLLv4_species <span class="sc">%&gt;%</span> </span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name, <span class="at">N =</span>Nmass, <span class="at">P =</span> Pmass,</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">WSG =</span> wsg, <span class="at">TLP =</span> tlp, <span class="at">LA =</span> leafarea) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(vleminckx, family, genus, species) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"TROLL V4"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Tapajos</span></span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(<span class="st">"data/species/tapajos_try.csv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(species, <span class="fu">c</span>(<span class="st">"genus"</span>, <span class="st">"Species"</span>), <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">family =</span> BIOMASS<span class="sc">::</span><span class="fu">getTaxonomy</span>(genus, <span class="at">findOrder =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>family)  <span class="sc">%&gt;%</span> </span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(family)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LMA =</span> <span class="dv">1</span><span class="sc">/</span>SLA<span class="sc">*</span><span class="dv">1000</span>, <span class="at">N =</span> <span class="st">`</span><span class="at">N_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">WSG =</span> wood_density,</span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">P =</span> <span class="st">`</span><span class="at">P_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">dbhmax =</span> dbh_max<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(family, genus, species, LMA, N, P, WSG, dbhmax) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Tapajos TRY"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="co"># All</span></span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(marechaux, </span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>                 tallo,</span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>                 vleminckx, </span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>                 guillemot, </span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>                 troll,</span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>                 tapajos) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()  </span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> raw <span class="sc">%&gt;%</span> </span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> vleminckx<span class="sc">$</span>species) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, dataset, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> trait, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>troll_tlp <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"~/Téléchargements/meanTLP_withoutManagFoRes.txt"</span>, </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>         <span class="at">skip =</span> <span class="dv">1</span>, <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">"species"</span>, <span class="st">"TLP"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species))</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>troll <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span>TROLLv4_species <span class="sc">%&gt;%</span> </span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name, <span class="at">N =</span>Nmass, <span class="at">P =</span> Pmass,</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">WSG =</span> wsg, <span class="at">TLP =</span> tlp, <span class="at">LA =</span> leafarea) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq, <span class="sc">-</span>TLP) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(troll_tlp) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(vleminckx, family, genus, species) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"TROLL V4"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Tapajos</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(<span class="st">"data/species/tapajos_try.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(species, <span class="fu">c</span>(<span class="st">"genus"</span>, <span class="st">"Species"</span>), <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">family =</span> BIOMASS<span class="sc">::</span><span class="fu">getTaxonomy</span>(genus, <span class="at">findOrder =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>family)  <span class="sc">%&gt;%</span> </span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(family)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LMA =</span> <span class="dv">1</span><span class="sc">/</span>SLA<span class="sc">*</span><span class="dv">1000</span>, <span class="at">N =</span> <span class="st">`</span><span class="at">N_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">WSG =</span> wood_density,</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>         <span class="at">P =</span> <span class="st">`</span><span class="at">P_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">dbhmax =</span> dbh_max<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(family, genus, species, LMA, N, P, WSG, dbhmax) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Tapajos TRY"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="co"># All</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(marechaux, </span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>                 tallo,</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>                 vleminckx, </span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>                 guillemot, </span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>                 troll,</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>                 tapajos) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()  </span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> raw <span class="sc">%&gt;%</span> </span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> vleminckx<span class="sc">$</span>species) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, dataset, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> trait, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -708,7 +711,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 </tr>
 <tr class="even">
 <td style="text-align: left;">TLP</td>
-<td style="text-align: right;">125</td>
+<td style="text-align: right;">95</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Toughness</td>
@@ -847,7 +850,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>filtered <span class="sc">%&gt;%</span> </span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(hmax, ah, dbhmax, LA, LMA, N, P, TLP, WSG) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">hlim =</span> hmax) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">hlim =</span> hmax, <span class="at">dbhtres =</span> dbhmax) <span class="sc">%&gt;%</span> </span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">type =</span> <span class="st">"upper"</span>, <span class="at">diag =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -896,7 +899,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(<span class="st">"outputs/imputation.tsv"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trait <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ah"</span>, <span class="st">"dbhmax"</span>, <span class="st">"hmax"</span>, <span class="st">"TLP"</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> <span class="fu">unique</span>(troll<span class="sc">$</span>species, tapajos<span class="sc">$</span>species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>, <span class="st">"TLP"</span> <span class="ot">=</span> <span class="st">"psi[~tlp]"</span>))</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[thres]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>, <span class="st">"TLP"</span> <span class="ot">=</span> <span class="st">"pi[~~tlp]"</span>))</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> t <span class="sc">%&gt;%</span> </span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(trait, type) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
@@ -905,7 +908,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.8</span>, <span class="fl">0.25</span>, <span class="fl">0.35</span>, <span class="dv">40</span>),</span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">density =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">10</span>, <span class="dv">1</span>, <span class="fl">0.05</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[max]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>, <span class="st">"TLP"</span> <span class="ot">=</span> <span class="st">"psi[~tlp]"</span>))</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trait_long =</span> <span class="fu">recode</span>(trait, <span class="st">"ah"</span> <span class="ot">=</span> <span class="st">"a[h]"</span>, <span class="st">"dbhmax"</span> <span class="ot">=</span> <span class="st">"dbh[thres]"</span>, <span class="st">"hmax"</span> <span class="ot">=</span> <span class="st">"h[lim]"</span>, <span class="st">"TLP"</span> <span class="ot">=</span> <span class="st">"pi[~~tlp]"</span>))</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(t, <span class="fu">aes</span>(value)) <span class="sc">+</span></span>
 <span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="fu">aes</span>(<span class="at">col =</span> type)) <span class="sc">+</span></span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> labels, <span class="fu">aes</span>(<span class="at">label =</span> label, <span class="at">y =</span> density)) <span class="sc">+</span></span>
@@ -1089,6 +1092,70 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 </div>
 </div>
 </div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rcontroll)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vroom)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>climate <span class="ot">&lt;-</span> <span class="fu">vroom</span>(<span class="st">"results/data/Paracou_climate.tsv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">paste0</span>(<span class="fu">month</span>(time), <span class="st">"-"</span>, <span class="fu">day</span>(time)) <span class="sc">!=</span> <span class="st">"2-29"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">snet =</span> <span class="fu">ifelse</span>(snet <span class="sc">&lt;=</span> <span class="fl">1.1</span>, <span class="fl">1.1</span>, snet)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">vpd =</span> <span class="fu">ifelse</span>(vpd <span class="sc">&lt;=</span> <span class="fl">0.011</span>, <span class="fl">0.011</span>, vpd)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ws =</span> <span class="fu">ifelse</span>(ws <span class="sc">&lt;=</span> <span class="fl">0.11</span>, <span class="fl">0.11</span>, ws))</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>clim <span class="ot">&lt;-</span> <span class="fu">generate_climate</span>(climate, </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                         <span class="at">daytime_start =</span> <span class="dv">7</span>, </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">daytime_end =</span> <span class="dv">19</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>day <span class="ot">&lt;-</span> <span class="fu">generate_dailyvar</span>(climate, </span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">daytime_start =</span> <span class="dv">7</span>, </span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                         <span class="at">daytime_end =</span> <span class="dv">19</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>spinup <span class="ot">&lt;-</span>  <span class="fu">load_output</span>(<span class="at">name =</span> <span class="st">"Paracou_1.8_-0.25_0.035"</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">path =</span> <span class="st">"results/calib_str4_run/Paracou_1.8_-0.25_0.035/"</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">nrow</span>(clim))</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>parameters <span class="ot">&lt;-</span> spinup<span class="sc">@</span>inputs<span class="sc">$</span>global <span class="sc">%&gt;%</span> </span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">ifelse</span>(param <span class="sc">==</span> <span class="st">"nbiter"</span>, n, value))</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">troll</span>(</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"old"</span>,</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"test_species"</span>,</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">global =</span> parameters,</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">species =</span> spinup<span class="sc">@</span>inputs<span class="sc">$</span>species, </span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">climate =</span> clim,</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">daily =</span> day,</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">pedology =</span> spinup<span class="sc">@</span>inputs<span class="sc">$</span>pedology, </span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">forest =</span> <span class="fu">get_forest</span>(spinup),</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">soil =</span> <span class="fu">get_soil</span>(spinup), </span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">load =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">overwrite =</span> <span class="cn">TRUE</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>species_new <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"outputs/Paracou_species_troll.tsv"</span>)</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">troll</span>(</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"new"</span>,</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"test_species"</span>,</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">global =</span> parameters,</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">species =</span> species_new, </span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">climate =</span> clim,</span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">daily =</span> day,</span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">pedology =</span> spinup<span class="sc">@</span>inputs<span class="sc">$</span>pedology, </span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">forest =</span> <span class="fu">get_forest</span>(spinup),</span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">soil =</span> <span class="fu">get_soil</span>(spinup), </span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">load =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">overwrite =</span> <span class="cn">TRUE</span></span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>stack <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span><span class="fu">load_stack</span>(<span class="st">"test_species"</span>, <span class="st">"test_species"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span><span class="fu">autoplot</span>(stack)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="at">plot =</span> g, <span class="at">filename =</span> <span class="st">"test_species.png"</span>, <span class="at">height =</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
@@ -1112,9 +1179,6 @@ Maréchaux, Isabelle, and Jérôme Chave. 2017. <span>“An Individual<span>-</s
 </div>
 <div id="ref-maréchaux2019" class="csl-entry" role="listitem">
 Maréchaux, Isabelle, Laurent Saint-André, Megan K. Bartlett, Lawren Sack, and Jérôme Chave. 2019. <span>“Leaf Drought Tolerance Cannot Be Inferred from Classic Leaf Traits in a Tropical Rainforest.”</span> Edited by Pierre Mariotte. <em>Journal of Ecology</em> 108 (3): 1030–45. <a href="https://doi.org/10.1111/1365-2745.13321">https://doi.org/10.1111/1365-2745.13321</a>.
-</div>
-<div id="ref-nemetschek2024" class="csl-entry" role="listitem">
-Nemetschek, Daniela, Géraldine Derroire, Eric Marcon, Mélaine Aubry-Kientz, Johanna Auer, Vincyane Badouard, Christopher Baraloto, et al. 2024. <span>“Climate Anomalies and Neighbourhood Crowding Interact in Shaping Tree Growth in Old<span>-</span>Growth and Selectively Logged Tropical Forests.”</span> <em>Journal of Ecology</em>, January. <a href="https://doi.org/10.1111/1365-2745.14256">https://doi.org/10.1111/1365-2745.14256</a>.
 </div>
 <div id="ref-schmitt2023a" class="csl-entry" role="listitem">
 Schmitt, Sylvain, and Marion Boisseaux. 2023. <span>“Higher Local Intra- Than Interspecific Variability in Water- and Carbon-Related Leaf Traits Among Neotropical Tree Species.”</span> <em>Annals of Botany</em> 131 (5): 801–11. <a href="https://doi.org/10.1093/aob/mcad042">https://doi.org/10.1093/aob/mcad042</a>.
