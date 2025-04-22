@@ -285,6 +285,12 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./97_key_figure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Key figure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./98_companion_figures.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Companion figures</span></a>
   </div>
@@ -594,46 +600,42 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 <span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Guillemot 2022"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
 <span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co"># TROLL V4</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>troll_tlp <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"~/Téléchargements/meanTLP_withoutManagFoRes.txt"</span>, </span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>         <span class="at">skip =</span> <span class="dv">1</span>, <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">"species"</span>, <span class="st">"TLP"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species))</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>troll <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span>TROLLv4_species <span class="sc">%&gt;%</span> </span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name, <span class="at">N =</span>Nmass, <span class="at">P =</span> Pmass,</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">WSG =</span> wsg, <span class="at">TLP =</span> tlp, <span class="at">LA =</span> leafarea) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq, <span class="sc">-</span>TLP) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(troll_tlp) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(vleminckx, family, genus, species) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"TROLL V4"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Tapajos</span></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(<span class="st">"data/species/tapajos_try.csv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(species, <span class="fu">c</span>(<span class="st">"genus"</span>, <span class="st">"Species"</span>), <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">family =</span> BIOMASS<span class="sc">::</span><span class="fu">getTaxonomy</span>(genus, <span class="at">findOrder =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>family)  <span class="sc">%&gt;%</span> </span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Species)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(family)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LMA =</span> <span class="dv">1</span><span class="sc">/</span>SLA<span class="sc">*</span><span class="dv">1000</span>, <span class="at">N =</span> <span class="st">`</span><span class="at">N_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">WSG =</span> wood_density,</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>         <span class="at">P =</span> <span class="st">`</span><span class="at">P_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">dbhmax =</span> dbh_max<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(family, genus, species, LMA, N, P, WSG, dbhmax) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Tapajos TRY"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="co"># All</span></span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(marechaux, </span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>                 tallo,</span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>                 vleminckx, </span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>                 guillemot, </span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>                 troll,</span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>                 tapajos) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()  </span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> raw <span class="sc">%&gt;%</span> </span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> vleminckx<span class="sc">$</span>species) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, dataset, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, trait) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> trait, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>troll <span class="ot">&lt;-</span> rcontroll<span class="sc">::</span>TROLLv4_species <span class="sc">%&gt;%</span> </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_all</span>(<span class="sc">~</span> <span class="fu">gsub</span>(<span class="st">"s_"</span>, <span class="st">""</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">species =</span> name, <span class="at">N =</span>Nmass, <span class="at">P =</span> Pmass,</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>         <span class="at">WSG =</span> wsg, <span class="at">TLP =</span> tlp, <span class="at">LA =</span> leafarea) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>   <span class="fu">mutate</span>(<span class="at">species =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>, <span class="st">" "</span>, species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>seedmass, <span class="sc">-</span>regionalfreq) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(vleminckx, family, genus, species) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"TROLL V4"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Tapajos</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>tapajos <span class="ot">&lt;-</span> vroom<span class="sc">::</span><span class="fu">vroom</span>(<span class="st">"data/species/tapajos_try.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(species, <span class="fu">c</span>(<span class="st">"genus"</span>, <span class="st">"Species"</span>), <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">family =</span> BIOMASS<span class="sc">::</span><span class="fu">getTaxonomy</span>(genus, <span class="at">findOrder =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>family)  <span class="sc">%&gt;%</span> </span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Species)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(family)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">LMA =</span> <span class="dv">1</span><span class="sc">/</span>SLA<span class="sc">*</span><span class="dv">1000</span>, <span class="at">N =</span> <span class="st">`</span><span class="at">N_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">WSG =</span> wood_density,</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>         <span class="at">P =</span> <span class="st">`</span><span class="at">P_try(mg/g)</span><span class="st">`</span><span class="sc">/</span><span class="dv">1000</span>, <span class="at">dbhmax =</span> dbh_max<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(family, genus, species, LMA, N, P, WSG, dbhmax) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dataset =</span> <span class="st">"Tapajos TRY"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(trait, value, <span class="sc">-</span>dataset, <span class="sc">-</span>family, <span class="sc">-</span>genus, <span class="sc">-</span>species)</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="co"># All</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(marechaux, </span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>                 tallo,</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>                 vleminckx, </span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>                 guillemot, </span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>                 troll,</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>                 tapajos) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>()  </span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>filtered <span class="ot">&lt;-</span> raw <span class="sc">%&gt;%</span> </span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> vleminckx<span class="sc">$</span>species) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, dataset, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(family, genus, species, trait) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">median</span>(value)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> trait, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
@@ -711,7 +713,7 @@ a_{h,s} \sim N (a_{h}, \sigma_a^2)
 </tr>
 <tr class="even">
 <td style="text-align: left;">TLP</td>
-<td style="text-align: right;">95</td>
+<td style="text-align: right;">125</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Toughness</td>

@@ -194,16 +194,12 @@ guillemot <- readxl::read_xlsx("data/species/guillemot.xlsx", "Dataset") %>%
   mutate(dataset = "Guillemot 2022") %>% 
   gather(trait, value, -dataset, -family, -genus, -species)
 # TROLL V4
-troll_tlp <- read_tsv("~/Téléchargements/meanTLP_withoutManagFoRes.txt", 
-         skip = 1, col_names = c("species", "TLP")) %>% 
-  mutate(species = gsub("_", " ", species))
 troll <- rcontroll::TROLLv4_species %>% 
   rename_all(~ gsub("s_", "", .)) %>% 
   rename(species = name, N =Nmass, P = Pmass,
          WSG = wsg, TLP = tlp, LA = leafarea) %>% 
    mutate(species = gsub("_", " ", species)) %>% 
-  select(-seedmass, -regionalfreq, -TLP) %>% 
-  left_join(troll_tlp) %>% 
+  select(-seedmass, -regionalfreq) %>% 
   left_join(select(vleminckx, family, genus, species) %>% unique()) %>% 
   mutate(dataset = "TROLL V4") %>% 
   gather(trait, value, -dataset, -family, -genus, -species)

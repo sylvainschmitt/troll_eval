@@ -332,6 +332,38 @@ g <- read_tsv("outputs/sensitivity.tsv") %>%
 ggsave("figures/fa04.png", g, dpi = 300, width = 8, height = 6, bg = "white")
 ```
 
+```{r}
+#| message: false
+#| warning: false
+g <- read_tsv("outputs/calib_str4.tsv") %>% 
+  select(-dbh_class) %>% 
+  group_by(site, a, b, m) %>% 
+  summarise_all(sum) %>% 
+  mutate(agb  = agb/10^3) %>% 
+  ungroup() %>% 
+  filter(ba > 10) %>% 
+  gather(variable, value, -site, -a, -b, -m) %>% 
+  gather(parameter, par_value, -site, -variable, -value) %>%
+  group_by(parameter) %>% 
+  mutate(par_value = scale(par_value)) %>% 
+  mutate(parameter = recode(parameter,
+                              "a" = "a[CR]",
+                              "b" = "b[CR]",
+                              "m" = "m")) %>% 
+   mutate(variable = recode(variable,
+                            "abundance" = "N",
+                            "agb" = "AGB",
+                            "ba" = "BA")) %>% 
+    ggplot(aes(par_value, value)) +
+    geom_point(alpha = .1) +
+    facet_grid(variable ~ parameter, scales = "free", labeller = label_parsed) +
+    theme_bw() +
+    geom_smooth(method = "lm") +
+  ggpubr::stat_regline_equation(col = "blue") +
+  xlab("Standard value") + ylab("")
+ggsave("figures/fa13.png", g, dpi = 300, width = 8, height = 6, bg = "white")
+```
+
 ## Best parameters
 
 We found similar $a=0.2$ and $b=0.015$ to be the best in Paracou and Tapajos, but slightly different $delta$ with $delta=0.1$ in Paracou and $delta=0.2$ in Tapajos. Except for delta in Tapajos all values are outside the limit of parameters explorations. The resulting litterfall dynamics of the simulations follows the intrannual pattern of observed litterfall with an early dry season peak (\~September Paracou, \~August Tapajos) of around 7 times the basal flux observed in the wet season. However, the model still have issues to simulated the intensity of the basal flux, especially in Tapajos.

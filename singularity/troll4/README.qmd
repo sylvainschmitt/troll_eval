@@ -28,7 +28,7 @@ Singularity container based on the recipe: [`Singularity`](https://github.com/sy
 **build**:
 
 ``` bash
-sudo singularity build troll4.sif Singularity
+sudo singularity build troll4.sif rcontroll.def
 ```
 
 **usage**:

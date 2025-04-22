@@ -1,3 +1,4 @@
+-   troll_eval 0.1.0.9057: accepted version code
 -   troll_eval 0.1.0.9056: responses v2 to report 2&3 (1 to do)
 -   troll_eval 0.1.0.9055: responses v1, to clean
 -   troll_eval 0.1.0.9054: complementary analyses for rev 2

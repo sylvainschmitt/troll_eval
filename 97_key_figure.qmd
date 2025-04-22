@@ -1,0 +1,216 @@
+```{r setup}
+#| include: false 
+library(tidyverse)
+cols <- c("obs" = "#3f3f3f", "sim" = "#0da1f8", "sat" = "#fb7754")
+```
+
+# Key figure {.unnumbered}
+
+A small appendix for the key figure of the companion paper.
+
+## GPP
+
+```{r gpp}
+#| message: false
+#| warning: false
+#| fig-cap: "Mean annual cycle from fortnightly means of growth primary productivity for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
+g_gpp <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
+  filter(variable == "gpp") %>% 
+  left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
+              mutate(observed = value*10^2*365/10^3) %>% 
+              select(-value)) %>% 
+  left_join(read_tsv("data/fluxes/rtsif.tsv") %>% 
+              mutate(satellite = rtsif*15.343*365/10^3) %>% 
+              select(-rtsif)) %>%
+  gather(type, value, -site, -date, -variable) %>% 
+  filter(site == "Paracou") %>% 
+  group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, variable, type, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(title = "Mean seasonal variation of GPP") %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1"))),
+                             site = c("Paracou"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
+  geom_smooth(aes(col = type), se = FALSE) +
+  theme_bw() +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  ylab(expression("Gross Primary Productivity [GPP, "~kgC~m^{-~2}~yr^{-~1}~"]")) +
+  xlab("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sat", "sim")]), 
+                     labels = c("Tower", "Satellite", "TROLL")) +
+  geom_text(aes(col = "simulated", label = lab), show.legend = FALSE,
+            data = data.frame(week = 8, 
+                              m = 1,
+                              lab = c("RMSEP=0.75"))) +
+  theme(legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  facet_wrap(~ title)
+g_gpp
+```
+
+## ET
+
+```{r et}
+#| message: false
+#| warning: false
+#| fig-cap: "Mean annual cycle from fortnightly means of evapotranspiration for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
+g_et <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
+  filter(variable == "et") %>% 
+  left_join(read_tsv("outputs/fluxnet_fluxes.tsv") %>% 
+              mutate(observed = value*20) %>% 
+              select(-value)) %>% 
+  gather(type, value, -site, -date, -variable) %>% 
+  filter(site == "Paracou") %>% 
+  group_by(site, variable, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, variable, type, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(title = "Mean seasonal variation of ET") %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1"))),
+                             site = c("Paracou"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
+  geom_smooth(aes(col = type), se = FALSE) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete("") +
+  scale_color_discrete("") +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) + 
+  ylab(expression("Evapotranspiration [ET, "~mm~day^{-~1}~"]")) + xlab("") +
+    scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  scale_fill_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Tower", "TROLL")) +
+  geom_text(aes(col = "simulated", label = lab), show.legend = FALSE,
+            data = data.frame(week = 8, 
+                              m = 1,
+                              site = c("Paracou"),
+                              lab = c("RMSEP=0.60"))) +
+  theme(legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  facet_wrap(~ title)
+g_et
+```
+
+## LAI
+
+```{r lai}
+#| message: false
+#| warning: false
+#| fig-cap: "Mean annual cycle from fortnightly means of leaf area index for Paracou and Tapajos. Bands are the intervals of means across years, and rectangles in the background correspond to the site's climatological dry season."
+g_lai <- read_tsv("outputs/evaluation_fluxes.tsv") %>% 
+  filter(variable == "lai") %>% 
+  select(-variable) %>% 
+  mutate(type = "simulated") %>% 
+  rename(value = simulated) %>% 
+  bind_rows(read_tsv("outputs/lai.tsv") %>% 
+              rename(type = variable)) %>% 
+    mutate(type = recode(type, 
+                       "LAD" = "TLS (Smith et al., 2019)",
+                       "LAI" = "Modis",
+                       "PAI" = "UAV",
+                       "simulated" = "TROLL")) %>% 
+  filter(site == "Paracou") %>% 
+  group_by(site, type, date = floor_date(date, "15 days")) %>% 
+  summarise_all(mean, na.rm = T) %>%
+  mutate(week = week(date)) %>%  
+  group_by(site, type, week) %>% 
+  summarise(l = quantile(value, 0.025, na.rm = TRUE), 
+            m = mean(value, na.rm = TRUE), 
+            h = quantile(value, 0.975, na.rm = TRUE)) %>% 
+  mutate(title = "Mean seasonal variation of LAI") %>% 
+  ggplot(aes(week, m)) +
+  geom_rect(aes(xmin = week, xmax = end), fill  = "#fff4e0",
+           ymin = -Inf, ymax = Inf, alpha = 0.5,
+           data = data.frame(week = week(as_date(c("2000-8-1"))),
+                             m = -Inf,
+                             end = week(as_date(c("2000-12-1"))),
+                             site = c("Paracou"))) +
+  geom_ribbon(aes(ymin = l, ymax = h, fill = type), col = NA, alpha = 0.2) +
+  geom_smooth(aes(col = type), se = FALSE) +
+  theme_bw() +
+  scale_fill_manual("", values = c("#ffa006", "#0da1f8", "#3f3f3f")) +
+  scale_color_manual("", values = c("#ffa006", "#0da1f8", "#3f3f3f")) +
+    scale_x_continuous(breaks = week(as_date(paste("2000-", 1:12, "-01"))),
+                     labels = c("J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D")) +
+  ylab(expression("Leaf Area Index [LAI, "~m^2~m^{-~2}~"]")) + xlab("") +
+  geom_text(aes(col = "TROLL", label = lab), show.legend = FALSE,
+            data = data.frame(week = 8, 
+                              m = 5.2,
+                              site = c("Paracou"),
+                              lab = c("RMSEP=0.11"))) +
+  theme(legend.position = c(0.7, 0.2), 
+        legend.background = element_rect(colour = NA, fill = NA)) +
+  facet_wrap(~ title)
+g_lai
+```
+
+## FT
+
+```{r ft}
+#| message: false
+#| warning: false
+#| fig-cap: "Functional composition estimated by TROLL at the Paracou and Tapajos site expressed in terms of distribution per trait and site."
+troll_traits <- list(
+    read_tsv("outputs/Paracou_species_troll.tsv"),
+    read_tsv("outputs/Tapajos_species_troll.tsv")
+) %>% bind_rows() %>% 
+  unique() %>% 
+  rename_all(~ gsub("s_", "", .)) %>% 
+  select(-seedmass, -regionalfreq) %>% 
+  rename(species = name) %>% 
+  mutate(species = gsub("_", " ", species)) %>% 
+  gather(trait, trait_value, -species) %>% 
+  filter(trait == "tlp")
+troll_traitdist <- read_tsv("outputs/evaluation_forest2.tsv") %>% 
+  filter(dbh >= 10) %>% 
+  mutate(plot = repetition) %>% 
+  select(site, plot, species) %>%
+  filter(site == "Paracou") %>% 
+  left_join(troll_traits)
+g_tlp <- read_tsv("outputs/functional_composition.tsv") %>%
+  filter(trait == "tlp") %>% 
+  mutate(title = "Individual tree trait distribution") %>% 
+  ggplot(aes(trait_value, group = plot)) +
+  stat_density(aes(col = "Observed"), geom="line",position="identity") +
+  stat_density(aes(col = "Simulated"), geom="line",position="identity",
+               data = troll_traitdist) +
+  theme_bw() +
+  xlab(expression("Leaf water potential at turgor loss point"~"["~pi[~" TLP"]~","~MPa~"]")) +
+  facet_wrap(~ title) +
+  scale_color_discrete("") +
+  scale_color_manual("", values = as.vector(cols[c("obs", "sim")]), 
+                     labels = c("Field", "TROLL")) +
+  theme(legend.position = c(0.55, 0.2), 
+        legend.background = element_rect(colour = NA, fill = NA)) 
+g_tlp
+```
+
+## Assembly
+
+```{r}
+g <- cowplot::plot_grid(g_gpp, g_et, g_lai, g_tlp)
+ggsave("figures/key_figure.png", g, dpi = 300, width = 9, height = 9, bg = "white")
+```
